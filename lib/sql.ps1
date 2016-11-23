@@ -14,7 +14,7 @@ begin{
 		
 		[SQL] static Get( $sqlFile ){
 			if( [SQL]::db -eq $null){
-				[SQL]::db = [SQL]::new( "$(pwd)\db\$($sqlFile)");
+				[SQL]::db = [SQL]::new( "$(global:csts.execPath)\db\$($sqlFile)");
 			}
 			return [SQL]::db
 		}

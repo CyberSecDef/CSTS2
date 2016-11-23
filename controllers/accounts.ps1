@@ -24,15 +24,65 @@ begin{
 			return $dormantUsers
 		}
 	
+		[void] showManageLocalAdmins(){
+				$webVars = @{}
+				
+				$webVars['users'] = "";
+				$userIndex = 0;
+				#specified hosts
+				foreach($currentHostName in ( $global:Hosts.Get().keys ) ){
+					write-host $currentHostName
+					$pingResult = Get-WmiObject -Class win32_pingstatus -Filter "address='$($currentHostName)'"
+					if( $pingResult ){
+						write-host 'ping'
+						if($currentHostName -ne $null -and $currentHostName -ne ''   ){
+							write-host 'notnull'
+							( gwmi  -Class Win32_Group  -Filter "LocalAccount='$true'"  -ComputerName $currentHostName  | ? { $_.Name -like 'Admin*' -or $_.Name -like 'Priv*' } ) | % {
+								$_.GetRelated("Win32_Account","Win32_GroupUser","","", "PartComponent","GroupComponent",$FALSE,$NULL) | ? {
+									($_.Domain -eq $currentHostname -and $currentHostname.indexOf(".") -eq -1)  -or ($currentHostName.indexOf(".") -gt 0 -and $_.Domain -eq $currentHostName.substring(0, $currentHostName.indexOf(".") ) )
+								} | %{
+									write-host 'in here'
+									$userIndex++
+									$webVars['users'] += @"
+	<tr>
+		<td>$($userIndex)</td>
+		<td>
+			<button class="btn btn-default">Manage</button>
+		</td>
+		<td>$($_.domain)</td>
+		<td>$($_.PSComputerName)</td>
+		<td>$($_.name)</td>
+		<td>$($_.FullName)</td>
+		<td><span class="label label-primary">$($_.status)</span></td>
+		<td><span class="label label-primary">$($_.disabled)</span></td>
+		<td><span class="label label-primary">$($_.lockout)</span></td>
+		<td><span class="label label-primary">$($_.passwordExpires)</span></td>
+		<td><span class="label label-primary">$($_.passwordChangeable)</span></td>
+		<td><span class="label label-primary">$($_.passwordRequired)</span></td>
+	</tr>
+"@
+								}
+							}
+						}
+					}
+				}
+				
+				$webVars['mainContent'] = gc "$($global:csts.execPath)\views\systems\manageLocalAdmins.tpl"
+				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString(
+					$global:GUI.renderTpl("default.tpl", $webVars)
+				)
+			}
+			
+			
 		[void] showFindDormant(){
 			$webVars = @{}
-			$webVars['mainContent'] = gc "$($pwd)\views\accounts\findDormant.tpl"
+			$webVars['mainContent'] = gc "$($global:csts.execPath)\views\accounts\findDormant.tpl"
 			$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString(
 				$global:GUI.renderTpl("default.tpl", $webVars)
 			)
 			
-			$this.getLocalAccounts('localhost') | ft | out-string | write-host
-			
+			# $this.getLocalAccounts('localhost') | ft | out-string | write-host
+			# $global:Hosts.Get() | ft | out-string | write-host
 		}
 	}
 }

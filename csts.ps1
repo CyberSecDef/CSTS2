@@ -5,9 +5,9 @@ begin{
 	Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, System.Windows.Controls.Ribbon
 
 	if ([System.IntPtr]::Size -eq 4) { 
-		[void][System.Reflection.Assembly]::LoadFrom("$pwd\bin\SQLite\x32\System.Data.SQLite.dll")
+		[void][System.Reflection.Assembly]::LoadFrom("$($PSScriptRoot)\bin\SQLite\x32\System.Data.SQLite.dll")
 	} else { 
-		[void][System.Reflection.Assembly]::LoadFrom("$pwd\bin\SQLite\x64\System.Data.SQLite.dll")
+		[void][System.Reflection.Assembly]::LoadFrom("$($PSScriptRoot)\bin\SQLite\x64\System.Data.SQLite.dll")
 	}
 			
 	#load any libraries
@@ -46,6 +46,9 @@ begin{
 		CSTS(){
 			$this.execPath = $PSScriptRoot;
 			$this.xaml =  ( iex ('@"' + "`n" + ( (gc "$($this.execPath)/views/layouts/csts.xaml" ) -replace "{{{pwd}}}",$this.execPath ) + "`n" + '"@') )
+			
+			write-host $this.xaml
+			
 			$this.self = $this
 			
 			#make the window
@@ -78,11 +81,11 @@ begin{
 			}
 			
 			#load stig select boxes in ribbon
-			ls "$($pwd)\views\stigs" -filter "*manual*" | ? { $_.name -notlike '*benchmark*' } | % {
+			ls "$($this.execPath)\stigs\" -filter "*manual*" | ? { $_.name -notlike '*benchmark*' } | % {
 				$this.window.FindName('rGCatSTIG').Items.Add($_)
 			}
 			
-			ls "$($pwd)\views\stigs" -filter "*benchmark*" | % {
+			ls "$($this.execPath)\stigs" -filter "*benchmark*" | % {
 				$this.window.FindName('rGCatSCAP').Items.Add($_)
 			}
 			
@@ -171,12 +174,13 @@ begin{
 		[void] Display(){
 			$global:csts.createEvents() | out-null
 			$global:csts.showHome() | out-null			
-			$this.window.ShowDialog() | out-null
+			$global:csts.window.ShowDialog() | out-null
 		}
 		
 		[void] showHome(){
 			$webVars = @{}
-			$webVars['mainContent'] = gc "$($pwd)\views\home.tpl"
+			$webVars['mainContent'] = gc "$($global:csts.execPath)\views\home.tpl"
+			
 			$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString(
 				$global:GUI.renderTpl("default.tpl", $webVars)
 			)
@@ -208,28 +212,35 @@ begin{
 			$this.window.findName('btnXls').add_click( { $global:csts.btnXls_Click() } ) | out-null
 			$this.window.findName('btnApplyPolicies').add_click( { $global:csts.objects.systems.showApplyPolicies() } ) | out-null
 			
-			$this.window.findName('btnManageLocalAdmins').add_click( { $global:csts.objects.systems.showManageLocalAdmins() } ) | out-null
+			$this.window.findName('btnManageLocalAdmins').add_click( { $global:csts.objects.accounts.showManageLocalAdmins() } ) | out-null
 			
 			$this.window.findName('btnDiacapControls').add_click( {
 				$global:csts.window.findName('rGalSCAP').SelectedItem = $null;
 				$global:csts.window.findName('rGalSTIG').SelectedItem = $null;
-				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( ( (gc "$pwd\views\stigs\8500controls.html") -join "`r`n") ) 
+				$html = $global:Utils::processXslt( "$($global:csts.execPath)\stigs\8500controls.xml","$($global:csts.execPath)\views\xslt\stigs\8500_controls_unclass.xsl",$null)
+				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( $html )
 			} ) | out-null
 			
 			$this.window.findName('btnRmfControls').add_click( { 
 				$global:csts.window.findName('rGalSCAP').SelectedItem = $null;
 				$global:csts.window.findName('rGalSTIG').SelectedItem = $null;
-				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( ( (gc "$pwd\views\stigs\80053controls.html") -join "`r`n") ) 
+				
+				$html = $global:Utils::processXslt( "$($global:csts.execPath)\stigs\80053controls.xml","$($global:csts.execPath)\views\xslt\stigs\80053_controls_unclass.xsl",$null)
+				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( $html )
+				
 			} ) | out-null
 
 			$this.window.findName('rGalSTIG').add_SelectionChanged( { 
 				$global:csts.window.findName('rGalSCAP').SelectedItem = $null
-				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( ( (gc "$pwd\views\stigs\$($global:csts.window.findName('rGalSTIG').SelectedItem)") -join "`r`n") ) 
+				
+				$html = $global:Utils::processXslt( "$($global:csts.execPath)\stigs\$($global:csts.window.findName('rGalSTIG').SelectedItem)","$($global:csts.execPath)\views\xslt\stigs\STIG_unclass.xsl",$null)
+				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( $html )
 			} ) | out-null
 
 			$this.window.findName('rGalSCAP').add_SelectionChanged( { 
 				$global:csts.window.findName('rGalSTIG').SelectedItem = $null
-				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( ( (gc "$pwd\views\stigs\$($global:csts.window.findName('rGalSCAP').SelectedItem)") -join "`r`n") ) 
+				$html = $global:Utils::processXslt( "$($global:csts.execPath)\stigs\$($global:csts.window.findName('rGalSCAP').SelectedItem)","$($global:csts.execPath)\views\xslt\stigs\STIG_unclass.xsl",$null)
+				$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString( $html )
 			} ) | out-null
 			
 			
@@ -253,7 +264,7 @@ process{
 	$global:csts = [CSTS]::new()
 	
 	#load all the controllers/objects
-	(gci "$($PSScriptRoot)\controllers") | % { 
+	(gci "$($global:csts.execPath)\controllers") | % { 
 		. "$($_.FullName)" | out-null
 		$global:csts.objects.add("$($_.BaseName)", (Get-Object("$($_.BaseName)")) ) | out-null
 	}
