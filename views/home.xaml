@@ -1,0 +1,31 @@
+<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Name="contentDiv"
+>
+
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries >       
+				<ResourceDictionary Source="{{{pwd}}}\views\layouts\styles.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+		
+	<StackPanel 
+		Margin="0" 
+		Background="#ffffff"  
+		TextOptions.TextFormattingMode="Ideal"
+	>
+	 	
+		<TextBox Style="{StaticResource ResourceKey=bsTopNavBar}" >Home</TextBox>
+		<TextBox x:Name="txtHomeHeader"  Style="{StaticResource ResourceKey=bsPanelHeader}">
+			Welcome to the Cyber Security Tool Suite
+		</TextBox>
+		
+		<TextBox Style="{StaticResource ResourceKey=bsPanelBody}" >
+			The Cyber Security Tool Suite is a suite of PowerShell scripts that will help automate and validate various Cyber Security processes. The ribbon of tabs at the top of this display break the multiple functions down into similiar groups. The panel on the right hand side of the form allows you to select hosts either by manually entering them (seperated by commas) or by selecting an OU from your domain environment. The status bar at the bottom of the window is updated as the various tools are executing.
+		</TextBox>
+	</StackPanel>
+
+</UserControl>

@@ -45,12 +45,12 @@ begin{
 		[Object[]] Get(){
 			$this.hostTable = @{};
 			 
-			if( $global:csts.window.findName('txtHosts').Text -ne $null){
-				$this.parseTxt( $global:csts.window.findName('txtHosts').Text ) | out-null
+			if( $global:csts.libs.gui.window.findName('txtHosts').Text -ne $null){
+				$this.parseTxt( $global:csts.libs.gui.window.findName('txtHosts').Text ) | out-null
 			}
 			
-			if( $global:csts.window.findName('treeAD').SelectedItem.tag -ne $null){
-				$this.parseOU($global:csts.window.findName('treeAD').SelectedItem.tag) | out-null
+			if( $global:csts.libs.gui.window.findName('treeAD').SelectedItem.tag -ne $null){
+				$this.parseOU($global:csts.libs.gui.window.findName('treeAD').SelectedItem.tag) | out-null
 			}
 			
 			return $this.hostTable;

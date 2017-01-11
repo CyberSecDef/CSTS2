@@ -1,34 +1,56 @@
 [CmdletBinding()]param()
 begin{
 	Class GUI{
-
-		[String] renderTpl($tpl, $vars){
+		$window;
 		
-			$vars['pwd'] = $global:csts.execPath
-
-			$html = ( (gc "$($global:csts.execPath)\views\$($tpl)") -join "`r`n" ) -replace '@""','@"'
-
-			while($html -like '*$[a-zA-Z]*' -or $html -like "*`{`{[a-zA-Z]*`}`}*" -or $html -like '*\[\[(.+?)\]\]*' ){
-
-				$html = $global:ExecutionContext.InvokeCommand.ExpandString( $html )
-
-				#get page includes
-				$html -match '\[\[([a-zA-Z0-9\.\\/]+?)\]\]' | out-null;
-				if($matches){
-					[regex]::matches( $html, '\[\[([a-zA-Z0-9\.\\/]+?)\]\]' ) | %{
-						$html = $html.replace("[[$($_.groups[1].value)]]", ( (gc "$($global:csts.execPath)\$($_.groups[1].value)") -join "`r`n") )
-					}
-				}
-				
-				$html = $html -replace '{{([a-zA-Z0-9_\.]+?)}}', '`$(`$vars[''$1''])'
-			}			
-			return $html
+		GUI(){
+			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)/views/layouts/csts.xaml" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
+			$this.window = Get-XAML( $xaml );
+			$this.window.FindName('btnHostExpand').add_Click({
+				$global:csts.libs.gui.expandHost();
+			})
 		}
 		
+		
+		[void] expandHost(){
+			$windowWidth = ($this.window.width)
+			if( ($this.window.findName('gridContent').ColumnDefinitions[2].width.value) -lt 200){				
+				$this.window.findName('gridContent').ColumnDefinitions[2].width = 200;
+				$this.window.findName('btnHostExpand').Content = '>>>'
+			}else{
+				$this.window.findName('gridContent').ColumnDefinitions[2].width = 25;
+				$this.window.findName('btnHostExpand').Content = '<<<'
+			}
+		}
+		
+		
+		[void] ShowContent($path){
+		
+			$content = [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execpath)/$($path)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
+			
+			$uc = Get-XAML( $content )
+			if($this.window.FindName('contentContainer').content){
+				$this.window.FindName('contentContainer').content = $null
+			}
+			$this.window.FindName('contentContainer').addChild($uc)
+		}
+		
+		[void] ShowDialog(){
+			$this.window.ShowDialog() | out-null
+		}
+		
+		[void] GetColors(){
+			if($global:csts.controllers['PixelData'] -ne $null){
+				$c = $global:csts.controllers['PixelData'].Get()			
+				$global:csts.libs.gui.window.FindName("Color").Background = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
+				$global:csts.libs.gui.window.FindName('lblHtml').Text = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
+			}
+		}
 	}
 }
 Process{
-	$global:GUI = [GUI]::new()
+
+	$global:csts.libs.add('GUI', ([GUI]::new()) ) | out-null
 }
 End{
 

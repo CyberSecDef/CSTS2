@@ -4,7 +4,7 @@
         xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
         Title="Cyber Security Tool Suite - Version 2.0"
 		x:Name="RibbonWindow"
-		Width="1280" Height="800">
+		Width="1280" Height="800" AllowsTransparency="False">
 
 	<Window.Resources>
 	
@@ -116,6 +116,11 @@
 			</Style.Triggers>
 		</Style>
 
+
+		
+    
+		
+		
 	</Window.Resources>
 
 
@@ -435,16 +440,10 @@
 				</Grid.ColumnDefinitions>
 
 				<Grid Grid.Column="0" Background="#e2e2e2" x:Name="contentContainer">
-					<UserControl
-					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					x:Name="contentDiv"
-				>
-						<WebBrowser Name="webDisplay"/>
-
-					</UserControl>
-
+					<!-- This is where the main content is updated with fragrments that the controllers load -->
 				</Grid>
+				
+				
 				<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" Height="Auto" Width="3" />
 				<Grid Grid.Column="2" Background="#000000" x:Name="contentContainer2" >
 					<Grid.RowDefinitions>

@@ -12,6 +12,10 @@ begin{
 		$grabber
 		$pollData
 		
+		[void] registerEvents(){
+		
+		}
+		
 		PixelData(){
 			$this.grabber = new-object cyberToolSuite.pixelDataObj
 			

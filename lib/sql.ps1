@@ -14,7 +14,7 @@ begin{
 		
 		[SQL] static Get( $sqlFile ){
 			if( [SQL]::db -eq $null){
-				[SQL]::db = [SQL]::new( "$(global:csts.execPath)\db\$($sqlFile)");
+				[SQL]::db = [SQL]::new( "$($global:csts.execPath)\db\$($sqlFile)");
 			}
 			return [SQL]::db
 		}
@@ -41,7 +41,6 @@ begin{
 			return $this
 		}
 		
-		
 		[Object[]] execAssoc(){
 			$dbReader = $this.dbCommand.executeReader()
 			$results = @()
@@ -56,7 +55,6 @@ begin{
 			$dbReader.close()
 			return $results
 		}
-		
 	
 		[void] execNonQuery(){			
 			$this.dbCommand.ExecuteNonQuery()
@@ -66,7 +64,6 @@ begin{
 			$this.dbConnection.close()
 			return $this
 		}
-		
 	}
 }
 Process{

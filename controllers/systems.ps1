@@ -2,12 +2,12 @@
 begin{
 	Class Systems{
 	
+		[void] registerEvents(){
+			$global:csts.window('btnApplyPolicies').add_click( { $global:csts.controllers.systems.showApplyPolicies() } ) | out-null
+		}
+	
 		[void] showApplyPolicies(){
-			$webVars = @{}
-			$webVars['mainContent'] = gc "$($global:csts.execPath)\views\systems\applyPolicies.tpl"
-			$global:csts.window.FindName('contentContainer').children[0].content[0].NavigateToString(
-				$global:GUI.renderTpl("default.tpl", $webVars)
-			)
+			write-host "test"
 		}
 	}
 }
