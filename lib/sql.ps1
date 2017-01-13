@@ -5,6 +5,10 @@ begin{
 		$dbConnection = $null;
 		$dbCommand = $null;
 		
+		SQL(){
+		
+		}
+		
 		SQL( $sqlFile ){
 			$this.dbConnection = New-Object -TypeName System.Data.SQLite.SQLiteConnection
 			
@@ -15,6 +19,10 @@ begin{
 		[SQL] static Get( $sqlFile ){
 			if( [SQL]::db -eq $null){
 				[SQL]::db = [SQL]::new( "$($global:csts.execPath)\db\$($sqlFile)");
+			}else{
+				if( [SQL]::db.dbConnection.state -ne 'Open'){
+					[SQL]::db.dbConnection.open()
+				}
 			}
 			return [SQL]::db
 		}
@@ -67,7 +75,7 @@ begin{
 	}
 }
 Process{
-
+	$global:csts.libs.add('SQL', ([SQL]::new()) ) | out-null
 }
 End{
 

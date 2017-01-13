@@ -5,64 +5,247 @@
 >
 
 	<Style x:Key="bsTopNavBar" TargetType="{x:Type TextBox}">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type TextBox}">
-						<TextBox 
-							Text="{TemplateBinding Text}" 
-							Margin="0" 
-							Padding="10" 
-							Background="#000000" 
-							Foreground="#f5f5f5" 
-							FontSize="16pt"  
-							FontFamily="Calibri"						
-						/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type TextBox}">
+					<TextBox 
+						Text="{TemplateBinding Text}" 
+						Margin="0" 
+						Padding="10" 
+						Background="#000000" 
+						Foreground="#f5f5f5" 
+						FontSize="16pt"  
+						FontFamily="Calibri"						
+					/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 		
-		<Style x:Key="bsPanelHeader" TargetType="{x:Type TextBox}">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type TextBox}">
-						<TextBox 
-							Text="{TemplateBinding Text}" 
-							BorderThickness="1" 
-							BorderBrush="#e1e1e8" 
-							Margin="0,25,0,0" 
-							Padding="10" 
-							Width="800"  
-							Background="#f5f5f5" 
-							Foreground="#000000" 
-							FontSize="24"  
-							FontFamily="Calibri"						
-						/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		
-		<Style x:Key="bsPanelBody" TargetType="{x:Type TextBox}">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type TextBox}">
-						<TextBox 
-							Text="{TemplateBinding Text}" 
-							BorderThickness="1" 
-							BorderBrush="#e1e1e8" 
-							Margin="0" 
-							Padding="10" 
-							Width="800"  
-							Background="#ffffff" 
-							Foreground="#000000" 
-							FontSize="18"  
-							FontFamily="Calibri"		
-							TextWrapping="Wrap"
-						/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+	<Style x:Key="panelHeader" TargetType="{x:Type TextBox}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type TextBox}">
+					<TextBox 
+						Text="{TemplateBinding Text}" 
+						BorderThickness="1" 
+						BorderBrush="#e1e1e8" 
+						Margin="0,25,0,0" 
+						Padding="10" 
+						Width="800"  
+						Background="#f5f5f5" 
+						Foreground="#000000" 
+						FontSize="24"  
+						FontFamily="Calibri"						
+					/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style x:Key="panelBody" TargetType="{x:Type TextBox}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type TextBox}">
+					<TextBox 
+						Text="{TemplateBinding Text}" 
+						BorderThickness="1" 
+						BorderBrush="#e1e1e8" 
+						Margin="0" 
+						Padding="10" 
+						Width="800"  
+						Background="#ffffff" 
+						Foreground="#000000" 
+						FontSize="18"  
+						FontFamily="Calibri"		
+						TextWrapping="Wrap"
+					/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
+	<Style x:Key="btnPrimary" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#143045"
+						CornerRadius="5"  
+						Background="#337ab7"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#286090" 
+								Foreground="#ffffff" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style x:Key="btnDefault" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#cccccc"
+						CornerRadius="5"  
+						Background="#ffffff"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#ffffff" 
+								Foreground="#333333" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style x:Key="btnSuccess" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#4cae4c"
+						CornerRadius="5"  
+						Background="#5cb85c"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#5cb85c" 
+								Foreground="#FFFFFF" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style x:Key="btnInfo" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#46b8da"
+						CornerRadius="5"  
+						Background="#5bc0de"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#5bc0de" 
+								Foreground="#FFFFFF" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="btnWarning" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#eea236"
+						CornerRadius="5"  
+						Background="#f0ad4e"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#f0ad4e" 
+								Foreground="#FFFFFF" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="btnDanger" TargetType="{x:Type Button}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border 
+						BorderThickness="1"
+						BorderBrush="#d43f3a"
+						CornerRadius="5"  
+						Background="#d9534f"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Center"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								Background="#d9534f" 
+								Foreground="#FFFFFF" 
+								FontSize="18" 
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 </ResourceDictionary>

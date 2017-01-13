@@ -177,7 +177,7 @@ begin{
 	}
 }
 Process{
-		$global:Utils = [Utils]::new()
+	$global:csts.libs.add('Utils', ([Utils]::new()) ) | out-null
 }
 End{
 

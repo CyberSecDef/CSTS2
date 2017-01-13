@@ -246,10 +246,6 @@
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnPatchStatus" Label="Patch Status" SmallImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" Tag="portScanner.Test" />
 				</ribbon:RibbonGroup>
 
-				<ribbon:RibbonGroup x:Name="rgrpPortScan">
-					<ribbon:RibbonButton Foreground="#333333" x:Name="btnPortScan" Label="Port Scan" SmallImageSource="{{{pwd}}}\images\ribbon\scans\portScan.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\portScan.png" Tag="portScanner.Load" />
-				</ribbon:RibbonGroup>
-
 				<ribbon:RibbonGroup x:Name="rgrpScan2Poam">
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnScan2Poam" Label="Scans to Poam" SmallImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png"  />
 				</ribbon:RibbonGroup>
@@ -347,14 +343,15 @@
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnCleanUsb" Label="Clean USB History" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\cleanUsb.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\cleanUsb.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnFileVerification" Label="File Verification" SmallImageSource="{{{pwd}}}\images\ribbon\systems\fileVerification.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fileVerification.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnWIFIScan" Label="Scan for Wireless" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\scanWifi.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\scanWifi.png"/>
+					
+					<ribbon:RibbonButton Foreground="#333333" x:Name="btnPortScan" Label="Port Scan" SmallImageSource="{{{pwd}}}\images\ribbon\systems\portScan.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\portScan.png" Tag="portScanner.Load" />
+				
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnRestart" Label="Restart System" 			SmallImageSource="{{{pwd}}}\images\ribbon\systems\restart.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\restart.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnWipe" Label="Secure Wipe" 					SmallImageSource="{{{pwd}}}\images\ribbon\systems\secureWipe.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\secureWipe.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnWSUS" Label="WSUS Offline" 					SmallImageSource="{{{pwd}}}\images\ribbon\systems\wsus.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\wsus.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnWallpaper" Label="Wallpaper Info" 			SmallImageSource="{{{pwd}}}\images\ribbon\systems\wallpaper.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\wallpaper.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnWake" Label="Wake on Lan" 					SmallImageSource="{{{pwd}}}\images\ribbon\systems\wol.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\wol.png"/>
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnUpdate" Label="Update Host" 				SmallImageSource="{{{pwd}}}\images\ribbon\systems\updateHost.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\updateHost.png"/>
-
-
 
 				</ribbon:RibbonGroup>
 			</ribbon:RibbonTab>
@@ -422,11 +419,54 @@
 			</ribbon:RibbonTab>
 
 		</ribbon:Ribbon> 
-		<StatusBar DockPanel.Dock="Bottom" Background="#808080" Foreground="#FFFFFF">
-			<StatusBarItem>
-				<TextBlock Name="lblCursorPosition" >Status</TextBlock>
+		<StatusBar  x:Name="Status" DockPanel.Dock="Bottom" Background="#808080" Foreground="#FFFFFF">
+		
+			<StatusBar.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="50" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="5" />
+							<ColumnDefinition Width="110" />
+							<ColumnDefinition Width="5" />
+							<ColumnDefinition Width="50" />
+							<ColumnDefinition Width="25" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+				</ItemsPanelTemplate>
+			</StatusBar.ItemsPanel>
+
+		
+			<StatusBarItem Grid.Column="0">
+				<Label Foreground="#ffffff" >Status:</Label>
+			</StatusBarItem>
+			<StatusBarItem Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+				<TextBlock Foreground="#ffffff" x:Name="sbarMsg" > </TextBlock>
+			</StatusBarItem>
+			
+			<Separator Grid.Column="2"/>
+			
+			
+			<StatusBarItem Grid.Column="3">
+				<ProgressBar Width="100" Height="20" Name="sbarPrg">
+					
+				</ProgressBar>
+			</StatusBarItem>
+  
+			<Separator Grid.Column="4"/>
+			
+			<StatusBarItem Grid.Column="5">
+				<TextBlock x:Name="sbarRole">Online</TextBlock>
+			</StatusBarItem>
+			<StatusBarItem Grid.Column="6" HorizontalAlignment="Right">
+				<Image Source="{{{pwd}}}\images\gear.png" Width="16" Height="16"/>
 			</StatusBarItem>
 		</StatusBar>
+	
 		<Grid Name="mainContent">
 			<Grid.RowDefinitions>
 				<RowDefinition />
@@ -436,10 +476,27 @@
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition MaxWidth="300" MinWidth="25" Width="25"/>
+					<ColumnDefinition MaxWidth="300" MinWidth="25" Width="200"/>
 				</Grid.ColumnDefinitions>
 
-				<Grid Grid.Column="0" Background="#e2e2e2" x:Name="contentContainer">
+				<Grid Grid.Column="0" Background="#e2e2e2" x:Name="test">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"></RowDefinition>
+							<RowDefinition Height="3"></RowDefinition>
+							<RowDefinition Height="3" MinHeight="3"></RowDefinition>
+						</Grid.RowDefinitions>
+						<ScrollViewer HorizontalScrollBarVisibility="Auto">
+							<Grid Grid.Row="0" x:Name="contentContainer">
+							
+							</Grid>
+						</ScrollViewer>
+						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows" Width="Auto" Height="3" />
+						<Grid Grid.Row="2" x:Name="Log" Background="#ffffff">
+							<TextBox x:Name="txtLog"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="Auto" Height="Auto" />
+						</Grid>
+					</Grid>
+				
 					<!-- This is where the main content is updated with fragrments that the controllers load -->
 				</Grid>
 				
@@ -452,7 +509,7 @@
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0">
 						<StackPanel Margin="1" Background="#edf3f9">
-							<Button x:Name="btnHostExpand">&lt;&lt;&lt;</Button>
+							<Button x:Name="btnHostExpand">&gt;&gt;&gt;</Button>
 							<Label Content="Hosts" Target="{Binding ElementName=txtHosts}" />
 							<TextBox x:Name="txtHosts"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto"  Height="100"/>
 							<Label Content="Single OU" Target="{Binding ElementName=treeAD}" />

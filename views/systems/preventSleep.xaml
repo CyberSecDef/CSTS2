@@ -1,0 +1,77 @@
+<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Name="contentDiv"
+	xmlns:util="clr-namespace:Wpf.Util;assembly=GridViewSort"
+>
+
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries >       
+				<ResourceDictionary Source="{{{pwd}}}\views\layouts\styles.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+		
+	<StackPanel 
+		Margin="0" 
+		Background="#ffffff"  
+		TextOptions.TextFormattingMode="Ideal"
+	>
+	 	
+		<TextBox Style="{StaticResource ResourceKey=bsTopNavBar}" >Systems - Prevent Sleep</TextBox>
+		<TextBox x:Name="txtHomeHeader"  Style="{StaticResource ResourceKey=panelHeader}">
+			Prevent Sleep on Selected Hosts
+		</TextBox>
+		<TextBox x:Name="txtHomeBody"  Style="{StaticResource ResourceKey=panelBody}">
+			This function will update the selected hosts to prevent them from entering a sleep or hibernation state.
+		</TextBox>
+		
+		<Grid Width="800" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="800" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="400" />
+			</Grid.RowDefinitions>
+			<ListView 
+				Grid.Column="0" 
+				Grid.Row="0"
+				x:Name="dgPreventSleepHosts" 
+				ScrollViewer.CanContentScroll="True" 
+				ScrollViewer.VerticalScrollBarVisibility="Auto"
+				ScrollViewer.HorizontalScrollBarVisibility="Auto"
+				util:GridViewSort.AutoSort="True"
+				util:GridViewSort.SortGlyphAscending="{{{pwd}}}/Images/up.png"
+				util:GridViewSort.SortGlyphDescending="{{{pwd}}}/Images/down.png"
+			>
+				<ListView.View >
+					<GridView >
+						<GridViewColumn Header="Hostname" DisplayMemberBinding="{Binding Hostname}" util:GridViewSort.PropertyName="Hostname"/>
+						<GridViewColumn Header="IP" DisplayMemberBinding="{Binding IP}" util:GridViewSort.PropertyName="IP"/>
+						<GridViewColumn Header="Results" DisplayMemberBinding="{Binding Results}" util:GridViewSort.PropertyName="Results"/>
+					</GridView>	
+				</ListView.View>
+			</ListView>
+		</Grid>
+		
+		<Border BorderBrush="Black" BorderThickness="1" Width="800" Margin="0,1,0,0">
+			<Grid Width="800" Height="40">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+	
+				<Button x:Name="btnPrepPrevSleep" Style="{StaticResource btnDefault}" Content="Prepare" Width="100" Grid.Column="4" />
+				<Button x:Name="btnExecPrevSleep" Style="{StaticResource btnPrimary}" Content="Execute" Width="100" Grid.Column="5" />
+				
+			</Grid>
+		</Border>
+		
+	</StackPanel>
+
+</UserControl>

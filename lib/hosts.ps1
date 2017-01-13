@@ -12,8 +12,16 @@ begin{
 			$ds.Filter = "ObjectCategory=Computer"
 			$ds.SearchRoot = "LDAP://$($ou)"
 			
-			$ds.FindAll() | % {
+			$hosts = $ds.FindAll() 
+			$i = 0
+			$t = $hosts.count
+			$hosts | sort { $_.properties['dnshostname']} | % {
+				$i++
 				$adHost = [string]($_.Properties['dnshostname'])
+				
+				$global:csts.libs.gui.sbarMsg("Gathering information on $($adhost).")
+				$global:csts.libs.gui.sbarProg( ( $i/$t*100 ) )
+				[System.Windows.Forms.Application]::DoEvents()  | out-null		
 				
 				if(($adHost.indexOf(".")) -ne -1){
 					if(($adHost.indexOf(".")) -gt 0){
@@ -23,12 +31,23 @@ begin{
 			
 				$adHost = $adHost.trim()
 				
-				if($global:Utils::isBlank($adHost) -eq $false){
+				if($global:csts.libs.Utils::isBlank($adHost) -eq $false){
 					if( $adHost -ne $null -and $this.hostTable.keys -notcontains $adHost ){
-						$this.hostTable.Add( $adHost, @{"Software" = @(); "Stigs" = @();} ) | out-null
+						$ip = ''
+						try{
+							$ip = ([System.Net.Dns]::GetHostAddresses($adHost).IPAddressToString | select -first 1)
+						}catch{
+							$ip = ''
+						}
+					
+						$this.hostTable.Add( $adHost, @{"Software" = @(); "Stigs" = @(); IP = $ip; } ) | out-null
 					}
 				}
 			} | out-null
+			
+			$global:csts.libs.gui.sbarMsg("")
+			$global:csts.libs.gui.sbarProg( 0 )
+			[System.Windows.Forms.Application]::DoEvents()  | out-null		
 		}
 		
 		[void] parseTxt( $txt ){
@@ -36,7 +55,7 @@ begin{
 			foreach($c in $txt.split(",")){
 				if($c -ne "" -and $c -ne $null){
 					if( $c -ne $null -and $this.hostTable.keys -notcontains $c.Trim() ){
-						$this.hostTable.Add($c.Trim(), @{"Software" = @(); "Stigs" = @(); } )
+						$this.hostTable.Add($c.Trim(), @{"Software" = @(); "Stigs" = @(); IP = ([System.Net.Dns]::GetHostAddresses($c.Trim()).IPAddressToString | select -first 1); } )
 					}
 				}
 			}
@@ -59,7 +78,7 @@ begin{
 	}
 }
 Process{
-	$global:Hosts = [Hosts]::new()
+	$global:csts.libs.add('Hosts', ([Hosts]::new()) ) | out-null
 }
 End{
 

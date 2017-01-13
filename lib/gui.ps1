@@ -9,8 +9,18 @@ begin{
 			$this.window.FindName('btnHostExpand').add_Click({
 				$global:csts.libs.gui.expandHost();
 			})
+			$this.window.findName('sbarRole').Text = $global:csts.Role;
 		}
 		
+		[void] sbarMsg($msg){
+			$this.window.findName('sbarMsg').Text = $msg
+			if($msg.length -gt 0){
+				$this.window.findName('txtLog').Text += "$(get-date -format 'HH:mm:ss') - $($msg)`n"
+			}
+		}
+		[void] sbarProg($p){
+			$this.window.findName('sbarPrg').Value = $p
+		}
 		
 		[void] expandHost(){
 			$windowWidth = ($this.window.width)
@@ -23,25 +33,33 @@ begin{
 			}
 		}
 		
-		
 		[void] ShowContent($path){
-		
 			$content = [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execpath)/$($path)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
-			
 			$uc = Get-XAML( $content )
-			if($this.window.FindName('contentContainer').content){
-				$this.window.FindName('contentContainer').content = $null
+			
+			try{
+				if($this.window.FindName('contentContainer').FindName( 'UC' )){
+					$this.window.FindName('contentContainer').UnregisterName( 'UC' )
+				}
+			}catch{
+				
 			}
+			$this.window.FindName('contentContainer').children.clear()
 			$this.window.FindName('contentContainer').addChild($uc)
+			$this.window.FindName('contentContainer').RegisterName( 'UC', $uc )
+			
+			
 		}
 		
 		[void] ShowDialog(){
-			$this.window.ShowDialog() | out-null
+			if(! $this.window.IsVisible){
+				$this.window.ShowDialog() | out-null
+			}
 		}
 		
 		[void] GetColors(){
-			if($global:csts.controllers['PixelData'] -ne $null){
-				$c = $global:csts.controllers['PixelData'].Get()			
+			if($global:csts.controllers.developer.PixelData -ne $null){
+				$c = $global:csts.controllers['developer'].PixelData.Get()			
 				$global:csts.libs.gui.window.FindName("Color").Background = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
 				$global:csts.libs.gui.window.FindName('lblHtml').Text = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
 			}
@@ -49,7 +67,6 @@ begin{
 	}
 }
 Process{
-
 	$global:csts.libs.add('GUI', ([GUI]::new()) ) | out-null
 }
 End{

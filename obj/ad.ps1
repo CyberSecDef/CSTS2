@@ -5,7 +5,7 @@ begin{
 		
 		}
 		
-		[void] adLoadLevel($selNode){
+		[void] loadLevel($selNode){
 			#get rid of the null node
 			$selNode.items.clear()
 			$adNode = new-object directoryservices.directoryentry "LDAP://$($selNode.tag)"
@@ -47,7 +47,7 @@ begin{
 			}
 		}
 		
-		[void] builtAdTree(){
+		[void] buildAdTree(){
 			$currentDomain = ([ADSI]"LDAP://RootDSE").Get("rootDomainNamingContext") -replace 'DC=','' -replace ',','.'
 			$rootNode = $global:csts.libs.gui.window.FindName('treeAD').Items[0]
 			$rootNode.header = $currentDomain
@@ -63,14 +63,12 @@ begin{
             $ous | sort { $_.Path } | % {
 				$this.addNode($rootNode,$_)
 			}
-
 			$global:csts.libs.gui.window.FindName('treeAD').Items[0].IsExpanded = $true;
 		}
-		
 	}
 }
 Process{
-	$global:csts.libs.add('AD', ( [ActiveDirectory]::new() ) ) | out-null
+
 }
 End{
 

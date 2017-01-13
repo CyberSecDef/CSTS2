@@ -8,42 +8,24 @@ begin{
 	}
 	
 	Class PixelData{
-		$gui
-		$grabber
-		$pollData
-		
-		[void] registerEvents(){
-		
-		}
+		$pixelGrabber;
+		$pollData;
 		
 		PixelData(){
-			$this.grabber = new-object cyberToolSuite.pixelDataObj
-			
-		}
-		
-		[Hashtable] Get(){
-			return $this.PollData
+			$this.pixelGrabber = new-object cyberToolSuite.pixelDataObj
 		}
 		
 		Poll(){
-			$color = $this.grabber.Get()
-			
-			$this.PollData = @{
-				"R" = $color.R;
-				"G" = $color.G;
-				"B" = $color.B;
-				"A" = $color.A;
-			}
+			$color = $this.pixelGrabber.Get()
+			$this.PollData = @{ "R" = $color.R; "G" = $color.G; "B" = $color.B; "A" = $color.A; }
 		}
+		
+		[Hashtable] Get(){return $this.PollData}
 	}
 }
-process{
-
+Process{
 	
 }
-end{
-	[System.GC]::Collect() | out-null
+End{
+
 }
-
-
-
