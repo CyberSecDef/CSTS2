@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("com",["Variable"],[["CommandProperty",,[["Wpf.Util.GridViewSort",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.CommandProperty","CSharpClass:Wpf.Util.GridViewSort:CommandProperty"]]]]);

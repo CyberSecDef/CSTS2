@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("upd",["Function"],[["UpdateHost",,[["PreventSleep",,,,0,"File:obj/preventSleep.ps1:PreventSleep.UpdateHost","PowerShellClass:PreventSleep:UpdateHost"]]]]);

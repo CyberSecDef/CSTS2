@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("add",["Function"],[["AddSortGlyph",,[["Wpf.Util.GridViewSort",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.AddSortGlyph","CSharpClass:Wpf.Util.GridViewSort:AddSortGlyph"]]]]);

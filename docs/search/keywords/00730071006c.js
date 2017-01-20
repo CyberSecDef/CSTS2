@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("sql",["Information"],[["SQLite",,[[,"Public Domain Statement for SQLite",,,0,"File:bin/NatDocs/License.txt:Public_Domain_Statement_for_SQLite"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("app",["Function"],[["ApplySort",,[["Wpf.Util.GridViewSort",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.ApplySort","CSharpClass:Wpf.Util.GridViewSort:ApplySort"]]]]);

@@ -19,8 +19,8 @@ begin{
 				$i++
 				$adHost = [string]($_.Properties['dnshostname'])
 				
-				$global:csts.libs.gui.sbarMsg("Gathering information on $($adhost).")
-				$global:csts.libs.gui.sbarProg( ( $i/$t*100 ) )
+				[GUI]::Get().sbarMsg("Gathering information on $($adhost).")
+				[GUI]::Get().sbarProg( ( $i/$t*100 ) )
 				[System.Windows.Forms.Application]::DoEvents()  | out-null		
 				
 				if(($adHost.indexOf(".")) -ne -1){
@@ -45,8 +45,8 @@ begin{
 				}
 			} | out-null
 			
-			$global:csts.libs.gui.sbarMsg("")
-			$global:csts.libs.gui.sbarProg( 0 )
+			[GUI]::Get().sbarMsg("")
+			[GUI]::Get().sbarProg( 0 )
 			[System.Windows.Forms.Application]::DoEvents()  | out-null		
 		}
 		
@@ -64,12 +64,12 @@ begin{
 		[Object[]] Get(){
 			$this.hostTable = @{};
 			 
-			if( $global:csts.libs.gui.window.findName('txtHosts').Text -ne $null){
-				$this.parseTxt( $global:csts.libs.gui.window.findName('txtHosts').Text ) | out-null
+			if( [GUI]::Get().window.findName('txtHosts').Text -ne $null){
+				$this.parseTxt( [GUI]::Get().window.findName('txtHosts').Text ) | out-null
 			}
 			
-			if( $global:csts.libs.gui.window.findName('treeAD').SelectedItem.tag -ne $null){
-				$this.parseOU($global:csts.libs.gui.window.findName('treeAD').SelectedItem.tag) | out-null
+			if( [GUI]::Get().window.findName('treeAD').SelectedItem.tag -ne $null){
+				$this.parseOU( [GUI]::Get().window.findName('treeAD').SelectedItem.tag) | out-null
 			}
 			
 			return $this.hostTable;

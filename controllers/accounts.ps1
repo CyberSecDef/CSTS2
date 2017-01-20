@@ -3,8 +3,8 @@ begin{
 	Class Accounts{
 		
 		[void] registerEvents(){
-			$global:csts.libs.gui.window.findName('btnFindDormantAccounts').add_click( { $global:csts.controllers.Accounts.showFindDormant(); } ) | out-null
-			$global:csts.libs.gui.window.findName('btnManageLocalAdmins').add_click( { $global:csts.controllers.accounts.showManageLocalAdmins() } ) | out-null
+			[GUI]::Get().window.findName('btnFindDormantAccounts').add_click( { $global:csts.controllers.Accounts.showFindDormantUI(); } ) | out-null
+			[GUI]::Get().window.findName('btnManageLocalAdmins').add_click( { $global:csts.controllers.accounts.showManageLocalAdmins() } ) | out-null
 		}
 		
 		
@@ -34,14 +34,29 @@ begin{
 			
 		}
 			
-		[void] showFindDormant(){
-			write-host 'this is a new test'
+		[void] showFindDormantUI(){
+			[GUI]::Get().ShowContent("/views/accounts/findDormant.xaml") | out-null
+			
+			[GUI]::Get().window.findName('UC').findName('btnPrepFindDormant').add_click( {
+				$global:csts.objs.FindDormant.Initialize()
+				$global:csts.controllers.accounts.updateFindDormantUI() 
+			} ) | out-null
+			
+			if($global:csts.objs.FindDormant -eq $null){
+				$global:csts.objs.Add('FindDormant', ( [FindDormant]::new()) )
+			}
 		}
 		
-		[void] testAdminStuff(){
-			write-host 'this is a new test'
-		}	
-		
+		[void] updateFindDormantUI(){
+			if( [GUI]::Get().window.findName('UC').findName('dgFindDormantHosts') -ne $null){
+				[GUI]::Get().window.findName('UC').findName('dgFindDormantHosts').Items.Clear()
+				$global:csts.objs.FindDormant.data | sort { $_.hostname} | % {
+					[GUI]::Get().window.findName('UC').findName('dgFindDormantHosts').Items.add($_)
+				}
+				[GUI]::Get().window.findName('UC').findName('dgFindDormantHosts').Items.Refresh()
+				[System.Windows.Forms.Application]::DoEvents()  | out-null		
+			}
+		}
 		
 	}
 }

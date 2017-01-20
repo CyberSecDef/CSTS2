@@ -248,4 +248,53 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
+	
+	<Style x:Key="lblFormBold" TargetType="{x:Type Label}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Label}">
+					<Border 
+						BorderThickness="0"
+						Cursor="Hand"
+						Margin="5">
+						<Grid >
+							<ContentControl 
+								Content="{TemplateBinding Content}"
+								VerticalContentAlignment="Center"
+								HorizontalAlignment="Right"
+								Padding="10" 
+								Margin="10,3,10,4" 
+								FontSize="18" 
+								FontWeight="Bold"
+								FontFamily="Calibri" 
+								BorderThickness="0"
+								/>
+						</Grid>	
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style x:Key="txtFormNormal" TargetType="{x:Type TextBox}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type TextBox}">
+					<TextBox 
+						Height="30"
+						VerticalContentAlignment="Center"
+						Text="{TemplateBinding Text}" 
+						BorderThickness="1" 
+						BorderBrush="#333333" 
+						Margin="0,0,0,0" 
+						Padding="0" 
+						Background="#f5f5f5" 
+						Foreground="#000000" 
+						FontSize="12"  
+						FontFamily="Calibri"						
+					/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 </ResourceDictionary>

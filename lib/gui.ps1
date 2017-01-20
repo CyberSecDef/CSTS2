@@ -1,35 +1,42 @@
 [CmdletBinding()]param()
 begin{
 	Class GUI{
+		static [GUI]$gui = $null;
 		$window;
 		
 		GUI(){
 			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)/views/layouts/csts.xaml" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
 			$this.window = Get-XAML( $xaml );
 			$this.window.FindName('btnHostExpand').add_Click({
-				$global:csts.libs.gui.expandHost();
+				[GUI]::Get().expandHost();
 			})
 			$this.window.findName('sbarRole').Text = $global:csts.Role;
 		}
 		
-		[void] sbarMsg($msg){
-			$this.window.findName('sbarMsg').Text = $msg
-			if($msg.length -gt 0){
-				$this.window.findName('txtLog').Text += "$(get-date -format 'HH:mm:ss') - $($msg)`n"
+		[GUI] static Get(  ){
+			if( [GUI]::GUI -eq $null -or $global:csts.isActive -eq $false){
+				[GUI]::GUI = [GUI]::new( );
 			}
+
+			return [GUI]::GUI
 		}
+		
+		[void] sbarMsg($msg){
+			[GUI]::Get().window.findName('sbarMsg').Text = $msg
+		}
+		
 		[void] sbarProg($p){
-			$this.window.findName('sbarPrg').Value = $p
+			[GUI]::Get().window.findName('sbarPrg').Value = $p
 		}
 		
 		[void] expandHost(){
-			$windowWidth = ($this.window.width)
-			if( ($this.window.findName('gridContent').ColumnDefinitions[2].width.value) -lt 200){				
-				$this.window.findName('gridContent').ColumnDefinitions[2].width = 200;
-				$this.window.findName('btnHostExpand').Content = '>>>'
+			$windowWidth = ([GUI]::Get().window.width)
+			if( ([GUI]::Get().window.findName('gridContent').ColumnDefinitions[2].width.value) -lt 200){				
+				[GUI]::Get().window.findName('gridContent').ColumnDefinitions[2].width = 200;
+				[GUI]::Get().window.findName('btnHostExpand').Content = '>>>'
 			}else{
-				$this.window.findName('gridContent').ColumnDefinitions[2].width = 25;
-				$this.window.findName('btnHostExpand').Content = '<<<'
+				[GUI]::Get().window.findName('gridContent').ColumnDefinitions[2].width = 25;
+				[GUI]::Get().window.findName('btnHostExpand').Content = '<<<'
 			}
 		}
 		
@@ -38,36 +45,48 @@ begin{
 			$uc = Get-XAML( $content )
 			
 			try{
-				if($this.window.FindName('contentContainer').FindName( 'UC' )){
-					$this.window.FindName('contentContainer').UnregisterName( 'UC' )
+				if([GUI]::Get().window.FindName('contentContainer').FindName( 'UC' )){
+					[GUI]::Get().window.FindName('contentContainer').UnregisterName( 'UC' )
 				}
 			}catch{
 				
 			}
-			$this.window.FindName('contentContainer').children.clear()
-			$this.window.FindName('contentContainer').addChild($uc)
-			$this.window.FindName('contentContainer').RegisterName( 'UC', $uc )
-			
-			
+			[GUI]::Get().window.FindName('contentContainer').children.clear()
+			[GUI]::Get().window.FindName('contentContainer').addChild($uc)
+			[GUI]::Get().window.FindName('contentContainer').RegisterName( 'UC', $uc )
 		}
 		
 		[void] ShowDialog(){
-			if(! $this.window.IsVisible){
-				$this.window.ShowDialog() | out-null
+			if(! [GUI]::Get().window.IsVisible){
+				[GUI]::Get().window.Icon = "$($global:csts.execpath)/images/lock.png"
+				if($global:csts.safe -eq $true){
+					[GUI]::Get().window.ShowDialog() | out-null
+				}else{
+					[GUI]::Get().window.Add_Closing({[System.Windows.Forms.Application]::Exit(); Stop-Process $pid})
+					$windowcode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);' 
+					$asyncwindow = Add-Type -MemberDefinition $windowcode -name Win32ShowWindowAsync -namespace Win32Functions -PassThru 
+					$asyncwindow::ShowWindowAsync((Get-Process -PID $global:pid).MainWindowHandle, 0) | out-null
+
+					[System.Windows.Forms.Integration.ElementHost]::EnableModelessKeyboardInterop([GUI]::Get().window)
+					[GUI]::Get().window.Show()
+					[GUI]::Get().window.Activate()
+					$appContext = New-Object System.Windows.Forms.ApplicationContext 
+					[void][System.Windows.Forms.Application]::Run($appContext)
+				}
 			}
 		}
 		
 		[void] GetColors(){
 			if($global:csts.controllers.developer.PixelData -ne $null){
 				$c = $global:csts.controllers['developer'].PixelData.Get()			
-				$global:csts.libs.gui.window.FindName("Color").Background = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
-				$global:csts.libs.gui.window.FindName('lblHtml').Text = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
+				[GUI]::Get().window.FindName("Color").Background = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
+				[GUI]::Get().window.FindName('lblHtml').Text = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
 			}
 		}
 	}
 }
 Process{
-	$global:csts.libs.add('GUI', ([GUI]::new()) ) | out-null
+	# $global:csts.libs.add('GUI', ([GUI]::new()) ) | out-null
 }
 End{
 

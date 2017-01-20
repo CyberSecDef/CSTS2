@@ -1,13 +1,17 @@
 <ribbon:RibbonWindow 
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
-        Title="Cyber Security Tool Suite - Version 2.0"
-		x:Name="RibbonWindow"
-		Width="1280" Height="800" AllowsTransparency="False">
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
+	Title="Cyber Security Tool Suite - Version 2.0"
+	x:Name="RibbonWindow"
+	Width="1280" 
+	Height="800" 
+	AllowsTransparency="False"
+>
 
-	<Window.Resources>
 	
+	<Window.Resources>
+
 		<Style x:Key="rtabHomeBindings" TargetType="{x:Type TextBlock}">
 			<Style.Triggers>
 				<DataTrigger Binding="{Binding IsSelected, ElementName=rtabHome}" Value="True">
@@ -115,23 +119,16 @@
 				</DataTrigger>
 			</Style.Triggers>
 		</Style>
-
-
-		
-    
-		
-		
 	</Window.Resources>
-
 
 	<DockPanel>
 		<ribbon:Ribbon x:Name="Ribbon" DockPanel.Dock="Top" Background="Gray"  Foreground="White">
 
 			<ribbon:Ribbon.QuickAccessToolBar>
 				<ribbon:RibbonQuickAccessToolBar HorizontalAlignment="Right">
-					<ribbon:RibbonButton Foreground="#333333" SmallImageSource="{{{pwd}}}\images\csts.png" KeyTip="R" />
-					<ribbon:RibbonButton Foreground="#333333" SmallImageSource="{{{pwd}}}\images\csts.png" KeyTip="O"/>
-					<ribbon:RibbonButton Foreground="#333333" SmallImageSource="{{{pwd}}}\images\csts.png" KeyTip="R"/>
+					<ribbon:RibbonButton Foreground="#333333" x:Name="btnXls" Label="XLS" SmallImageSource="{{{pwd}}}\images\ribbon\file\xls.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\xls.png"  />
+					<ribbon:RibbonButton Foreground="#333333" x:Name="btnDoc" Label="DOC" SmallImageSource="{{{pwd}}}\images\ribbon\file\doc.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\doc.png"  />
+					<ribbon:RibbonButton Foreground="#333333" x:Name="btnPdf" Label="PDF" SmallImageSource="{{{pwd}}}\images\ribbon\file\pdf.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\pdf.png"  />
 				</ribbon:RibbonQuickAccessToolBar>
 			</ribbon:Ribbon.QuickAccessToolBar>
 
@@ -151,15 +148,7 @@
 					<ribbon:RibbonButton Foreground="#333333" x:Name="btnHome" Label="Go Home" SmallImageSource="{{{pwd}}}\images\ribbon\home\home.png" LargeImageSource="{{{pwd}}}\images\ribbon\home\home.png" />
 				</ribbon:RibbonGroup>
 				
-				<ribbon:RibbonGroup x:Name="rgrpExport">
-					<RibbonGroup.Header>
-						<TextBlock Text="Exports" Foreground="Black" />
-					</RibbonGroup.Header>
-
-					<ribbon:RibbonButton Foreground="#333333" x:Name="btnXls" Label="XLS" SmallImageSource="{{{pwd}}}\images\ribbon\file\xls.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\xls.png"  />
-					<ribbon:RibbonButton Foreground="#333333" x:Name="btnDoc" Label="DOC" SmallImageSource="{{{pwd}}}\images\ribbon\file\doc.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\doc.png"  />
-					<ribbon:RibbonButton Foreground="#333333" x:Name="btnPdf" Label="PDF" SmallImageSource="{{{pwd}}}\images\ribbon\file\pdf.png" LargeImageSource="{{{pwd}}}\images\ribbon\file\pdf.png"  />
-				</ribbon:RibbonGroup>
+				
 				
 			</ribbon:RibbonTab>
 
@@ -493,7 +482,7 @@
 						</ScrollViewer>
 						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows" Width="Auto" Height="3" />
 						<Grid Grid.Row="2" x:Name="Log" Background="#ffffff">
-							<TextBox x:Name="txtLog"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="Auto" Height="Auto" />
+							<TextBox x:Name="txtLog"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="Auto" Height="Auto" FontFamily="Courier"/>
 						</Grid>
 					</Grid>
 				

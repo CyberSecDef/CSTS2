@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("rem",["Function"],[["RemoveSortGlyph",,[["Wpf.Util.GridViewSort",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.RemoveSortGlyph","CSharpClass:Wpf.Util.GridViewSort:RemoveSortGlyph"]]]]);

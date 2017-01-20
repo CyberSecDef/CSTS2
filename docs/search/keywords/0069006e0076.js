@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("inv",["Function"],[["InvokePreventSleep",,[["PreventSleep",,,,0,"File:obj/preventSleep.ps1:PreventSleep.InvokePreventSleep","PowerShellClass:PreventSleep:InvokePreventSleep"]]]]);

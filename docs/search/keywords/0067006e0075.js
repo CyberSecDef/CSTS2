@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("gnu",["Information"],[["GNU",,[[,"GNU Affero General Public License",,,0,"File:bin/NatDocs/License.txt:GNU_Affero_General_Public_License"]]]]);

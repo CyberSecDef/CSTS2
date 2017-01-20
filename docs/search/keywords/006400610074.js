@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("dat",["Property"],[["data",,[["PreventSleep",,,,0,"File:obj/preventSleep.ps1:PreventSleep.data","PowerShellClass:PreventSleep:data"]]],["dataComp",,[["PreventSleep",,,,0,"File:obj/preventSleep.ps1:PreventSleep.dataComp","PowerShellClass:PreventSleep:dataComp"]]]]);

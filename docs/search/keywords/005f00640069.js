@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_di",["Variable"],[["_direction",,[["Wpf.Util.GridViewSort.SortGlyphAdorner",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.SortGlyphAdorner._direction","CSharpClass:Wpf.Util.GridViewSort.SortGlyphAdorner:_direction"]]]]);

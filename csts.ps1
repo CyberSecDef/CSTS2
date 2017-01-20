@@ -1,4 +1,7 @@
-[CmdletBinding()]param()
+[CmdletBinding()]param(
+	[switch]$safe
+)
+
 begin{
 	clear
 	$error.clear()
@@ -16,17 +19,32 @@ begin{
 		$db = "csts.dat";
 		$role = (@('User','Admin')[ ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator") ]);
 		$ad = ""
+		$activeModule = $null;
+		$isActive = $true;
+		$safe = (Get-Variable -Name 'safe' -ErrorAction SilentlyContinue).value;
 		
 		CSTS(){
 			$this.execPath = $PSScriptRoot;
 			$this.self = $this
+			# $this.safe = $safe
+			
+			
 		}
 		
 		[object] findName($name){
-			return ( $global:csts.libs.gui.window.findName($name) )
+			return ( iex '[GUI]::Get().window.findName($name)' )
+		}
+		
+		[void] exportXls(){
+			if($global:csts.activeModule -ne $null -and ( $global:csts.activeModule | gm | ? { $_.name -eq 'ExportData' }) -ne $null ){
+				$global:csts.activeModule.ExportData( "XLSX" )
+			}
+			
 		}
 		
 		[void] init(){
+			iex '[GUI]::Get().window.findName("btnXls").add_click( { $global:csts.exportXls() } ) | out-null'
+		
 			if ((gwmi win32_computersystem).partofdomain -eq $true) {
 				$global:csts.objs.add('AD', (Get-Object('ActiveDirectory')))
 				$global:csts.objs.AD.buildAdTree()
@@ -74,27 +92,29 @@ begin{
 			}
 			
 			#set up heart beat
-			$this.timer.Interval = 1000
-			$this.timer.Enabled = $true
-			$this.timer.start() | out-null
-			$this.timer.add_Tick( { $global:csts.Poll() } )
+			$global:csts.timer.Interval = 1000
+			$global:csts.timer.Enabled = $true
+			$global:csts.timer.start() | out-null
+			$global:csts.timer.add_Tick( { $global:csts.Poll() } )
+			
 		}
-					
+
 		#this event will occur every second.
 		[void] Poll(){
 			#run through all the controllers poll methods
-			$this.controllers.keys | %{
-				if( ($this.controllers[$_] | gm | select -expand Name) -contains 'Poll' ){
-					$this.controllers[$_].Poll()
-				}
+			$global:csts.controllers.keys | %{
+				if( ($global:csts.controllers[$_] | gm | select -expand Name) -contains 'Poll' ){
+					$global:csts.controllers[$_].Poll()
+				}	
 			}
 			#this class has the pixel data stuff, so load it.
-			$this.libs.gui.GetColors();
+			iex "[GUI]::Get().GetColors();"
+			
 		}
 		
 		
 		[void] Dispose(){
-			$this.timer.stop()		
+			$global:csts.timer.stop()		
 		}
 	}
 }
@@ -127,14 +147,16 @@ process{
 		# [SQL]::Get( $global:csts.db ).query("insert into test2(name) values ('test') ").execNonQuery()
 	# }
 
-	# $global:csts.libs.SQL::Get( $global:csts.db ).query("SELECT * FROM test2").execAssoc().ForEach({[PSCustomObject]$_}) | Format-Table -AutoSize
+	# [SQL]::Get( $global:csts.db ).query("SELECT * FROM test2").execAssoc().ForEach({[PSCustomObject]$_}) | Format-Table -AutoSize
 
 	#show the form.  This is a dialog, so after this all actions must be event calls or based off the heart beat.
-	$global:csts.libs.GUI.ShowContent("/views/home.xaml") | out-null
-	$global:csts.libs.GUI.ShowDialog() | out-null
+	[GUI]::Get().ShowContent("/views/home.xaml") | out-null
+	[GUI]::Get().ShowDialog() | out-null
 }
 end{
-	$global:csts.libs.SQL::Get( $global:csts.db ).Close() | out-null
+	$global:csts.IsActive = $false;
+	[SQL]::Get( $global:csts.db ).Close() | out-null
+	[Log]::Get().save();
 	$global:csts.Dispose();
 	[System.GC]::Collect() | out-null
 	$error;

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("gri",["Class"],[["GridViewSort",,[["Wpf.Util",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort","CSharpClass:Wpf.Util.GridViewSort"]]]]);

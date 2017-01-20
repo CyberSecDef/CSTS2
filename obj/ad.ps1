@@ -49,7 +49,7 @@ begin{
 		
 		[void] buildAdTree(){
 			$currentDomain = ([ADSI]"LDAP://RootDSE").Get("rootDomainNamingContext") -replace 'DC=','' -replace ',','.'
-			$rootNode = $global:csts.libs.gui.window.FindName('treeAD').Items[0]
+			$rootNode = [GUI]::Get().window.FindName('treeAD').Items[0]
 			$rootNode.header = $currentDomain
 			
 			#add children under root node
@@ -63,7 +63,7 @@ begin{
             $ous | sort { $_.Path } | % {
 				$this.addNode($rootNode,$_)
 			}
-			$global:csts.libs.gui.window.FindName('treeAD').Items[0].IsExpanded = $true;
+			[GUI]::Get().window.FindName('treeAD').Items[0].IsExpanded = $true;
 		}
 	}
 }

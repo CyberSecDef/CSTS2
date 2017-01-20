@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("exp",["Function"],[["ExportData",,[["PreventSleep",,,,0,"File:obj/preventSleep.ps1:PreventSleep.ExportData","PowerShellClass:PreventSleep:ExportData"]]]]);

@@ -15,7 +15,7 @@ begin{
 			$html = $global:csts.libs.Utils::processXslt( "$($global:csts.execPath)\stigs\80053controls.xml","$($global:csts.execPath)\views\xslt\stigs\80053_controls_unclass.xsl",$null)
 			$web = new-object "System.Windows.Controls.WebBrowser"
 			$web.navigateToString( $html )
-			$global:csts.libs.gui.window.FindName('contentContainer').addChild($web)
+			[GUI]::Get().window.FindName('contentContainer').addChild($web)
 		}
 		
 		[void] showDiacap(){
@@ -24,7 +24,7 @@ begin{
 			$html = $global:csts.libs.Utils::processXslt( "$($global:csts.execPath)\stigs\8500controls.xml","$($global:csts.execPath)\views\xslt\stigs\8500_controls_unclass.xsl",$null)
 			$web = new-object "System.Windows.Controls.WebBrowser"
 			$web.navigateToString( $html )
-			$global:csts.libs.gui.window.FindName('contentContainer').addChild($web)
+			[GUI]::Get().window.FindName('contentContainer').addChild($web)
 		}
 		
 		[void] showSTIG(){
@@ -32,7 +32,7 @@ begin{
 			$html = $global:csts.libs.Utils::processXslt( "$($global:csts.execPath)\stigs\$($global:csts.findName('rGalSTIG').SelectedItem)","$($global:csts.execPath)\views\xslt\stigs\STIG_unclass.xsl",$null)
 			$web = new-object "System.Windows.Controls.WebBrowser"
 			$web.navigateToString( $html )
-			$global:csts.libs.gui.window.FindName('contentContainer').addChild($web)
+			[GUI]::Get().window.FindName('contentContainer').addChild($web)
 		}
 		
 		[void] showSCAP(){
@@ -40,7 +40,7 @@ begin{
 			$html = $global:csts.libs.Utils::processXslt( "$($global:csts.execPath)\stigs\$($global:csts.findName('rGalSCAP').SelectedItem)","$($global:csts.execPath)\views\xslt\stigs\STIG_unclass.xsl",$null)
 			$web = new-object "System.Windows.Controls.WebBrowser"
 			$web.navigateToString( $html )
-			$global:csts.libs.gui.window.FindName('contentContainer').addChild($web)
+			[GUI]::Get().window.FindName('contentContainer').addChild($web)
 		}
 	}
 }

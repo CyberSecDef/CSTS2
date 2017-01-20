@@ -1,61 +1,48 @@
 [CmdletBinding()]param()
 begin{
 
-	Class PortScanner{
-
-		[void] registerEvents(){
-		
-		}
-	
-		PortScanner(){
-			
-		}
-		
-		[void]Poll(){
-		
-		}
-		
-		[void]Test(){
-			write-host 'in test'
-		}
-		
-		[void]Load(){
-		
-		}
-	}
-	
-	
 	Class Systems{
 	
-		[void] registerEvents(){
-			$global:csts.findName('btnApplyPolicies').add_click( { $global:csts.controllers.systems.showApplyPolicies() } ) | out-null
-			$global:csts.findName('btnPreventSleep').add_click( { $global:csts.controllers.systems.showPreventSleep() } ) | out-null
-		}
-	
-		[void] showApplyPolicies(){
-			write-host "test"
-		}
-		
-		[void] sortClick(){
-		
-			write-host 'test'
-		}
-		
-		[void] prepPrevSleep(){
-			write-host 'prepPrevSleep'
-			$hosts = $global:csts.libs.hosts.Get()
-			$global:csts.libs.gui.window.findName('UC').findName('dgPreventSleepHosts').Items.Clear()
-			$hosts.keys | sort | % {
-				$global:csts.libs.gui.window.findName('UC').findName('dgPreventSleepHosts').Items.add(
-					([pscustomobject]@{'Hostname'=$_;IP= "$($hosts.$($_).IP)" ;Results="___"})
-				)
+		[void] Poll(){
+			if($global:csts.objs.PreventSleep -ne $null){
+				$global:csts.objs.PreventSleep.pollEvents()
+				if($global:csts.objs.PreventSleep.IsChanged -eq $true){
+					$global:csts.controllers.systems.updatePreventSleepUI()
+				}
 			}
 		}
 		
-		[void] showPreventSleep(){
-			write-host "Prevent Sleep"
-			$global:csts.libs.GUI.ShowContent("/views/systems/preventSleep.xaml") | out-null
-			$global:csts.libs.gui.window.findName('UC').findName('btnPrepPrevSleep').add_click( { $global:csts.controllers.systems.prepPrevSleep() } ) | out-null
+		[void] registerEvents(){
+			$global:csts.findName('btnPreventSleep').add_click( { $global:csts.controllers.systems.showPreventSleepUI() } ) | out-null
+		}
+		
+		[void] showPreventSleepUI(){
+			[GUI]::Get().ShowContent("/views/systems/preventSleep.xaml") | out-null
+			
+			[GUI]::Get().window.findName('UC').findName('btnPrepPrevSleep').add_click( {
+				$global:csts.objs.PreventSleep.Initialize()
+				$global:csts.controllers.systems.updatePreventSleepUI() 
+			} ) | out-null
+			
+			[GUI]::Get().window.findName('UC').findName('btnExecPrevSleep').add_click( { 
+				$global:csts.objs.PreventSleep.InvokePreventSleep()
+				$global:csts.controllers.systems.updatePreventSleepUI() 
+			} ) | out-null
+			
+			if($global:csts.objs.PreventSleep -eq $null){
+				$global:csts.objs.Add('PreventSleep', ( [PreventSleep]::new()) )
+			}
+		}
+		
+		[void] updatePreventSleepUI(){
+			if( [GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts') -ne $null){
+				[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.Clear()
+				$global:csts.objs.PreventSleep.data | sort { $_.hostname} | % {
+					[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.add($_)
+				}
+				[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.Refresh()
+				[System.Windows.Forms.Application]::DoEvents()  | out-null		
+			}
 		}
 	}
 }

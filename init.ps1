@@ -1,4 +1,5 @@
-Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, System.Windows.Controls.Ribbon
+Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, System.Windows.Controls.Ribbon, WindowsFormsIntegration
+
 
 if ([System.IntPtr]::Size -eq 4) { 
 	[void][System.Reflection.Assembly]::LoadFrom("$($PSScriptRoot)\bin\SQLite\x32\System.Data.SQLite.dll")
@@ -24,3 +25,6 @@ if (!("cyberToolSuite.pixelDataObj" -as [type])) {
 function Get-XAML( $content ){ ([Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $content ))); }
 function Get-Object( $object ){ return  new-object "$object" }
 function Get-PlusMinus(){ return [System.Windows.Forms.TreeViewHitTestLocations]::PlusMinus }
+
+#enums are defined here
+. "$($PSScriptRoot)\types\enums.ps1"

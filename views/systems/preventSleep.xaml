@@ -47,9 +47,9 @@
 			>
 				<ListView.View >
 					<GridView >
-						<GridViewColumn Header="Hostname" DisplayMemberBinding="{Binding Hostname}" util:GridViewSort.PropertyName="Hostname"/>
-						<GridViewColumn Header="IP" DisplayMemberBinding="{Binding IP}" util:GridViewSort.PropertyName="IP"/>
-						<GridViewColumn Header="Results" DisplayMemberBinding="{Binding Results}" util:GridViewSort.PropertyName="Results"/>
+						<GridViewColumn Header="Hostname" DisplayMemberBinding="{Binding Hostname}" util:GridViewSort.PropertyName="Hostname" Width="195"/>
+						<GridViewColumn Header="IP" DisplayMemberBinding="{Binding IP}" util:GridViewSort.PropertyName="IP" Width="90"/>
+						<GridViewColumn Header="Results" DisplayMemberBinding="{Binding Results}" util:GridViewSort.PropertyName="Results" Width="500"/>
 					</GridView>	
 				</ListView.View>
 			</ListView>

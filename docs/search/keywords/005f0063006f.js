@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_co",["Variable"],[["_columnHeader",,[["Wpf.Util.GridViewSort.SortGlyphAdorner",,,,0,"File:types/GridViewSort.cs:Wpf.Util.GridViewSort.SortGlyphAdorner._columnHeader","CSharpClass:Wpf.Util.GridViewSort.SortGlyphAdorner:_columnHeader"]]]]);
