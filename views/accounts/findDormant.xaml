@@ -13,48 +13,52 @@
 		</ResourceDictionary>
 	</UserControl.Resources>
 		
-	<StackPanel 
-		Margin="0" 
-		Background="#ffffff"  
-		TextOptions.TextFormattingMode="Ideal"
-	>
-	 	
-		<TextBox Style="{StaticResource ResourceKey=bsTopNavBar}" >Accounts - Find Dormant Accounts</TextBox>
-		<TextBox x:Name="txtHomeHeader"  Style="{StaticResource ResourceKey=panelHeader}">
-			Find Dormant Accounts
-		</TextBox>
-		<TextBox x:Name="txtHomeBody"  Style="{StaticResource ResourceKey=panelBody}">
-			This applet will find dormant accounts on the selected computers and Organizational Units
-		</TextBox>
+	<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+	<Grid x:Name="ContentGrid">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="18*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="75"/>
+			<RowDefinition Height="75"/>
+			<RowDefinition Height="75"/>
+			<RowDefinition MinHeight="250" Height="Auto"/>
+			<RowDefinition Height="75"/>
+		</Grid.RowDefinitions>
+		<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.ColumnSpan="3" Grid.Row="0" >Accounts - Find Dormant Accounts</TextBlock>
 		
-		<Border BorderBrush="#e1e1e8" BorderThickness="1" Width="800" Margin="0">
-			<Grid Width="800" Height="40">
+		<Border Grid.Column="1" Grid.Row="1" Style="{StaticResource ResourceKey=panelHeader}">
+			<TextBlock x:Name="txtHomeHeader" Grid.Column="1" Grid.Row="1">
+				Find Dormant Accounts
+			</TextBlock>
+		</Border>
+		
+		<Border Grid.Column="1" Grid.Row="2" Style="{StaticResource ResourceKey=panelBody}">
+			<TextBlock x:Name="txtHomeBody" Grid.Column="1"  Grid.Row="2">
+				This applet will find dormant accounts on the selected computers and Organizational Units
+			</TextBlock>
+		</Border>
+		
+		<Border Style="{StaticResource ResourceKey=form}" Grid.Column="1"  Grid.Row="3">
+			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="9*"/>
 				</Grid.ColumnDefinitions>
-				<Label Content="Days Since Last Logon" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource ResourceKey=lblFormBold}" />
-				
-				<TextBox x:Name="txtNumOfDays" Grid.Column="2" Grid.ColumnSpan="6" Style="{StaticResource ResourceKey=txtFormNormal}" Width="580" >30</TextBox>
+				<Label Content="Days Since Last Logon" Grid.Column="0" Style="{StaticResource ResourceKey=lblFormBold}" />
+				<TextBox x:Name="txtNumOfDays" Grid.Column="1" Style="{StaticResource ResourceKey=txtFormNormal}" Text="{Binding RelativeSource={RelativeSource Self}, Path=Text, Mode=TwoWay}" />
 			</Grid>
 		</Border>
 		
-		
-		<Grid Width="800" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="800" />
-			</Grid.ColumnDefinitions>
+		<Grid Grid.Column="1"  Grid.Row="4" >
 			<Grid.RowDefinitions>
-				<RowDefinition Height="300" />
+				<RowDefinition MinHeight="250" />
 			</Grid.RowDefinitions>
 			<ListView 
-			BorderBrush="#e1e1e8"
+				BorderBrush="#e1e1e8"
 				Grid.Column="0" 
 				Grid.Row="0"
 				x:Name="dgFindDormantHosts" 
@@ -67,19 +71,18 @@
 			>
 				<ListView.View>
 					<GridView >
-						<GridViewColumn Header="Account Type" DisplayMemberBinding="{Binding accountType}" util:GridViewSort.PropertyName="accountType" Width="75"/>
+						<GridViewColumn Header="Account Type" DisplayMemberBinding="{Binding accountType}" util:GridViewSort.PropertyName="accountType" Width="100"/>
 						<GridViewColumn Header="Display Name" DisplayMemberBinding="{Binding displayName}" util:GridViewSort.PropertyName="displayName" Width="125"/>
 						<GridViewColumn Header="User Name" DisplayMemberBinding="{Binding userName}" util:GridViewSort.PropertyName="userName" Width="125"/>
-						<GridViewColumn Header="Last Logon" DisplayMemberBinding="{Binding lastLogon}" util:GridViewSort.PropertyName="lastLogon" Width="125"/>
+						<GridViewColumn Header="Last Logon" DisplayMemberBinding="{Binding lastLogon}" util:GridViewSort.PropertyName="lastLogon" Width="100"/>
 						<GridViewColumn Header="Disabled" DisplayMemberBinding="{Binding disabled}" util:GridViewSort.PropertyName="disabled" Width="75"/>
 						<GridViewColumn Header="Path" DisplayMemberBinding="{Binding path}" util:GridViewSort.PropertyName="path" Width="275"/>
 					</GridView>	
 				</ListView.View>
 			</ListView>
 		</Grid>
-		
-		<Border BorderBrush="#e1e1e8" BorderThickness="1" Width="800" Margin="0">
-			<Grid Width="800" Height="40">
+		<Border BorderBrush="#e1e1e8" BorderThickness="1" Margin="0" Grid.Column="1"  Grid.Row="5">
+			<Grid Height="40">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition/>
 					<ColumnDefinition/>
@@ -88,13 +91,10 @@
 					<ColumnDefinition/>
 					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
-	
-				<Button x:Name="btnPrepFindDormant" Style="{StaticResource btnDefault}" Content="Prepare" Width="100" Grid.Column="4" />
 				<Button x:Name="btnExecFindDormant" Style="{StaticResource btnPrimary}" Content="Execute" Width="100" Grid.Column="5" />
-				
 			</Grid>
 		</Border>
 		
-	</StackPanel>
-
+	</Grid>
+	</ScrollViewer>
 </UserControl>

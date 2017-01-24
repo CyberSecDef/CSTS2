@@ -2,8 +2,8 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	x:Name="contentDiv"
+	xmlns:util="clr-namespace:Wpf.Util;assembly=GridViewSort"
 >
-
 	<UserControl.Resources>
 		<ResourceDictionary >
 			<ResourceDictionary.MergedDictionaries >       
@@ -11,21 +11,32 @@
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</UserControl.Resources>
-		
-	<StackPanel 
-		Margin="0" 
-		Background="#ffffff"  
-		TextOptions.TextFormattingMode="Ideal"
-	>
-	 	
-		<TextBox Style="{StaticResource ResourceKey=bsTopNavBar}" >Home</TextBox>
-		<TextBox x:Name="txtHomeHeader"  Style="{StaticResource ResourceKey=panelHeader}">
-			Welcome to the Cyber Security Tool Suite
-		</TextBox>
-		
-		<TextBox Style="{StaticResource ResourceKey=panelBody}" >
-			The Cyber Security Tool Suite is a suite of PowerShell scripts that will help automate and validate various Cyber Security processes. The ribbon of tabs at the top of this display break the multiple functions down into similiar groups. The panel on the right hand side of the form allows you to select hosts either by manually entering them (seperated by commas) or by selecting an OU from your domain environment. The status bar at the bottom of the window is updated as the various tools are executing.
-		</TextBox>
-	</StackPanel>
+	
+	<Grid x:Name="ContentGrid" >
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="18*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="100"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
 
+		<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.ColumnSpan="3" Grid.Row="0">Home</TextBlock>
+		
+		<Border Grid.Column="1" Grid.Row="1" Style="{StaticResource ResourceKey=panelHeader}">
+			<TextBlock x:Name="txtHomeHeader"  Grid.Column="1" Grid.Row="1">
+				Welcome to the Cyber Security Tool Suite
+			</TextBlock>
+		</Border>
+		
+		<Border Style="{StaticResource ResourceKey=panelBody}" Grid.Column="1" Grid.Row="2">
+			<TextBlock  Grid.Column="1" Grid.Row="2" TextWrapping="Wrap">
+				The Cyber Security Tool Suite is a suite of PowerShell scripts that will help automate and validate various Cyber Security processes. The ribbon of tabs at the top of this display break the multiple functions down into similiar groups. The panel on the right hand side of the form allows you to select hosts either by manually entering them (seperated by commas) or by selecting an OU from your domain environment. The status bar at the bottom of the window is updated as the various tools are executing.
+			</TextBlock> 
+		</Border>
+	</Grid>
+		
 </UserControl>

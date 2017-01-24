@@ -7,9 +7,8 @@
 	Width="1280" 
 	Height="800" 
 	AllowsTransparency="False"
+	Icon="{{{pwd}}}\images\securityIcon.png"
 >
-
-	
 	<Window.Resources>
 
 		<Style x:Key="rtabHomeBindings" TargetType="{x:Type TextBlock}">
@@ -119,6 +118,33 @@
 				</DataTrigger>
 			</Style.Triggers>
 		</Style>
+		
+		
+		<Style x:Key="modalGrid" TargetType="Grid">
+			<Setter Property="Grid.Column" Value="0"></Setter>
+			<Setter Property="ZIndex" Value="999"></Setter>
+			<Setter Property="Visibility" Value="Collapsed"></Setter>
+		</Style>
+		
+		<Style x:Key="modalBG" TargetType="TextBlock">
+			<Setter Property="Background" Value="#333333"></Setter>
+			<Setter Property="Opacity" Value=".9"></Setter>
+		</Style>
+		
+		<Style x:Key="modalBody" TargetType="TextBlock">
+			<Setter Property="Background" Value="#ffffff"></Setter>
+			<Setter Property="Width" Value="600"></Setter>
+			<Setter Property="Height" Value="100"></Setter>
+			<Setter Property="Foreground" Value="#000000"></Setter>
+			<Setter Property="FontSize" Value="24"></Setter>
+			<Setter Property="FontFamily" Value="Calibri"></Setter>
+			<Setter Property="FontWeight" Value="Bold"></Setter>
+			<Setter Property="HorizontalAlignment" Value="Center"></Setter>
+			<Setter Property="Padding" Value="0,25,0,0"></Setter>
+			<Setter Property="TextBlock.TextAlignment" Value="Center"></Setter>
+
+		</Style>
+		
 	</Window.Resources>
 
 	<DockPanel>
@@ -461,35 +487,41 @@
 				<RowDefinition />
 				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			
 			<Grid Grid.Row="0" x:Name="gridContent">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="3" />
 					<ColumnDefinition MaxWidth="300" MinWidth="25" Width="200"/>
 				</Grid.ColumnDefinitions>
-
-				<Grid Grid.Column="0" Background="#e2e2e2" x:Name="test">
+				
+				<!-- this is the main content that gets updated per scriptlet -->
+				<Grid Grid.Column="0" Background="#ffffff" x:Name="mainWindow" ZIndex="500">
 					<Grid>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="*"></RowDefinition>
 							<RowDefinition Height="3"></RowDefinition>
 							<RowDefinition Height="3" MinHeight="3"></RowDefinition>
 						</Grid.RowDefinitions>
-						<ScrollViewer HorizontalScrollBarVisibility="Auto">
-							<Grid Grid.Row="0" x:Name="contentContainer">
-							
-							</Grid>
-						</ScrollViewer>
+						<Grid Grid.Row="0" x:Name="contentContainer">
+						</Grid>
 						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows" Width="Auto" Height="3" />
 						<Grid Grid.Row="2" x:Name="Log" Background="#ffffff">
 							<TextBox x:Name="txtLog"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="Auto" Height="Auto" FontFamily="Courier"/>
 						</Grid>
 					</Grid>
+				</Grid>
 				
-					<!-- This is where the main content is updated with fragrments that the controllers load -->
+				<Grid Style="{StaticResource ResourceKey=modalGrid}" x:Name="modalDialog" Grid.Column="0">
+					<TextBlock Style="{StaticResource ResourceKey=modalBG}"></TextBlock>
+					<TextBlock Style="{StaticResource ResourceKey=modalBody}" x:Name="modalBody">Loading...Please Wait!</TextBlock>
 				</Grid>
 				
 				
+				<!-- The Grids below are the right hand host selection fragments -->
 				<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" Height="Auto" Width="3" />
 				<Grid Grid.Column="2" Background="#000000" x:Name="contentContainer2" >
 					<Grid.RowDefinitions>
