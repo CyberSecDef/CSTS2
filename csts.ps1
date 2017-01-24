@@ -96,9 +96,9 @@ begin{
 			$global:csts.timer.Enabled = $true
 			$global:csts.timer.start() | out-null
 			$global:csts.timer.add_Tick( { $global:csts.Poll() } )
-			
 		}
-
+		
+		
 		#this event will occur every second.
 		[void] Poll(){
 			#run through all the controllers poll methods
