@@ -173,7 +173,15 @@ begin{
 			
 			return $ret
 		}
-	
+		
+		static [void] list($par){
+			$par | fl | out-string | write-host
+		}
+		
+		static [void] table($par){
+			$par | ft | out-string | write-host
+		}
+		
 	}
 }
 Process{
