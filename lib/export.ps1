@@ -20,6 +20,12 @@ begin{
 				}
 				$this.HeaderWritten = $False
 				$this.exportWorkSheet( $InputObject, $Path )
+				
+				#this should open the excel document after it's generated
+				if( (test-path $path) -eq $true){
+					invoke-expression $Path
+				}
+				
 			}
 		}
 		
@@ -27,12 +33,12 @@ begin{
 			[Object[]]$InputObject,
 			[String]$Path
 		){
-			
 			$exPkg = [System.IO.Packaging.Package]::Open($Path, [System.IO.FileMode]::Open)
 			$WorkSheetPart = $exPkg.GetPart($this.Worksheet.Uri)
 			$WorkSheetXmlDoc = New-Object System.Xml.XmlDocument
 			$WorkSheetXmlDoc.Load($WorkSheetPart.GetStream([System.IO.FileMode]::Open,[System.IO.FileAccess]::Read))
 			$this.HeaderWritten = $False
+			$headers = ($InputObject[0].psobject.properties | select -expand Name)
 
 			If($InputObject.GetType().Name -match 'byte|short|int32|long|sbyte|ushort|uint32|ulong|float|double|decimal|string') {
 				Add-Member -InputObject $InputObject -MemberType NoteProperty -Name ($InputObject.GetType().Name) -Value $InputObject
@@ -42,7 +48,8 @@ begin{
 				
 				$RowNode = $WorkSheetXmlDoc.CreateElement('row', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 			
-				ForEach($Prop in ( $InputObject | gm -memberType NoteProperty  ) ) {
+			
+				ForEach($Prop in $headers ) {
 					
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
@@ -52,7 +59,7 @@ begin{
 					$Null = $CellNode.AppendChild($CellNodeIs)
 					
 					$CellNodeIsT = $WorkSheetXmlDoc.CreateElement('t', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
-					$CellNodeIsT.InnerText = [String]$Prop.Name
+					$CellNodeIsT.InnerText = [String]$Prop
 					$Null = $CellNodeIs.AppendChild($CellNodeIsT)
 					
 					$Null = $WorkSheetXmlDoc.DocumentElement.Item("sheetData").AppendChild($RowNode)	
@@ -63,7 +70,7 @@ begin{
 
 			foreach($row in $inputObject.GetEnumerator() ){
 				$RowNode = $WorkSheetXmlDoc.CreateElement('row', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
-				ForEach($Prop in ( $row | gm -memberType NoteProperty ) ) {
+				ForEach($Prop in $headers ) {
 
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
@@ -73,7 +80,7 @@ begin{
 					$Null = $CellNode.AppendChild($CellNodeIs)
 					
 					$CellNodeIsT = $WorkSheetXmlDoc.CreateElement('t', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
-					$CellNodeIsT.InnerText = [String]$row.$($prop.name)
+					$CellNodeIsT.InnerText = [String]$row.$($prop)
 					$Null = $CellNodeIs.AppendChild($CellNodeIsT)
 					
 					$Null = $WorkSheetXmlDoc.DocumentElement.Item("sheetData").AppendChild($RowNode)
