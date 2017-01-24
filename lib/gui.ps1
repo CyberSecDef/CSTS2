@@ -56,6 +56,17 @@ begin{
 			[GUI]::Get().window.FindName('contentContainer').RegisterName( 'UC', $uc )
 		}
 		
+		
+		[void] showModal($msg){
+			[GUI]::Get().window.findName('modalBody').Text = $msg
+			[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+		}
+		
+		[void] hideModal(){
+			[GUI]::Get().window.findName('modalBody').Text = ''
+			[GUI]::Get().window.findName('modalDialog').Visibility = 'Collapsed'
+		}
+		
 		[void] ShowDialog(){
 			if(! [GUI]::Get().window.IsVisible){
 				[GUI]::Get().window.Icon = "$($global:csts.execpath)/images/lock.png"
