@@ -1,8 +1,26 @@
 [CmdletBinding()]param()
 begin{
 	Class ActiveDirectory{
+		$checkedItems = @();
+		
 		ActiveDirectory(){
 		
+		}
+		
+		[object[]] getCheckedItems(){
+			$this.checkedItems = @();
+			$rootNode = [GUI]::Get().window.FindName('treeAD').Items[0]
+			$this.ProcessNode($rootNode);
+			return $this.checkedItems
+		}
+		
+		processNode($node){
+			foreach($child in $node.items){
+				if ($child.header.IsChecked -eq $true){
+					$this.checkedItems += $child;
+				}
+				$this.processNode($child);
+			}
 		}
 		
 		[void] loadLevel($selNode){
@@ -23,12 +41,17 @@ begin{
 	        $newNode = new-object System.Windows.Controls.TreeViewItem
 			
 		    $newNode.Tag = $obj.properties['distinguishedname'][0]
-		    $newNode.Header = $obj.properties['name'][0]
+			
+			$chk = new-object System.Windows.Controls.Checkbox
+			$txt = new-object System.Windows.Controls.TextBlock
+			$txt.Text = $obj.properties['name'][0]
+			$chk.Content = $txt
+		    $newNode.Header = $chk
 			
 			If ($this.adNodeHasChildren($obj)){
 				$newNode.Items.Add('') | Out-Null
 			}
-			
+
 	        $RootNode.Items.Add($newNode) | Out-Null 
 		}
 		
