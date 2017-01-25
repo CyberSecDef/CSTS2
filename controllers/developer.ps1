@@ -35,6 +35,8 @@ begin{
 		[void] registerEvents(){
 			$global:csts.findName('rGalMines').add_SelectionChanged( { write-host $global:csts.findName('rGalMines').SelectedItem } ) | out-null
 			$global:csts.findName('rGalMineLength').add_SelectionChanged( { write-host $global:csts.findName('rGalMineLength').SelectedItem } ) | out-null	
+			
+			$global:csts.findName('rGalTheme').add_SelectionChanged( { [GUI]::Get().ChangeTheme( $global:csts.findName('rGalTheme').SelectedItem ) } )  | out-null	
 		}
 		
 		Developer(){

@@ -26,9 +26,6 @@ begin{
 		CSTS(){
 			$this.execPath = $PSScriptRoot;
 			$this.self = $this
-			# $this.safe = $safe
-			
-			
 		}
 		
 		[object] findName($name){
@@ -91,11 +88,19 @@ begin{
 				$global:csts.findName('rGCatSCAP').Items.Add($_)
 			}
 			
+			ls "$($global:csts.execPath)\views\themes\" | % {
+				$global:csts.findName('rGalCatTheme').Items.Add( $_ )
+			}
+			
 			#set up heart beat
 			$global:csts.timer.Interval = 1000
 			$global:csts.timer.Enabled = $true
 			$global:csts.timer.start() | out-null
 			$global:csts.timer.add_Tick( { $global:csts.Poll() } )
+			
+			
+			
+			iex "[GUI]::Get().changeTheme('dark.xaml')"
 		}
 		
 		

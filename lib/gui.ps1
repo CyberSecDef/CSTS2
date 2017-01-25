@@ -21,6 +21,28 @@ begin{
 			return [GUI]::GUI
 		}
 		
+		[void] changeTheme($theme){
+			
+			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)\views\themes\$($theme)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
+			$theme = Get-XAML( $xaml );
+			
+			
+			[GUI]::Get().window.resources.MergedDictionaries.Clear();
+			[GUI]::Get().window.resources.MergedDictionaries.Add($theme);
+	 
+	 
+			
+			# [GUI]::Get().window.resources.themeDictionary.theme = $theme
+			
+			# [GUI]::Get().window.resources | gm |  ft | out-string | write-host 
+			# [GUI]::Get().window.resources.themeDictionary.theme.themeBG |  fl | out-string | write-host 
+			
+			# $theme | fl | out-string | write-host
+			# [GUI]::Get().window.findName('Ribbon') | fl | out-string | write-host
+			
+			
+		}
+		
 		[void] sbarMsg($msg){
 			[GUI]::Get().window.findName('sbarMsg').Text = $msg
 		}

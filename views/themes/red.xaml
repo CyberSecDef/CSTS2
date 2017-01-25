@@ -1,0 +1,13 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+>
+	<x:String x:Key="Title">Red Theme</x:String>
+
+	<Style x:Key="ribbonTheme">
+		<Setter Property="Ribbon.Background" Value="#FF0000"></Setter>
+		<Setter Property="Ribbon.Foreground" Value="#ffffff"></Setter>
+	</Style>
+    
+
+</ResourceDictionary>
