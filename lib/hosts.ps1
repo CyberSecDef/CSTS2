@@ -71,12 +71,13 @@ begin{
 			if( [GUI]::Get().window.findName('treeAD').SelectedItem.tag -ne $null){
 				$this.parseOU( [GUI]::Get().window.findName('treeAD').SelectedItem.tag) | out-null
 			}
-			
-			$global:csts.objs.AD.getCheckedItems()
-			$global:csts.objs.AD.checkedItems | % {
-				$this.parseOU( $_.tag ) | out-null
+
+			if($global:csts.objs.AD -ne $null){
+				$global:csts.objs.AD.getCheckedItems()
+				$global:csts.objs.AD.checkedItems | % {
+					$this.parseOU( $_.tag ) | out-null
+				}
 			}
-			
 			
 			return $this.hostTable;
 		}

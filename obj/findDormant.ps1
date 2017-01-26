@@ -140,9 +140,12 @@ begin{
 				$global:csts.controllers.accounts.updateFindDormantUI()
 			}
 			
-			$global:csts.objs.AD.getCheckedItems() | % {
-				$global:csts.objs.FindDormant.getDomainAccounts( $_.tag, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ) )
+			if( $global:csts.objs.AD -ne $null){
+				$global:csts.objs.AD.getCheckedItems() | % {
+					$global:csts.objs.FindDormant.getDomainAccounts( $_.tag, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ) )
+				}
 			}
+			
 			
 			[GUI]::Get().sbarMsg(" ")
 			[GUI]::Get().sbarProg( 0 )
