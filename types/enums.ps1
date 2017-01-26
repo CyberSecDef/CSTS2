@@ -14,6 +14,9 @@ Enum CSTS_Export{
 	CSV;
 }
 
-Enum CSTS_Event{
-	CHANGE;
+Enum CSTS_ScanExtension{
+	CKL;
+	ZIP;
+	XML;
+	NESSUS;
 }

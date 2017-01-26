@@ -1,0 +1,160 @@
+<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Name="contentDiv"
+	xmlns:util="clr-namespace:Wpf.Util;assembly=GridViewSort"
+>
+
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries >       
+				<ResourceDictionary Source="{{{pwd}}}\views\layouts\styles.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+		
+	<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+	<Grid x:Name="ContentGrid">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="18*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="75"/>
+			<RowDefinition Height="75"/>
+			<RowDefinition Height="40"/>
+			<RowDefinition Height="40"/>
+			<RowDefinition MinHeight="250" Height="Auto"/>
+			<RowDefinition Height="75"/>
+		</Grid.RowDefinitions>
+		<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.ColumnSpan="3" Grid.Row="0" >Scans - Scans To Poam</TextBlock>
+		
+		<Border Grid.Column="1" Grid.Row="1" Style="{StaticResource ResourceKey=panelHeader}">
+			<TextBlock x:Name="txtHomeHeader" Grid.Column="1" Grid.Row="1">
+				Scans To Poam
+			</TextBlock>
+		</Border>
+		
+		<Border Grid.Column="1" Grid.Row="2" Style="{StaticResource ResourceKey=panelBody}">
+			<TextBlock x:Name="txtHomeBody" Grid.Column="1"  Grid.Row="2">
+				This applet will parse selected scan results and generate a POAM
+			</TextBlock>
+		</Border>
+		
+		
+		
+		
+		<Border Style="{StaticResource ResourceKey=form}" Grid.Column="1"  Grid.Row="3">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="8*"/>
+					<ColumnDefinition Width="1*"/>
+				</Grid.ColumnDefinitions>
+				<Label Content="Scan Location" Grid.Column="0" Style="{StaticResource ResourceKey=lblFormBold}" />
+				<TextBox x:Name="txtScanLocation" Grid.Column="1" Style="{StaticResource ResourceKey=txtFormNormal}" Text="{Binding RelativeSource={RelativeSource Self}, Path=Text, Mode=TwoWay}" />
+				<Button x:Name="btnScansToPoamBrowse" Style="{StaticResource btnDefault}" Content="Browse..."  Grid.Column="2" Padding="5"/>
+			</Grid>
+		</Border>
+		
+		<Border Style="{StaticResource ResourceKey=form}" Grid.Column="1"  Grid.Row="4">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="9*"/>
+				</Grid.ColumnDefinitions>
+				<Label Content="Recursively Scan?" Grid.Column="0" Style="{StaticResource ResourceKey=lblFormBold}" />
+				
+				<CheckBox x:Name="chkScansToPoamRecurse"   Grid.Column="1" Margin="0,15,0,0"/>
+			</Grid>
+		</Border>
+		
+		<Grid Grid.Column="1"  Grid.Row="5" >
+		
+		<Grid.Resources>
+			<AlternationConverter x:Key="BackgroundConverter">
+				<SolidColorBrush>#eeeeee</SolidColorBrush>
+				<SolidColorBrush>#ffffff</SolidColorBrush>
+				
+			</AlternationConverter>
+
+			<Style x:Key="alternatingWithBinding" TargetType="{x:Type ListBoxItem}">
+				<Setter Property="Background" 
+				Value="{Binding RelativeSource={RelativeSource Self},
+				Path=(ItemsControl.AlternationIndex),
+				Converter={StaticResource BackgroundConverter}}"/>
+
+			</Style>
+
+		</Grid.Resources>
+  
+  
+			<Grid.RowDefinitions>
+				<RowDefinition MinHeight="250" />
+			</Grid.RowDefinitions>
+			<ListView 
+				ItemContainerStyle="{StaticResource alternatingWithBinding}"
+				AlternationCount="2"
+				BorderBrush="#e1e1e8"
+				Grid.Column="0" 
+				Grid.Row="0"
+				x:Name="dgScansToPoam" 
+				ScrollViewer.CanContentScroll="True" 
+				ScrollViewer.VerticalScrollBarVisibility="Auto"
+				ScrollViewer.HorizontalScrollBarVisibility="Auto"
+				util:GridViewSort.AutoSort="True"
+				util:GridViewSort.SortGlyphAscending="{{{pwd}}}/Images/up.png"
+				util:GridViewSort.SortGlyphDescending="{{{pwd}}}/Images/down.png"
+			>
+				<ListView.View>
+					<GridView >
+						<GridViewColumn Header="Security Controls" DisplayMemberBinding="{Binding control}" util:GridViewSort.PropertyName="control" Width="100"/>
+						
+						<GridViewColumn Header="Source" util:GridViewSort.PropertyName="source" Width="200">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock TextWrapping="Wrap" Text="{Binding source}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						
+						
+						<GridViewColumn Header="Test ID" DisplayMemberBinding="{Binding checks}" util:GridViewSort.PropertyName="checks" Width="175"/>
+						
+						<GridViewColumn Header="Description" util:GridViewSort.PropertyName="title" Width="225">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock TextWrapping="Wrap" Text="{Binding title}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+			
+			
+						
+						
+						<GridViewColumn Header="Raw Risk" DisplayMemberBinding="{Binding rawRisk}" util:GridViewSort.PropertyName="rawRisk" Width="75"/>
+						<GridViewColumn Header="Status" DisplayMemberBinding="{Binding status}" util:GridViewSort.PropertyName="status" Width="75"/>
+						<GridViewColumn Header="Devices Affected" DisplayMemberBinding="{Binding hosts}" util:GridViewSort.PropertyName="hosts" Width="100"/>
+					</GridView>	
+				</ListView.View>
+			</ListView>
+		</Grid>
+		<Border BorderBrush="#e1e1e8" BorderThickness="1" Margin="0" Grid.Column="1"  Grid.Row="6">
+			<Grid Height="40">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Button x:Name="btnExecuteScansToPoam" Style="{StaticResource btnPrimary}" Content="Execute" Width="100" Grid.Column="5" />
+			</Grid>
+		</Border>
+		
+	</Grid>
+	</ScrollViewer>
+</UserControl>
