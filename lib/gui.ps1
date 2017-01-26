@@ -29,33 +29,21 @@ begin{
 		}
 		
 		[void] changeTheme($theme){
-			
 			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)\views\themes\$($theme)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
 			$theme = Get-XAML( $xaml );
-			
-			
 			[GUI]::Get().window.resources.MergedDictionaries.Clear();
 			[GUI]::Get().window.resources.MergedDictionaries.Add($theme);
-	 
-	 
-			
-			# [GUI]::Get().window.resources.themeDictionary.theme = $theme
-			
-			# [GUI]::Get().window.resources | gm |  ft | out-string | write-host 
-			# [GUI]::Get().window.resources.themeDictionary.theme.themeBG |  fl | out-string | write-host 
-			
-			# $theme | fl | out-string | write-host
-			# [GUI]::Get().window.findName('Ribbon') | fl | out-string | write-host
-			
-			
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
 		[void] sbarMsg($msg){
 			[GUI]::Get().window.findName('sbarMsg').Text = $msg
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
 		[void] sbarProg($p){
 			[GUI]::Get().window.findName('sbarPrg').Value = $p
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
 		[void] expandHost(){
@@ -83,17 +71,73 @@ begin{
 			[GUI]::Get().window.FindName('contentContainer').children.clear()
 			[GUI]::Get().window.FindName('contentContainer').addChild($uc)
 			[GUI]::Get().window.FindName('contentContainer').RegisterName( 'UC', $uc )
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
 		
-		[void] showModal($msg){
+		[void] showModal([System.Object[]]$msg){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Collapsed'
+			}
+			
+			[GUI]::Get().window.findName('modalPanel').child.children.clear()
+			
+			foreach($m in $msg){
+				$pbar = new-object "system.windows.controls.ProgressBar"
+				$pbar.height = 15
+				$pbar.width = 500
+				$pbar.value = $m.Progress
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
+				
+				$textBlock = new-object "system.windows.controls.textblock"
+				$textBlock.FontSize = 18
+				$textBlock.Text = $m.Text
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
+			}
+			
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+		}
+		
+		[void] showModal([String]$msg){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Collapsed'
+			}
 			[GUI]::Get().window.findName('modalBody').Text = $msg
-			[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		[void] hideModal(){
 			[GUI]::Get().window.findName('modalBody').Text = ''
 			[GUI]::Get().window.findName('modalDialog').Visibility = 'Collapsed'
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
 		[void] ShowDialog(){
@@ -121,6 +165,7 @@ begin{
 				$c = $global:csts.controllers['developer'].PixelData.Get()			
 				[GUI]::Get().window.FindName("Color").Background = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
 				[GUI]::Get().window.FindName('lblHtml').Text = "#" + $('{0:X2}' -f $c.R) + ('{0:X2}' -f $c.G) + ('{0:X2}' -f $c.B);
+				[System.Windows.Forms.Application]::DoEvents()  | out-null
 			}
 		}
 	}
