@@ -45,6 +45,7 @@
 		<Setter Property="Border.CornerRadius" Value="5"></Setter>
 		<Setter Property="Border.Cursor" Value="Hand"></Setter>
 		<Setter Property="Border.Margin" Value="5"></Setter>
+		<Setter Property="VerticalContentAlignment" Value="Center"></Setter>
 	</Style>
 	
 	<Style x:Key="btnText" TargetType="{x:Type ContentControl}">
@@ -79,9 +80,9 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#cccccc" Background="#ffffff">
-						<Grid >
-							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#ffffff"  Foreground="#333333" />
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#cccccc" Background="#ffffff" >
+						<Grid>
+							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#ffffff"  Foreground="#333333"  />
 						</Grid>	
 					</Border>
 				</ControlTemplate>
@@ -186,10 +187,11 @@
 					<TextBox 
 						Height="30"
 						VerticalContentAlignment="Center"
+						
 						Text="{TemplateBinding Text}" 
 						BorderThickness="1" 
 						BorderBrush="#333333" 
-						Margin="0,0,10,0" 
+						Margin="10,0,10,0" 
 						Padding="0" 
 						Background="#f5f5f5" 
 						Foreground="#000000" 

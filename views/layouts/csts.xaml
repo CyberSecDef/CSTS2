@@ -19,7 +19,7 @@
 		
 		<Style x:Key="modalBG" TargetType="TextBlock">
 			<Setter Property="Background" Value="#333333"></Setter>
-			<Setter Property="Opacity" Value=".9"></Setter>
+			<Setter Property="Opacity" Value=".7"></Setter>
 		</Style>
 		
 		<Style x:Key="modalBody" TargetType="TextBlock">
@@ -27,14 +27,23 @@
 			<Setter Property="Width" Value="600"></Setter>
 			<Setter Property="Height" Value="100"></Setter>
 			<Setter Property="Foreground" Value="#000000"></Setter>
-			<Setter Property="FontSize" Value="24"></Setter>
+			<Setter Property="FontSize" Value="18"></Setter>
 			<Setter Property="FontFamily" Value="Calibri"></Setter>
 			<Setter Property="FontWeight" Value="Bold"></Setter>
 			<Setter Property="HorizontalAlignment" Value="Center"></Setter>
 			<Setter Property="Padding" Value="0,25,0,0"></Setter>
+			<Setter Property="Visibility" Value="Collapsed"></Setter>
 			<Setter Property="TextBlock.TextAlignment" Value="Center"></Setter>
-
 		</Style>
+		
+		<Style x:Key="modalPanel" TargetType="Border">
+			<Setter Property="Background" Value="#ffffff"></Setter>
+			<Setter Property="Width" Value="600"></Setter>
+			<Setter Property="Height" Value="100"></Setter>
+			<Setter Property="Padding" Value="0,25,0,0"></Setter>
+			<Setter Property="Visibility" Value="Collapsed"></Setter>
+		</Style>
+		
 		
 		<ResourceDictionary x:Key="themeResources">
 			<ResourceDictionary.MergedDictionaries >
@@ -167,7 +176,7 @@
 				</ribbon:RibbonGroup>
 
 				<ribbon:RibbonGroup x:Name="rgrpScan2Poam">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScan2Poam" Label="Scans to Poam" SmallImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png"  />
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScanToPoam" Label="Scans to Poam" SmallImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png"  />
 				</ribbon:RibbonGroup>
 
 				<ribbon:RibbonGroup x:Name="rgrpSw2Stig">
@@ -389,6 +398,9 @@
 				<Grid Style="{StaticResource ResourceKey=modalGrid}" x:Name="modalDialog" Grid.Column="0">
 					<TextBlock Style="{StaticResource ResourceKey=modalBG}"></TextBlock>
 					<TextBlock Style="{StaticResource ResourceKey=modalBody}" x:Name="modalBody">Loading...Please Wait!</TextBlock>
+					<Border Style="{StaticResource ResourceKey=modalPanel}" x:Name="modalPanel">
+						<StackPanel Grid.Column="0" Grid.Row="0" />
+					</Border>
 				</Grid>
 				
 				
