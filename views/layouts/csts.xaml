@@ -41,7 +41,16 @@
 				<ResourceDictionary x:Key="theme" Source="{{{pwd}}}/views/themes/dark.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
-		
+
+
+		<ResourceDictionary x:Key="AlignmentDictionary">
+			<Style TargetType="RibbonTwoLineText">
+				<Setter Property="HorizontalAlignment" Value="Left"/>
+				<Setter Property="Width" Value="40"/>
+				<Setter Property="Foreground" Value="Black"/>
+			</Style>
+		</ResourceDictionary>
+					
 	</Window.Resources>
 
  	<DockPanel>
@@ -55,23 +64,27 @@
 				</ribbon:RibbonQuickAccessToolBar>
 			</ribbon:Ribbon.QuickAccessToolBar>
 
-
 			<ribbon:Ribbon.ApplicationMenu>
 				<ribbon:RibbonApplicationMenu SmallImageSource="{{{pwd}}}\images\csts.png">
 					<ribbon:RibbonApplicationMenuItem Header="Hello _Ribbon" x:Name="MenuItem1"/>
 				</ribbon:RibbonApplicationMenu>
 			</ribbon:Ribbon.ApplicationMenu>
 
-
 			<ribbon:RibbonTab x:Name="rtabHome">
 				<RibbonTab.Header>
 					<TextBlock Text="Home" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
+
 				<ribbon:RibbonGroup x:Name="rgrpHome">
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnHome" Label="Go Home" SmallImageSource="{{{pwd}}}\images\ribbon\home\home.png" LargeImageSource="{{{pwd}}}\images\ribbon\home\home.png" />
 				</ribbon:RibbonGroup>
+			
+				<ribbon:RibbonGroup x:Name="rgrpSpace" />
 				
-				
+				<ribbon:RibbonGroup x:Name="rgrpHelp">
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnHelp" Label="Help" SmallImageSource="{{{pwd}}}\images\ribbon\help\help.png" LargeImageSource="{{{pwd}}}\images\ribbon\help\help.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnAbout" Label="About" SmallImageSource="{{{pwd}}}\images\ribbon\help\about.png" LargeImageSource="{{{pwd}}}\images\ribbon\help\about.png"/>
+				</ribbon:RibbonGroup>
 				
 			</ribbon:RibbonTab>
 
@@ -117,9 +130,6 @@
 				</ribbon:RibbonGroup>
 			</ribbon:RibbonTab>
 
-
-
-
 			<ribbon:RibbonTab x:Name="rtabPolicies">
 				<RibbonTab.Header>
 					<TextBlock Text="Policies" Style="{DynamicResource rTabBindings}" />
@@ -143,8 +153,6 @@
 				<RibbonTab.Header>
 					<TextBlock Text="Scans" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
-
-
 
 				<ribbon:RibbonGroup x:Name="rgrpCleanScap">
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnCleanScap" Label="Clean SCAP Folder" SmallImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" />
@@ -170,36 +178,19 @@
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUpdateStig" Label="Update STIG" SmallImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png"  />
 				</ribbon:RibbonGroup>
 
-
 				<ribbon:RibbonGroup x:Name="rgrpVramFindings">
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="brnVramFindings" Label="VRAM Open Findings" SmallImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png"  />
 				</ribbon:RibbonGroup>
-
-
 			</ribbon:RibbonTab>
 
 			<ribbon:RibbonTab x:Name="rtabScapStig">
-				
 				<RibbonTab.Header>
 					<TextBlock Text="SCAP/STIG" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
-				<ribbon:RibbonGroup x:Name="diacapControls">
+				<ribbon:RibbonGroup x:Name="diacapControls" Style="{ DynamicResource textElements }">
 				
-				<RibbonGroup.Resources>
-					<ResourceDictionary>
-						<ResourceDictionary x:Key="AlignmentDictionary">
-							<Style TargetType="RibbonTwoLineText">
-								<Setter Property="HorizontalAlignment" Value="Left"/>
-								<Setter Property="Width" Value="40"/>
-								<Setter Property="Foreground" Value="Black"/>
-							</Style>
-						</ResourceDictionary>
-					</ResourceDictionary>
-				</RibbonGroup.Resources>
-				
-				
-					<RibbonGroup.Header>
-						<TextBlock Text="Viewers" Foreground="Black" />
+					<RibbonGroup.Header >
+						<TextBlock Text="Viewers" />
 					</RibbonGroup.Header>
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnDiacapControls" Label="DIACAP" SmallImageSource="{{{pwd}}}\images\ribbon\scapStig\DIACAP.png" LargeImageSource="{{{pwd}}}\images\ribbon\scapStig\DIACAP.png" />
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnRmfControls" Label="RMF" SmallImageSource="{{{pwd}}}\images\ribbon\scapStig\RMF.png" LargeImageSource="{{{pwd}}}\images\ribbon\scapStig\RMF.png" />
@@ -225,9 +216,9 @@
 					<TextBlock Text="Systems" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
 
-				<ribbon:RibbonGroup x:Name="rgrpConfigurations" SmallImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png">
+				<ribbon:RibbonGroup x:Name="rgrpConfigurations" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png">
 					<RibbonGroup.Header>
-						<TextBlock Text="Configurations" Foreground="Black" />
+						<TextBlock Text="Configurations" />
 					</RibbonGroup.Header>
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnApplyPolicies" Label="Apply Policies" SmallImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png"/>
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFixDotNet" Label="Fix Dot Net" SmallImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png"/>
@@ -236,9 +227,9 @@
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnServiceQuotes" Label="Service Quotes" SmallImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png"/>
 				</ribbon:RibbonGroup>
 
-				<ribbon:RibbonGroup x:Name="rgrpResources" SmallImageSource="{{{pwd}}}\images\ribbon\systems\resources.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\resources.png">
+				<ribbon:RibbonGroup x:Name="rgrpResources" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\resources.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\resources.png">
 					<RibbonGroup.Header>
-						<TextBlock Text="Resources" Foreground="Black" />
+						<TextBlock Text="Resources" />
 					</RibbonGroup.Header>
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSystemMgr" Label="System Manager" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png"/>
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFileSystem" Label="File System" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png"/>
@@ -247,9 +238,9 @@
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSysInfo" Label="System Info" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png"/>
 				</ribbon:RibbonGroup>
 
-				<ribbon:RibbonGroup x:Name="rgrpActions"  SmallImageSource="{{{pwd}}}\images\ribbon\systems\actions.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\actions.png">
+				<ribbon:RibbonGroup x:Name="rgrpActions" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\actions.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\actions.png">
 					<RibbonGroup.Header>
-						<TextBlock Text="Actions" Foreground="Black" />
+						<TextBlock Text="Actions"/>
 					</RibbonGroup.Header>
 
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnCleanUsb" Label="Clean USB History" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\cleanUsb.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\cleanUsb.png"/>
@@ -273,40 +264,28 @@
 					<TextBlock Text="Settings" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
 
-				<ribbon:RibbonGroup x:Name="grpPixelData">
+				<ribbon:RibbonGroup x:Name="grpPixelData" Style="{ DynamicResource textElements }">
 					<RibbonGroup.Header>
-						<TextBlock Text="Pixel Data" Foreground="Black" />
+						<TextBlock Text="Pixel Data" />
 					</RibbonGroup.Header>
 
 					<ribbon:RibbonTextBox x:Name="Color" />
-					<ribbon:RibbonTextBox x:Name="lblHtml" Label="" Foreground="#000000"/>
+					<ribbon:RibbonTextBox x:Name="lblHtml" Label=""/>
 				</ribbon:RibbonGroup>
-				<ribbon:RibbonGroup x:Name="grpMinerSweep">
-					<RibbonGroup.Resources>
-						<ResourceDictionary>
-							<ResourceDictionary x:Key="AlignmentDictionary">
-								<Style TargetType="RibbonTwoLineText">
-									<Setter Property="HorizontalAlignment" Value="Left"/>
-									<Setter Property="Width" Value="75"/>
-									<Setter Property="Foreground" Value="Black"/>
-								</Style>
-							</ResourceDictionary>
-						</ResourceDictionary>
-					</RibbonGroup.Resources>
+				<ribbon:RibbonGroup x:Name="grpMinerSweep" Style="{ DynamicResource textElements }">
 				
 					<RibbonGroup.Header>
-						<TextBlock Text="MineSweeper" Foreground="Black" />
+						<TextBlock Text="MineSweeper"  />
 					</RibbonGroup.Header>
 
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnMineSweep" Label="Boom" SmallImageSource="{{{pwd}}}\images\ribbon\developer\mine.png" LargeImageSource="{{{pwd}}}\images\ribbon\developer\mine.png" />
 					
-					<ribbon:RibbonComboBox x:Name="cboMineLength"  Label="Side Length:" IsEditable="True" Foreground="Black" SelectionBoxWidth="20" Resources="{StaticResource AlignmentDictionary}">
+					<ribbon:RibbonComboBox x:Name="cboMineLength"  Label="Length:" IsEditable="True" Foreground="Black" SelectionBoxWidth="20" Resources="{StaticResource AlignmentDictionary}">
 						<ribbon:RibbonGallery x:Name="rGalMineLength" SelectedValuePath="Name" MaxColumnCount="1" >
 							<ribbon:RibbonGalleryCategory x:Name="rGCatMineLength"/>
 						</ribbon:RibbonGallery>
 					</ribbon:RibbonComboBox>
 					
-
 					<ribbon:RibbonComboBox x:Name="cboMines"  Label="Mines:" IsEditable="True" Foreground="Black" SelectionBoxWidth="20" Resources="{StaticResource AlignmentDictionary}">
 						<ribbon:RibbonGallery x:Name="rGalMines" SelectedValuePath="Name" MaxColumnCount="1" >
 							<ribbon:RibbonGalleryCategory x:Name="rGCatMines"/>
@@ -314,18 +293,11 @@
 					</ribbon:RibbonComboBox>
 				</ribbon:RibbonGroup>
 				
-				<ribbon:RibbonGroup x:Name="grpThemes">
-					<RibbonGroup.Resources>
-						<ResourceDictionary>
-							<ResourceDictionary x:Key="AlignmentDictionary">
-								<Style TargetType="RibbonTwoLineText">
-									<Setter Property="HorizontalAlignment" Value="Left"/>
-									<Setter Property="Width" Value="75"/>
-									<Setter Property="Foreground" Value="Black"/>
-								</Style>
-							</ResourceDictionary>
-						</ResourceDictionary>
-					</RibbonGroup.Resources>
+				<ribbon:RibbonGroup x:Name="grpThemes" Style="{ DynamicResource textElements }">
+					<RibbonGroup.Header>
+						<TextBlock Text="Themes"  />
+					</RibbonGroup.Header>
+					
 					<ribbon:RibbonComboBox x:Name="cboTheme"  Label="Theme:" IsEditable="False" Foreground="Black" SelectionBoxWidth="60" Resources="{StaticResource AlignmentDictionary}">
 						<ribbon:RibbonGallery x:Name="rGalTheme" SelectedValuePath="Name" MaxColumnCount="1" >
 							<ribbon:RibbonGalleryCategory x:Name="rGalCatTheme"/>
@@ -335,20 +307,9 @@
 				
 			</ribbon:RibbonTab>
 
-			<ribbon:RibbonTab x:Name="rtabHelp">
-				<RibbonTab.Header>
-					<TextBlock Text="Help" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="Help">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnHelp" Label="Help" SmallImageSource="{{{pwd}}}\images\ribbon\help\help.png" LargeImageSource="{{{pwd}}}\images\ribbon\help\help.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnAbout" Label="About" SmallImageSource="{{{pwd}}}\images\ribbon\help\about.png" LargeImageSource="{{{pwd}}}\images\ribbon\help\about.png"/>
-				</ribbon:RibbonGroup>
-
-			</ribbon:RibbonTab>
 
 		</ribbon:Ribbon> 
-		<StatusBar  x:Name="Status" DockPanel.Dock="Bottom" Background="#808080" Foreground="#FFFFFF">
+		<StatusBar  x:Name="Status" DockPanel.Dock="Bottom" Style="{DynamicResource statusTheme}">
 		
 			<StatusBar.ItemsPanel>
 				<ItemsPanelTemplate>
@@ -363,27 +324,23 @@
 							<ColumnDefinition Width="110" />
 							<ColumnDefinition Width="5" />
 							<ColumnDefinition Width="50" />
-							<ColumnDefinition Width="25" />
+							<ColumnDefinition Width="31" />
 						</Grid.ColumnDefinitions>
 					</Grid>
 				</ItemsPanelTemplate>
 			</StatusBar.ItemsPanel>
 
-		
 			<StatusBarItem Grid.Column="0">
-				<Label Foreground="#ffffff" >Status:</Label>
+				<Label Style="{ DynamicResource statusText }"  >Status:</Label>
 			</StatusBarItem>
 			<StatusBarItem Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-				<TextBlock Foreground="#ffffff" x:Name="sbarMsg" > </TextBlock>
+				<TextBlock Style="{ DynamicResource statusText }" x:Name="sbarMsg" > </TextBlock>
 			</StatusBarItem>
 			
 			<Separator Grid.Column="2"/>
 			
-			
 			<StatusBarItem Grid.Column="3">
-				<ProgressBar Width="100" Height="20" Name="sbarPrg">
-					
-				</ProgressBar>
+				<ProgressBar Style="{ DynamicResource statusPBar}" Name="sbarPrg" />
 			</StatusBarItem>
   
 			<Separator Grid.Column="4"/>
@@ -413,7 +370,7 @@
 				</Grid.ColumnDefinitions>
 				
 				<!-- this is the main content that gets updated per scriptlet -->
-				<Grid Grid.Column="0" Background="#ffffff" x:Name="mainWindow" ZIndex="500">
+				<Grid Grid.Column="0" x:Name="mainWindow" Style="{ DynamicResource mainTheme }">
 					<Grid>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="*"></RowDefinition>
@@ -423,8 +380,8 @@
 						<Grid Grid.Row="0" x:Name="contentContainer">
 						</Grid>
 						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows" Width="Auto" Height="3" />
-						<Grid Grid.Row="2" x:Name="Log" Background="#ffffff">
-							<TextBox x:Name="txtLog"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="Auto" Height="Auto" FontFamily="Courier"/>
+						<Grid Grid.Row="2" x:Name="Log"  >
+							<TextBox x:Name="txtLog"   Style="{ DynamicResource mainLog }"/>
 						</Grid>
 					</Grid>
 				</Grid>
@@ -437,21 +394,20 @@
 				
 				<!-- The Grids below are the right hand host selection fragments -->
 				<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" Height="Auto" Width="3" />
-				<Grid Grid.Column="2" Background="#000000" x:Name="contentContainer2" >
+				<Grid Grid.Column="2" x:Name="contentContainer2" >
 					<Grid.RowDefinitions>
 						<RowDefinition Height="150" />
 						<RowDefinition  Height="*"/>
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0">
-						<StackPanel Margin="1" Background="#edf3f9">
-							<Button x:Name="btnHostExpand">&gt;&gt;&gt;</Button>
-							<Label Content="Hosts" Target="{Binding ElementName=txtHosts}" />
-							<TextBox x:Name="txtHosts"  AcceptsReturn="True" VerticalScrollBarVisibility="Auto"  Height="100"/>
-							<Label Content="Single OU" Target="{Binding ElementName=treeAD}" />
+						<StackPanel Margin="1" Style="{DynamicResource hostBarTheme}">
+							<Button x:Name="btnHostExpand" Style="{ DynamicResource hostBarButton}">&gt;&gt;&gt;</Button>
+							<Label Content="Hosts" Target="{Binding ElementName=txtHosts}" Style="{ DynamicResource hostBarLabel}"/>
+							<TextBox x:Name="txtHosts" Style="{ DynamicResource hostBarHosts}"/>
 						</StackPanel>
 					</Grid>
 					<Grid Grid.Row="1">
-						<TreeView x:Name="treeAD" Grid.ZIndex="1000" Height="Auto" >
+						<TreeView x:Name="treeAD" Grid.ZIndex="1000" Style="{ DynamicResource hostBarAD}" >
 							<TreeViewItem Header="Active Directory Hierarchy"/>
 						</TreeView>
 					</Grid>

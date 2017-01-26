@@ -8,15 +8,39 @@
 	<x:String x:Key="Title">Dark Theme</x:String>
 	
 	<Style x:Key="ribbonTheme">
-		<Setter Property="Ribbon.Background" Value="#999999"></Setter>
-		<Setter Property="Ribbon.Foreground" Value="#000000"></Setter>
-		
+		<Setter Property="Ribbon.Background" Value="#666666"></Setter>
+		<Setter Property="Ribbon.Foreground" Value="#000000"></Setter>		
 	</Style>
 	
 	<Style x:Key="ribbonButtonTheme">
 		<Setter Property="RibbonButton.Foreground" Value="#333333"></Setter>
 	</Style>
 	
+	<Style x:Key="hostBarHosts">
+		<Setter Property="TextBox.Background" Value="#eeeeee"></Setter>
+		<Setter Property="TextBox.Foreground" Value="#000000"></Setter>
+		
+		<Setter Property="TextBox.AcceptsReturn" Value="True"></Setter>
+		<Setter Property="TextBox.VerticalScrollBarVisibility" Value="Auto"></Setter>
+		<Setter Property="TextBox.Height" Value="100"></Setter>
+	</Style>
+	
+	<Style x:Key="hostBarAD">
+		<Setter Property="TreeView.Background" Value="#cccccc"></Setter>
+		<Setter Property="TreeView.Foreground" Value="#000000"></Setter>
+		<Setter Property="TreeView.Height" Value="Auto"></Setter>
+	</Style>
+
+	<Style x:Key="hostBarButton">
+		<Setter Property="Label.Background" Value="#000000"></Setter>
+		<Setter Property="Label.Foreground" Value="#ffffff"></Setter>
+	</Style>
+
+	
+	<Style x:Key="hostBarLabel">
+		<Setter Property="Label.Background" Value="#000000"></Setter>
+		<Setter Property="Label.Foreground" Value="#ffffff"></Setter>
+	</Style>
 	
     <Style x:Key="rTabBindings" TargetType="{x:Type TextBlock}" >
 		<Style.Triggers>
@@ -29,6 +53,36 @@
 		</Style.Triggers>
 	</Style>
 	
+	<Style x:Key="statusTheme">
+		<Setter Property="StatusBar.Background" Value="#808080"></Setter>
+		<Setter Property="StatusBar.Foreground" Value="#ffffff"></Setter>		
+	</Style>
+	<Style x:Key="statusText">
+		<Setter Property="StatusBar.Foreground" Value="#ffffff"></Setter>		
+	</Style>	
+	<Style x:Key="statusPBar">
+		<Setter Property="ProgressBar.Width" Value="100"></Setter>
+		<Setter Property="ProgressBar.Height" Value="20"></Setter>		
+	</Style>
 	
-
+	<Style x:Key="textElements">
+		<Setter Property="TextBlock.Foreground" Value="#000000"></Setter>
+	</Style>
+	
+	<Style x:Key="mainTheme">
+		<Setter Property="Grid.Background" Value="#ffffff"></Setter>
+		<Setter Property="Grid.ZIndex" Value="500"></Setter>
+	</Style>
+	
+	<Style x:Key="mainLog" TargetType="TextBox">
+		<Setter Property="AcceptsReturn" Value="True"></Setter>
+		<Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+		<Setter Property="Width" Value="Auto"></Setter>
+		<Setter Property="Height" Value="Auto"></Setter>
+		<Setter Property="FontFamily" Value="Courier"></Setter>
+		<Setter Property="Background" Value="#eeeeee"></Setter>
+		<Setter Property="IsReadOnly" Value="True"></Setter>		
+	</Style>
+	
+	
 </ResourceDictionary>

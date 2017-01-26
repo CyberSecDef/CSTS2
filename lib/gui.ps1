@@ -11,6 +11,13 @@ begin{
 				[GUI]::Get().expandHost();
 			})
 			$this.window.findName('sbarRole').Text = $global:csts.Role;
+			$this.window.findName('rgrpSpace').Width = $this.window.Width - 175;
+			
+			$this.window.add_SizeChanged( { 
+			
+			[GUI]::Get().window.findName('rgrpSpace').Width = $_.NewSize.width - 175 
+			
+			} )
 		}
 		
 		[GUI] static Get(  ){

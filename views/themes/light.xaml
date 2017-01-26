@@ -2,18 +2,82 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MSDNSample"
+	xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
 	>
 
-	<x:String x:Key="Title">Dark Theme</x:String>
+	<x:String x:Key="Title">Light Theme</x:String>
 	
 	<Style x:Key="ribbonTheme">
-		<Setter Property="Ribbon.Foreground" Value="#333333"></Setter>
 		<Setter Property="Ribbon.Background" Value="#ffffff"></Setter>
+		<Setter Property="Ribbon.Foreground" Value="#000000"></Setter>		
 		
 	</Style>
+	
 	<Style x:Key="ribbonButtonTheme">
 		<Setter Property="RibbonButton.Foreground" Value="#333333"></Setter>
 	</Style>
-    
-
+	
+	<Style x:Key="hostBarHosts">
+		<Setter Property="TextBox.Background" Value="#ffffff"></Setter>
+		<Setter Property="TextBox.Foreground" Value="#000000"></Setter>
+		
+		<Setter Property="TextBox.AcceptsReturn" Value="True"></Setter>
+		<Setter Property="TextBox.VerticalScrollBarVisibility" Value="Auto"></Setter>
+		<Setter Property="TextBox.Height" Value="100"></Setter>
+	</Style>
+	
+	<Style x:Key="hostBarAD">
+		<Setter Property="TreeView.Background" Value="#ffffff"></Setter>
+		<Setter Property="TreeView.Foreground" Value="#000000"></Setter>
+		<Setter Property="TreeView.Height" Value="Auto"></Setter>
+	</Style>
+	
+	<Style x:Key="hostBarButton">
+		<Setter Property="Label.Background" Value="#ffffff"></Setter>
+		<Setter Property="Label.Foreground" Value="#000000"></Setter>
+	</Style>
+	
+	<Style x:Key="hostBarLabel">
+		<Setter Property="Label.Background" Value="#ffffff"></Setter>
+		<Setter Property="Label.Foreground" Value="#000000"></Setter>
+	</Style>
+	
+    <Style x:Key="rTabBindings" TargetType="{x:Type TextBlock}" >
+		<Style.Triggers>
+			<DataTrigger  Binding="{Binding RelativeSource={RelativeSource Self}, Path=Parent.IsSelected}" Value="True">
+				<Setter Property="TextElement.Foreground" Value="#000000"/>
+			</DataTrigger>
+			<DataTrigger  Binding="{Binding RelativeSource={RelativeSource Self}, Path=Parent.IsSelected}" Value="False">
+				<Setter Property="TextElement.Foreground" Value="#cccccc"/>
+			</DataTrigger>
+		</Style.Triggers>
+	</Style>
+	
+	<Style x:Key="statusTheme">
+		<Setter Property="StatusBar.Background" Value="#ffffff"></Setter>
+		<Setter Property="StatusBar.Foreground" Value="#000000"></Setter>		
+	</Style>
+	<Style x:Key="statusText">
+		<Setter Property="StatusBar.Foreground" Value="#000000"></Setter>		
+	</Style>	
+	<Style x:Key="statusPBar">
+		<Setter Property="ProgressBar.Width" Value="100"></Setter>
+		<Setter Property="ProgressBar.Height" Value="20"></Setter>		
+	</Style>
+	
+	<Style x:Key="mainTheme">
+		<Setter Property="Grid.Background" Value="#ffffff"></Setter>
+		<Setter Property="Grid.ZIndex" Value="500"></Setter>
+	</Style>
+	<Style x:Key="mainLog" TargetType="TextBox">
+		<Setter Property="AcceptsReturn" Value="True"></Setter>
+		<Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+		<Setter Property="Width" Value="Auto"></Setter>
+		<Setter Property="Height" Value="Auto"></Setter>
+		<Setter Property="FontFamily" Value="Courier"></Setter>
+		<Setter Property="Background" Value="#ffffff"></Setter>
+		<Setter Property="IsReadOnly" Value="True"></Setter>		
+	</Style>
+	
+	
 </ResourceDictionary>
