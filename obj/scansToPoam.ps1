@@ -100,7 +100,45 @@ begin{
 			switch( "$([CSTS_Export]::$($exportType))" ){
 				{ "$([CSTS_Export]::XLSX)" } {
 					$filename = "$($global:csts.execPath)\results\ScansToPoam_$(get-date -format 'yyyy.MM.dd_HH.mm.ss').xlsx"
-					$global:csts.libs.Export.Excel( $this.data, $fileName,$false, 'POAM')
+					
+					$poam = @()
+					$rar = @()
+					
+					# $this.poamArr | fl | out-string | write-host
+					
+					foreach($finding in ($this.poamArr.keys)){
+						$rule = $this.poamArr.$finding
+
+						$poam += [pscustomobject]@{
+							Description = @"
+Title: $($rule.title)
+Description: $($rule.description)
+Devices Affected:
+$($rule.hosts -join "`n")
+"@;
+							Control = $rule.IA_Controls;
+							Org = "";
+							Checks = @"
+Group ID: $($rule.GrpId)
+Vuln ID: $($rule.VulnId)
+Rule ID: $($rule.RuleId)
+Plugin ID: $($rule.PluginId)
+"@;
+							Risk = $rule.RawRisk;
+							Mitigations = "";
+							Resources = $rule.Responsibility;
+							SCD = "";
+							Milestones = "";
+							Sources = $rule.sources;
+							Status = $rule.Status;
+							Comments = $($rule.hosts -join "`n");
+					
+						}
+					}
+					
+					# $poam | fl | out-string | write-host
+					
+					$global:csts.libs.Export.Excel( $poam, $fileName,$false, 'POAM', @(50,25,25,25,25,50,25,50,50,50,50,50,50,50))
 				}
 			}
 		}
@@ -214,8 +252,8 @@ begin{
 							$this.poamArr.$key.sources += ( $reportItem.shortSource )
 						}
 					}else{
-						$reportItem.sources = @()
-						$reportItem.sources += $reportItem.shortSource
+						$reportItem.Sources = @()
+						$reportItem.Sources += $reportItem.shortSource
 						$reportItem.hosts = @()
 						$reportItem.hosts += "$h".ToLower()
 						$this.poamArr.add( $key, $reportItem)
@@ -278,42 +316,51 @@ begin{
 				$rule = Select-Xml -Namespace $xmlNs -xpath "//cdf:Rule[@id='$($vulns[$i].Node.idref)']" $xml
 				
 				$reportItem = @{}
-				$reportItem.Title = $rule.Node.title
-				$reportItem.Description = $rule.Node.description
-				$reportItem.RawRisk = (Get-Culture).TextInfo.ToTitleCase( $rule.Node.severity ) 
 				
-				switch($rule.Node.severity){
-					"low" 		{$reportItem.RawCat = "III"}
-					"medium" 	{$reportItem.RawCat = "II"}
-					"high" 		{$reportItem.RawCat = "I"}
-					default 	{$reportItem.RawCat = "IV"}
-				}
-				
-				$reportItem.Likelihood = "Low"
 				$reportItem.Comments = ""
+				$reportItem.FixId = "$($rule.Node.fixtext.fixref)"
+				$reportItem.GrpId = $vulns[$i].Node.version
+				$reportItem.PluginId = ""
+				$reportItem.RuleId = $vulns[$i].Node.idref
+				$reportItem.ShortSource = "SCAP"
+				$reportItem.Solution = "$($rule.Node.fixtext.'#text')"
+				$reportItem.Source = (Select-Xml -Namespace $xmlNs -xpath "/cdf:Benchmark/cdf:title" $xml)
+				$reportItem.Title = $rule.Node.title
+				$reportItem.VulnId = $rule.Node.ParentNode.id
+				
+				$reportItem.Description = ""
+				$reportItem.IAControl = ""
 				$reportItem.Responsibility = ""
 				
-				$mitigation = $rule.Node.fixtext.'#text'
-				$reportItem.Mitigation = "$mitigation
+				if([Utils]::isBlank( $rule.Node.description ) -eq $false){
+					if( $rule.Node.description.indexOf('<VulnDiscussion>') -gt 0){
+						$reportItem.Description = $rule.Node.description.substring( 0, $rule.Node.description.indexOf('<VulnDiscussion>') - 1)
+					}else{
+						$reportItem.Description = $rule.Node.description
+					}
 				
-				FixId: $($rule.Node.fixtext.fixref)"
-				
-				$reportItem.IA_Controls = ""
-				
-				if([Utils]::isBlank( $reportItem.description ) -eq $false){
 					try{
 						$description = [xml]( "<root>$(
 							$rule.Node.description.substring( $rule.Node.description.indexOf('</VulnDiscussion>') + 17 )
 						)</root>" )
-						$reportItem.IA_Controls = $description.root.IAControls
-						$index = $reportItem.IA_Controls.indexOf(',')
+						$reportItem.Responsibility = $description.root.Responsibility
+						$reportItem.IAControl = $description.root.IAControls
+						$index = $reportItem.IAControl.indexOf(',')
 						if($index -ge 0){  
-							$reportItem.IA_Controls = $reportItem.IA_Controls.substring(0, $index )
+							$reportItem.IAControl = $reportItem.IAControl.substring(0, $index )
 						}
 					}catch{
 						
 					}
 				}
+				
+				switch($rule.Node.severity){
+					"low" 		{$reportItem.RawRisk = "III"}
+					"medium" 	{$reportItem.RawRisk = "II"}
+					"high" 		{$reportItem.RawRisk = "I"}
+					default 	{$reportItem.RawRisk = "IV"}
+				}
+				
 				
 				switch($vulns[$i].Node.result){
 					"pass" {$reportItem.Status = "Completed"}
@@ -322,15 +369,7 @@ begin{
 					"error" {$reportItem.Status = "Error"}
 					default {$reportItem.Status = "Ongoing"}
 				}
-						
-				$source = (Select-Xml -Namespace $xmlNs -xpath "/cdf:Benchmark/cdf:title" $xml)
-				$reportItem.Source = "$source"
-				$reportItem.ShortSource = "SCAP"
-				$reportItem.PluginId = ""
-				$reportItem.RuleId = $vulns[$i].Node.idref
-				$reportItem.VulnId = $rule.Node.ParentNode.id
-				$reportItem.GrpId = $vulns[$i].Node.version
-					
+				
 				if($reportItem.Status -ne 'Completed' -and "$h".trim() -ne ''){
 					$this.addResult($h,$reportItem)
 				}
@@ -419,25 +458,23 @@ begin{
 				$this.scans.ckl.$title.$vrKey."$([io.path]::GetFilename( $file.fullName );)".date = $scanDate
 			
 				for($i = 0; $i -lt $vulns.count; $i++){
+					
 					$reportItem = @{}
-					$reportItem.Title = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_Title']/ATTRIBUTE_DATA" $xml)
-					$reportItem.Description = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
-					$reportItem.RawRisk = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Severity']/ATTRIBUTE_DATA" $xml)
-					$reportItem.Responsibility = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Responsibility']/ATTRIBUTE_DATA" $xml)
 					$reportItem.Comments = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/COMMENTS" $xml)
+					$reportItem.Description = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
+					$reportItem.FixId= ""
+					$reportItem.GrpId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Group_Title']/ATTRIBUTE_DATA" $xml)
+					$reportItem.PluginId = ""
+					$reportItem.Responsibility = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Responsibility']/ATTRIBUTE_DATA" $xml)
+					$reportItem.RuleId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_ID']/ATTRIBUTE_DATA" $xml)
+					$reportItem.ShortSource = "CKL"
+					$reportItem.Solution = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Fix_Text']/ATTRIBUTE_DATA" $xml)
+					$reportItem.Source = "$(Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='STIGRef']/ATTRIBUTE_DATA" $xml)"
+					$reportItem.Title = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_Title']/ATTRIBUTE_DATA" $xml)
+					$reportItem.VulnId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Num']/ATTRIBUTE_DATA" $xml)
 					
-					switch($reportItem.RawRisk){
-						"low" 		{$reportItem.RawCat = "III"}
-						"medium" 	{$reportItem.RawCat = "II"}
-						"high" 		{$reportItem.RawCat = "I"}
-						default 	{$reportItem.RawCat = "IV"}
-					}
-					$reportItem.Likelihood = "Low"
-					$reportItem.Mitigation = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Fix_Text']/ATTRIBUTE_DATA" $xml)
-					$reportItem.IA_Controls = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='IA_Controls']/ATTRIBUTE_DATA" $xml)
-					
-					
-					if([Utils]::isBlank( $reportItem.IA_Controls.'#text' ) -eq $true){
+					$reportItem.IAControl = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='IA_Controls']/ATTRIBUTE_DATA" $xml).'#text'
+					if([Utils]::isBlank( $reportItem.IAControl ) -eq $true){
 						$cci = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='CCI_REF']/ATTRIBUTE_DATA" $xml | select -first 1)
 						if([Utils]::isBlank($cci) -eq $false){
 							$cciNode  = $cciXml.selectSingleNode("//ns:cci_list/ns:cci_items/ns:cci_item[@id='$($cci)']", $cciNs)
@@ -450,11 +487,22 @@ begin{
 							}
 							
 							if([Utils]::isblank($iaControl) -eq $false){
-								$reportItem.IA_Controls = $iaControl
+								$reportItem.IAControl = $iaControl
 							}else{
-								$reportItem.IA_Controls = ''
+								$reportItem.IAControl = ''
 							}
 						}
+					}
+					$index = "$($reportItem.IAControl)".indexOf(',')
+					if($index -ge 0){  
+						$reportItem.IAControl = $reportItem.IAControl.substring(0, $index )
+					}
+					
+					switch( (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Severity']/ATTRIBUTE_DATA" $xml) ){
+						"low" 		{$reportItem.RawRisk = "III"}
+						"medium" 	{$reportItem.RawRisk = "II"}
+						"high" 		{$reportItem.RawRisk = "I"}
+						default 	{$reportItem.RawRisk = "IV"}
 					}
 					
 					switch( Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STATUS" $xml ){
@@ -464,12 +512,6 @@ begin{
 						default 			{$reportItem.Status =  "Ongoing"}
 					}
 					
-					$reportItem.Source = "$(Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='STIGRef']/ATTRIBUTE_DATA" $xml)"
-					$reportItem.ShortSource = "CKL"
-					$reportItem.PluginId = ""
-					$reportItem.RuleId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_ID']/ATTRIBUTE_DATA" $xml)
-					$reportItem.VulnId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Num']/ATTRIBUTE_DATA" $xml)
-					$reportItem.GrpId = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Group_Title']/ATTRIBUTE_DATA" $xml)
 					if([Utils]::isBlank("$($reportItem.RuleId)$($reportItem.vulnid)$($reportItem.grpId)".Trim() ) -eq $false  ){
 						$this.addResult($h,$reportItem)
 					}
@@ -544,27 +586,28 @@ begin{
 				for($i = 0; $i -lt $vulns.count; $i++){
 
 					$reportItem = @{}
-					$reportItem.Title = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_Title']/ATTRIBUTE_DATA" $xml)
-					
-					$reportItem.Description = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
-					$reportItem.RawRisk = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Severity']/ATTRIBUTE_DATA" $xml)
-					
-					$reportItem.Responsibility = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Responsibility']/ATTRIBUTE_DATA" $xml)
-					
 					$reportItem.Comments = (Select-Xml "/CHECKLIST/VULN[$i]/COMMENTS" $xml)
+					$reportItem.Description = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
+					$reportItem.FixId= ""
+					$reportItem.GrpId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Group_Title']/ATTRIBUTE_DATA" $xml)
+					$reportItem.PluginId = ""
+					$reportItem.Responsibility = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Responsibility']/ATTRIBUTE_DATA" $xml)
+					$reportItem.RuleId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_ID']/ATTRIBUTE_DATA" $xml)
+					$reportItem.ShortSource = "CKL"
+					$reportItem.Solution = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Fix_Text']/ATTRIBUTE_DATA" $xml)
+					$reportItem.Source = "$(Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='STIGRef']/ATTRIBUTE_DATA" $xml)"
+					$reportItem.Title = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_Title']/ATTRIBUTE_DATA" $xml)
+					$reportItem.VulnId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Num']/ATTRIBUTE_DATA" $xml)
 					
-					switch($reportItem.RawRisk){
-						"low" 		{$reportItem.RawCat = "III"}
-						"medium" 	{$reportItem.RawCat = "II"}
-						"high" 		{$reportItem.RawCat = "I"}
-						default 	{$reportItem.RawCat = "IV"}
+					switch( (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Severity']/ATTRIBUTE_DATA" $xml) ){
+						"low" 		{$reportItem.RawRisk = "III"}
+						"medium" 	{$reportItem.RawRisk = "II"}
+						"high" 		{$reportItem.RawRisk = "I"}
+						default 	{$reportItem.RawRisk = "IV"}
 					}
-					$reportItem.Likelihood = "Low"
-					$reportItem.Mitigation = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Fix_Text']/ATTRIBUTE_DATA" $xml)
-					$reportItem.IA_Controls = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='IA_Controls']/ATTRIBUTE_DATA" $xml)
 					
-
-					if([Utils]::isBlank( $reportItem.IA_Controls.'#text' ) -eq $true){
+					$reportItem.IAControl = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='IA_Controls']/ATTRIBUTE_DATA" $xml).'#text'
+					if([Utils]::isBlank( $reportItem.IAControl ) -eq $true){
 						$cci = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='CCI_REF']/ATTRIBUTE_DATA" $xml | select -first 1)
 						if([Utils]::isBlank($cci) -eq $false){
 							$cciNode  = $cciXml.selectSingleNode("//ns:cci_list/ns:cci_items/ns:cci_item[@id='$($cci)']", $cciNs)
@@ -577,11 +620,16 @@ begin{
 							}
 							
 							if([Utils]::isblank($iaControl) -eq $false){
-								$reportItem.IA_Controls = $iaControl
+								$reportItem.IAControl = $iaControl
 							}else{
-								$reportItem.IA_Controls = ''
+								$reportItem.IAControl = ''
 							}
 						}
+					}
+					
+					$index = "$($reportItem.IAControl)".indexOf(',')
+					if($index -ge 0){  
+						$reportItem.IAControl = $reportItem.IAControl.substring(0, $index )
 					}
 					
 					switch( Select-Xml "/CHECKLIST/VULN[$i]/STATUS" $xml ){
@@ -591,14 +639,6 @@ begin{
 						default 			{$reportItem.Status =  "Ongoing"}
 					}
 					
-					$source = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='STIGRef']/ATTRIBUTE_DATA" $xml)
-					$reportItem.Source = "$source"
-					
-					$reportItem.ShortSource = "CKL"
-					$reportItem.PluginId = ""
-					$reportItem.RuleId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Rule_ID']/ATTRIBUTE_DATA" $xml)
-					$reportItem.VulnId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Num']/ATTRIBUTE_DATA" $xml)
-					$reportItem.GrpId = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Group_Title']/ATTRIBUTE_DATA" $xml)
 					if([Utils]::isBlank("$($reportItem.RuleId)$($reportItem.vulnid)$($reportItem.grpId)".Trim() ) -eq $false  ){
 						$this.addResult($h,$reportItem)
 					}
@@ -631,41 +671,31 @@ begin{
 				foreach($report in $h.Node.ReportItem){
 					#create a report item
 					$reportItem = @{}
-					$reportItem.Title = $report.pluginName
+					$reportItem.Comments = $report.plugin_output
 					$reportItem.Description = $report.synopsis
-					$reportItem.RawRisk = $report.risk_factor
+					$reportItem.FixId= ""
+					$reportItem.GrpId = $report.pluginFamily
+					$reportItem.PluginId = $report.pluginId
+					$reportItem.Responsibility = ""
+					$reportItem.RuleId = ""
+					$reportItem.ShortSource = "ACAS"
+					$reportItem.Solution = $report.solution
+					$reportItem.Source = "Assured Compliance Assessment Solution:"
+					$reportItem.Title = $report.pluginName
+					$reportItem.VulnId = ""
+										
+					
+					$reportItem.IA_Controls = ""
+					$reportItem.Status = "Ongoing"
 					
 					switch($report.risk_factor){
-						"None" 		{$reportItem.RawCat = "IV"}
-						"Low" 		{$reportItem.RawCat = "III"}
-						"Medium" 	{$reportItem.RawCat = "II"}
-						"High" 		{$reportItem.RawCat = "I"}
-						"Critical" 	{$reportItem.RawCat = "I"}
-						default 	{$reportItem.RawCat = "IV"}
+						"None" 		{$reportItem.RawRisk = "IV"}
+						"Low" 		{$reportItem.RawRisk = "III"}
+						"Medium" 	{$reportItem.RawRisk = "II"}
+						"High" 		{$reportItem.RawRisk = "I"}
+						"Critical" 	{$reportItem.RawRisk = "I"}
+						default 	{$reportItem.RawRisk = "IV"}
 					}
-					
-					switch($report.severity){
-						"0" {$reportItem.Likelihood = "Info"}
-						"1" {$reportItem.Likelihood = "Low"}
-						"2" {$reportItem.Likelihood = "Medium"}
-						"3" {$reportItem.Likelihood = "High"}
-						"4" {$reportItem.Likelihood = "High"}
-						default {$reportItem.Likelihood = "Info"}
-					}
-					
-					$reportItem.Comments = $report.plugin_output
-					$reportItem.Mitigation = $report.solution
-					$reportItem.IA_Controls = ""
-					
-					$reportItem.Responsibility = ""
-					$reportItem.Status = "Ongoing"
-					$reportItem.Source = "Assured Compliance Assessment Solution:"
-					
-					$reportItem.ShortSource = "ACAS"
-					$reportItem.PluginId = $report.pluginId
-					$reportItem.RuleId = ""
-					$reportItem.VulnId = ""
-					$reportItem.GrpId = $report.pluginFamily
 					
 					$this.addResult($h.Node.name, $reportItem)
 				}

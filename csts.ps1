@@ -103,20 +103,27 @@ begin{
 			iex "[GUI]::Get().changeTheme('dark.xaml')"
 		}
 		
-		
-		#this event will occur every second.
+		#this heartbeat event will occur every second.
 		[void] Poll(){
-			#run through all the controllers poll methods
-			$global:csts.controllers.keys | %{
-				if( ($global:csts.controllers[$_] | gm | select -expand Name) -contains 'Poll' ){
-					$global:csts.controllers[$_].Poll()
-				}	
+			
+			#only poll if the tool suite has focus
+			$active = (iex "[GUI]::Get().window.isActive")
+			if($active){
+				#dont poll if the a textbox has keyboard focus
+				$focused = ( (iex "(([System.Windows.Input.Keyboard]::FocusedElement).GetType()).Name ") -eq "TextBox")
+				if(! ([bool]$focused) ){
+					#run through all the controllers poll methods
+					$global:csts.controllers.keys | %{
+						if( ($global:csts.controllers[$_] | gm | select -expand Name) -contains 'Poll' ){
+							$global:csts.controllers[$_].Poll()
+						}	
+					}
+				}
 			}
-			#this class has the pixel data stuff, so load it.
+		
 			iex "[GUI]::Get().GetColors();"
 			
 		}
-		
 		
 		[void] Dispose(){
 			$global:csts.timer.stop()		

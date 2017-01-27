@@ -8,6 +8,10 @@ begin{
 			
 		}
 		
+		[void] Poll(){
+			
+		}
+		
 		[void] showHome(){
 			[GUI]::Get().ShowContent("/views/home.xaml") | out-null
 		}

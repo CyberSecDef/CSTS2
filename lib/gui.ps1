@@ -14,9 +14,7 @@ begin{
 			$this.window.findName('rgrpSpace').Width = $this.window.Width - 175;
 			
 			$this.window.add_SizeChanged( { 
-			
-			[GUI]::Get().window.findName('rgrpSpace').Width = $_.NewSize.width - 175 
-			
+				[GUI]::Get().window.findName('rgrpSpace').Width = $_.NewSize.width - 175 
 			} )
 		}
 		

@@ -10,7 +10,7 @@ begin{
 			
 		}
 		
-		[void] Excel( $inputObject, $Path, $Append, $WorkSheetName){
+		[void] Excel( $inputObject, $Path, $Append, $WorkSheetName, $widths = $null){
 			if($inputObject -ne $null){
 				If((Test-Path $Path) -and $Append ) {
 					$this.WorkSheet = $this.addXLSXWorkSheet($Path, $WorkSheetName)
@@ -19,7 +19,7 @@ begin{
 					$this.WorkSheet = $this.addXLSXWorkSheet($path, $WorkSheetName)
 				}
 				$this.HeaderWritten = $False
-				$this.exportWorkSheet( $InputObject, $Path )
+				$this.exportWorkSheet( $InputObject, $Path, $widths )
 				
 				#this should open the excel document after it's generated
 				if( (test-path $path) -eq $true){
@@ -31,7 +31,8 @@ begin{
 		
 		exportWorkSheet(
 			[Object[]]$InputObject,
-			[String]$Path
+			[String]$Path,
+			$widths = $null
 		){
 			$exPkg = [System.IO.Packaging.Package]::Open($Path, [System.IO.FileMode]::Open)
 			$WorkSheetPart = $exPkg.GetPart($this.Worksheet.Uri)
@@ -53,6 +54,7 @@ begin{
 					
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
+					# $Null = $CellNode.SetAttribute('s',"1")
 					$Null = $RowNode.AppendChild($CellNode)
 					
 					$CellNodeIs = $WorkSheetXmlDoc.CreateElement('is', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
@@ -74,6 +76,11 @@ begin{
 
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
+					
+					if( ( ( [String]$row.$($prop) ) -split "`n").count -gt 1){
+						$Null = $CellNode.SetAttribute('s',"1")
+					}
+					
 					$Null = $RowNode.AppendChild($CellNode)
 					
 					$CellNodeIs = $WorkSheetXmlDoc.CreateElement('is', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
@@ -86,6 +93,24 @@ begin{
 					$Null = $WorkSheetXmlDoc.DocumentElement.Item("sheetData").AppendChild($RowNode)
 				}
 			}
+			
+			if($widths -ne $null){
+				$cols = $WorkSheetXmlDoc.CreateElement('cols', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI )
+				$i = 0
+				$widths | % {
+					$i++
+					$col = $WorkSheetXmlDoc.CreateElement('col', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
+					$col.SetAttribute('width', $_)
+					$col.SetAttribute('min', $i)
+					$col.SetAttribute('max', $i)
+					$col.SetAttribute('customWidth', 1)
+					$cols.appendChild($col)
+				}
+				$Null = $WorkSheetXmlDoc.DocumentElement.InsertBefore($cols, $WorkSheetXmlDoc.DocumentElement.Item("sheetData"))
+				
+			}
+			
+			
 			$WorkSheetXmlDoc.Save($WorkSheetPart.GetStream([System.IO.FileMode]::Open,[System.IO.FileAccess]::Write))
 			$exPkg.Close()
 		}
@@ -203,6 +228,11 @@ begin{
 			$New_Worksheet_xml.Save($dest)
 			
 			$Null = $WorkBookPart.CreateRelationship($Uri_xl_worksheets_sheet_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet", $NewWorkBookRelId)
+			
+			
+			$Uri_xl_styles_xml = New-Object System.Uri -ArgumentList ("/xl/styles.xml", [System.UriKind]::Relative)
+			$Null = $WorkBookPart.CreateRelationship($Uri_xl_styles_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles", 'rId999')
+			
 
 			$WorkBookXmlDoc = New-Object System.Xml.XmlDocument
 
@@ -262,8 +292,20 @@ begin{
 			$Part_xl_workbook_xml = $exPkg.CreatePart($Uri_xl_workbook_xml, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")
 			$dest = $part_xl_workbook_xml.GetStream([System.IO.FileMode]::Create,[System.IO.FileAccess]::Write)
 			$xl_workbook_xml.Save($dest)
-
 			$Null = $exPkg.CreateRelationship($Uri_xl_workbook_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument", "rId1")
+			
+			
+			$style_xml = [xml]@"
+<?xml version="1.0" encoding="utf-16" standalone="yes"?> <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"> <fonts count="1"> <font /> </fonts> <fills count="1"> <fill /> </fills> <borders count="1"> <border /> </borders> <cellStyleXfs count="1"> <xf /> </cellStyleXfs> <cellXfs count="2" > <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" /> <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1" > <alignment wrapText="1" /> </xf> </cellXfs> </styleSheet>
+"@
+			$Uri_xl_styles_xml = New-Object System.Uri -ArgumentList ("/xl/styles.xml", [System.UriKind]::Relative)
+			$Part_xl_styles_xml = $exPkg.CreatePart($Uri_xl_styles_xml, "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml")
+			$styleDest = $Part_xl_styles_xml.GetStream([System.IO.FileMode]::Create,[System.IO.FileAccess]::Write)
+			$style_xml.Save($styleDest)
+			# $Null = $exPkg.CreateRelationship($Uri_xl_styles_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument", "rId999")
+			
+
+			
 			$exPkg.Close()
 			Return (Get-Item $Path)
 		}
