@@ -1,3 +1,4 @@
+
 [CmdletBinding()]param()
 begin{
 	$Null = [Reflection.Assembly]::LoadWithPartialName("WindowsBase")
@@ -20,15 +21,9 @@ begin{
 				}
 				$this.HeaderWritten = $False
 				$this.exportWorkSheet( $InputObject, $Path, $widths )
-				
-				#this should open the excel document after it's generated
-				if( (test-path $path) -eq $true){
-					invoke-expression $Path
-				}
-				
 			}
 		}
-		
+				
 		exportWorkSheet(
 			[Object[]]$InputObject,
 			[String]$Path,
@@ -54,7 +49,7 @@ begin{
 					
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
-					# $Null = $CellNode.SetAttribute('s',"1")
+					$Null = $CellNode.SetAttribute('s',"1")
 					$Null = $RowNode.AppendChild($CellNode)
 					
 					$CellNodeIs = $WorkSheetXmlDoc.CreateElement('is', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
@@ -77,9 +72,9 @@ begin{
 					$CellNode = $WorkSheetXmlDoc.CreateElement('c', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
 					$Null = $CellNode.SetAttribute('t',"inlineStr")
 					
-					if( ( ( [String]$row.$($prop) ) -split "`n").count -gt 1){
+					# if( ( ( [String]$row.$($prop) ) -split "`n").count -gt 1){
 						$Null = $CellNode.SetAttribute('s',"1")
-					}
+					# }
 					
 					$Null = $RowNode.AppendChild($CellNode)
 					
@@ -157,7 +152,7 @@ begin{
 					break
 				}
 			}
-
+			
 			If(-not $WorkBookPart) {
 				Write-Error "Excel Workbook not found in : $Path"
 				$exPkg.Close()
@@ -228,11 +223,12 @@ begin{
 			$New_Worksheet_xml.Save($dest)
 			
 			$Null = $WorkBookPart.CreateRelationship($Uri_xl_worksheets_sheet_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet", $NewWorkBookRelId)
-			
-			
-			$Uri_xl_styles_xml = New-Object System.Uri -ArgumentList ("/xl/styles.xml", [System.UriKind]::Relative)
-			$Null = $WorkBookPart.CreateRelationship($Uri_xl_styles_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles", 'rId999')
-			
+
+
+			if( ( $WorkBookPart.GetRelationships() | ? { $_.TargetUri -eq "/xl/styles.xml" } ) -eq $null){
+				$Uri_xl_styles_xml = New-Object System.Uri -ArgumentList ("/xl/styles.xml", [System.UriKind]::Relative)
+				$Null = $WorkBookPart.CreateRelationship($Uri_xl_styles_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles", 'rId999')
+			}
 
 			$WorkBookXmlDoc = New-Object System.Xml.XmlDocument
 
@@ -302,9 +298,6 @@ begin{
 			$Part_xl_styles_xml = $exPkg.CreatePart($Uri_xl_styles_xml, "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml")
 			$styleDest = $Part_xl_styles_xml.GetStream([System.IO.FileMode]::Create,[System.IO.FileAccess]::Write)
 			$style_xml.Save($styleDest)
-			# $Null = $exPkg.CreateRelationship($Uri_xl_styles_xml, [System.IO.Packaging.TargetMode]::Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument", "rId999")
-			
-
 			
 			$exPkg.Close()
 			Return (Get-Item $Path)

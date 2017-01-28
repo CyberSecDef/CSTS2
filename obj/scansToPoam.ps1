@@ -112,11 +112,14 @@ begin{
 						$poam += [pscustomobject]@{
 							Description = @"
 Title: $($rule.title)
-Description: $($rule.description)
+
+Description: 
+$($rule.description)
+
 Devices Affected:
 $($rule.hosts -join "`n")
 "@;
-							Control = $rule.IA_Controls;
+							Control = $rule.IAControl;
 							Org = "";
 							Checks = @"
 Group ID: $($rule.GrpId)
@@ -125,20 +128,95 @@ Rule ID: $($rule.RuleId)
 Plugin ID: $($rule.PluginId)
 "@;
 							Risk = $rule.RawRisk;
-							Mitigations = "";
+							Mitigations = $rule.comments;
 							Resources = $rule.Responsibility;
 							SCD = "";
 							Milestones = "";
-							Sources = $rule.sources;
+							Sources = "$( ( $rule.sources | sort ) -join '/' ): $($rule.Source)";
 							Status = $rule.Status;
 							Comments = $($rule.hosts -join "`n");
 					
+						}
+						
+						$rar += [pscustomObject]@{
+							'Security Controls' = $rule.IAControl;
+							'Source of Discovery' = "$( ( $rule.sources | sort ) -join '/' ): $($rule.Source)";
+							'Vulnerability ID' = @"
+Group ID: $($rule.GrpId)
+Vuln ID: $($rule.VulnId)
+Rule ID: $($rule.RuleId)
+Plugin ID: $($rule.PluginId)
+"@;
+							'Vulnerability Description' = $rule.title;
+							'Devices Affected'= $($rule.hosts -join "`n");
+							'Raw Risk' = $rule.RawRisk;
+							'Mitigations' = "";
+							'Remediations' = "";
+							'Threat Description' = $rule.description;
+							'Resources' = $rule.Responsibility;
+							'Likelihood' = "";
+							'Impact' = "$(switch($rule.RawRisk){ 'IV' {'VL'} 'III' {'L'} 'II' {'M'} 'I' {'H'} })";
+							'Residual Risk' = "";
+							'Status' = $rule.status;
+							'Recommendations' = "$($rule.fixid) $($rule.solution)";
+							'Comments' = $rule.comments;
 						}
 					}
 					
 					# $poam | fl | out-string | write-host
 					
-					$global:csts.libs.Export.Excel( $poam, $fileName,$false, 'POAM', @(50,25,25,25,25,50,25,50,50,50,50,50,50,50))
+					$global:csts.libs.Export.Excel( $poam, $fileName,$false, 'POAM', @(50,15,25,40,15,50,20,25,25,35,50,50,20,35))
+					$global:csts.libs.Export.Excel( $rar, $fileName,$true, 'RAR', @(15,40,40,40,25,15,40,40,40,25,15,15,15,25,50,40))
+
+					$tests = @()
+					
+					$tmpAcas = @()
+					foreach($acasScan in ( $this.scans.acas | sort -property scanDate )){
+						$tmpAcas += "$($acasScan.scanDate.toString('MM/dd/yyyy') )|$($acasScan.scanOs)|$($acasScan.scanFile)|$($acasScan.engine)|$($acasScan.host)"
+					}
+					
+					foreach($acasScan in ( $tmpAcas | sort -unique)){
+						$scan = $acasScan.split("|")
+					
+						$tests += [psCustomObject]@{
+							'Title' = 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner'
+							'Version' = "$($scan[3])"
+							'Host' = "$($scan[4])"
+							'Filename' = "$($scan[2])"
+							'Date' = "$($scan[0])"
+						}
+					}
+					
+					#only doing it this way because there is no sort unique for objects that works well.
+					$tmpScapCkl = @()
+					foreach($scapTitle in ( $this.scans.scap.keys | sort )){
+						foreach($scapVersion in ($this.scans.scap.$scapTitle.keys | Sort )){
+							$tmpScapCkl += "$($scapTitle -replace 'Security Technical Implementation Guide','STIG') - SCAP Benchmark|$($scapVersion)|$($this.scans.scap.$scapTitle.$scapVersion.hosts -join '; ')| |$($this.scans.scap.$scapTitle.$scapVersion.date | sort | select @{Label='Start'; Expression = {$_.toString('MM/dd/yyyy') }} -first 1 | select -expand Start) - $($this.scans.scap.$scapTitle.$scapVersion.date | sort  -descending| select @{Label='Stop'; Expression = {$_.toString('MM/dd/yyyy') }} -first 1 | select -expand Stop)"
+						}
+					}
+					
+					foreach($cklTitle in ( $this.scans.ckl.keys | sort )){
+						foreach($cklVersion in ($this.scans.ckl.$cklTitle.keys | Sort )){
+							foreach($cklFile in ($this.scans.ckl.$cklTitle.$cklVersion.keys | Sort )){
+								$tmpScapCkl += "$($cklTitle -replace 'Security Technical Implementation Guide','STIG') - STIG Checklist|$($cklVersion)|$( $this.scans.ckl.$cklTitle.$cklVersion.$cklFile.host )|$($cklFile)|$( $this.scans.ckl.$cklTitle.$cklVersion.$cklFile.date.toString('MM/dd/yyyy') )"
+							}
+						}
+					}
+					
+					foreach($scapCkl in ( $tmpScapCkl | sort -unique)){
+						$scan = $scapCkl.split("|")
+						$tests += [psCustomObject]@{
+							'Title' = "$($scan[0])"
+							'Version' = "$($scan[1])"
+							'Host' = "$($scan[2])"
+							'Filename' = "$($scan[3])"
+							'Date' = "$($scan[4])"
+						}					
+					}
+					
+		
+					$global:csts.libs.Export.Excel( $tests, $fileName, $true, 'Test Plan', @(75,15,35,35,35))					
+					
 				}
 			}
 		}
@@ -333,8 +411,8 @@ Plugin ID: $($rule.PluginId)
 				$reportItem.Responsibility = ""
 				
 				if([Utils]::isBlank( $rule.Node.description ) -eq $false){
-					if( $rule.Node.description.indexOf('<VulnDiscussion>') -gt 0){
-						$reportItem.Description = $rule.Node.description.substring( 0, $rule.Node.description.indexOf('<VulnDiscussion>') - 1)
+					if( $rule.Node.description.indexOf('</VulnDiscussion>') -gt 0){
+						$reportItem.Description = $rule.Node.description.substring( $rule.Node.description.indexOf('<VulnDiscussion>') + 17, $rule.Node.description.indexOf('</VulnDiscussion>') - 1)
 					}else{
 						$reportItem.Description = $rule.Node.description
 					}
@@ -665,6 +743,7 @@ Plugin ID: $($rule.PluginId)
 					"scanOs" = $hostScanOs;
 					"scanFile" = [io.path]::GetFilename( $file.name );
 					"engine" = $hostScanEngine;
+					"host" = $h.node.name
 				}
 			
 			
