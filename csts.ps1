@@ -98,8 +98,6 @@ begin{
 			$global:csts.timer.start() | out-null
 			$global:csts.timer.add_Tick( { $global:csts.Poll() } )
 			
-			
-			
 			iex "[GUI]::Get().changeTheme('dark.xaml')"
 		}
 		

@@ -81,7 +81,7 @@ begin{
 		#
 		# =========================================================
 		[void] InvokePreventSleep(){
-			[GUI]::Get().showModal('Please Wait... Updating Sleep Settings on Hosts')
+			[GUI]::Get().showModal('Updating Sleep Settings on Hosts')
 			$i = 0
 			$t = $this.data.count
 			

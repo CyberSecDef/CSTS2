@@ -25,6 +25,10 @@ begin{
 
 			return [GUI]::GUI
 		}
+
+		[void] showMessage($msg){
+			[System.Windows.MessageBox]::Show($msg);
+		}
 		
 		[void] changeTheme($theme){
 			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)\views\themes\$($theme)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
@@ -72,6 +76,67 @@ begin{
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
+		[void] showModal([System.Object[]]$msg, [String]$header){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Collapsed'
+			}
+			
+			[GUI]::Get().window.findName('modalHeader').Text = $header
+			[GUI]::Get().window.findName('modalPanel').child.children.clear()
+			
+			foreach($m in $msg){
+				$pbar = new-object "system.windows.controls.ProgressBar"
+				$pbar.height = 15
+				$pbar.width = 500
+				$pbar.value = $m.Progress
+				$pbar.margin = "0,0,0,10"
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
+				
+				$textBlock = new-object "system.windows.controls.textblock"
+				$textBlock.FontSize = 14
+				$textBlock.Text = $m.Text
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
+			}
+			[GUI]::Get().window.findName('modalFooter').Text = $header
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+		}
+		
+		[void] showModal([System.Object[]]$msg, [String]$header, [String]$footer){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Collapsed'
+			}
+			
+			[GUI]::Get().window.findName('modalHeader').Text = $header
+			[GUI]::Get().window.findName('modalPanel').child.children.clear()
+			
+			foreach($m in $msg){
+				$pbar = new-object "system.windows.controls.ProgressBar"
+				$pbar.height = 15
+				$pbar.width = 500
+				$pbar.value = $m.Progress
+				$pbar.margin = "0,0,0,10"
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
+				
+				$textBlock = new-object "system.windows.controls.textblock"
+				$textBlock.FontSize = 14
+				$textBlock.Text = $m.Text
+				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
+			}
+			[GUI]::Get().window.findName('modalFooter').Text = $footer
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+		}
 		
 		[void] showModal([System.Object[]]$msg){
 			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
@@ -84,6 +149,7 @@ begin{
 				[GUI]::Get().window.findName('modalBody').Visibility = 'Collapsed'
 			}
 			
+			[GUI]::Get().window.findName('modalHeader').Text = "Please Wait..."
 			[GUI]::Get().window.findName('modalPanel').child.children.clear()
 			
 			foreach($m in $msg){
@@ -91,14 +157,15 @@ begin{
 				$pbar.height = 15
 				$pbar.width = 500
 				$pbar.value = $m.Progress
+				$pbar.margin = "0,0,0,10"
 				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
 				
 				$textBlock = new-object "system.windows.controls.textblock"
-				$textBlock.FontSize = 18
+				$textBlock.FontSize = 14
 				$textBlock.Text = $m.Text
 				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
 			}
-			
+			[GUI]::Get().window.findName('modalFooter').Text = "Please Wait..."
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
@@ -112,13 +179,43 @@ begin{
 			if( [GUI]::Get().window.findName('modalPanel').Visibility -eq 'Visible'){
 				[GUI]::Get().window.findName('modalPanel').Visibility = 'Collapsed'
 			}
+			[GUI]::Get().window.findName('modalHeader').Text = "Please Wait..."
 			[GUI]::Get().window.findName('modalBody').Text = $msg
+			[GUI]::Get().window.findName('modalFooter').Text = "Please Wait..."
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
+		[void] showModal([String]$msg, [String]$header){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Collapsed'
+			}
+			[GUI]::Get().window.findName('modalHeader').Text = $header
+			[GUI]::Get().window.findName('modalBody').Text = $msg
+			[GUI]::Get().window.findName('modalFooter').Text = $header
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+		}
 		
-		
-		
+		[void] showModal([String]$msg, [String]$header, [String]$footer){
+			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalDialog').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalBody').Visibility -ne 'Visible'){
+				[GUI]::Get().window.findName('modalBody').Visibility = 'Visible'
+			}
+			if( [GUI]::Get().window.findName('modalPanel').Visibility -eq 'Visible'){
+				[GUI]::Get().window.findName('modalPanel').Visibility = 'Collapsed'
+			}
+			[GUI]::Get().window.findName('modalHeader').Text = $header
+			[GUI]::Get().window.findName('modalBody').Text = $msg
+			[GUI]::Get().window.findName('modalFooter').Text = $footer
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+		}
 		
 		
 		

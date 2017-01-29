@@ -113,7 +113,7 @@ begin{
 		#
 		# =========================================================
 		[void] InvokeFindDormant(){
-			[GUI]::Get().showModal('Please Wait... Retrieving Existing Users')
+			[GUI]::Get().showModal('Retrieving Existing Users')
 			
 			$hosts = $global:csts.libs.hosts.Get()
 			$this.data = @()

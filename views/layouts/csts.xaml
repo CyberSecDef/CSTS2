@@ -17,9 +17,33 @@
 			<Setter Property="Visibility" Value="Collapsed"></Setter>
 		</Style>
 		
+		<Style x:Key="modalWindow" TargetType="Grid">
+			<Setter Property="HorizontalAlignment" Value="Center"></Setter>
+			<Setter Property="VerticalAlignment" Value="Center"></Setter>
+		</Style>
+		
+		
+		<Style x:Key="modalHeader">
+			<Setter Property="Grid.VerticalAlignment" Value="Center"></Setter>
+			<Setter Property="TextBlock.FontSize" Value="20"></Setter>
+		</Style>
+
+		<Style x:Key="modalBorder" >
+			<Setter Property="Border.Padding" Value="10"></Setter>
+			<Setter Property="Border.Background" Value="#ffffff"></Setter>
+			<Setter Property="Border.Height" Value="50"></Setter>
+			<Setter Property="Border.BorderThickness" Value="0,1,0,1"></Setter>
+			<Setter Property="Border.BorderBrush" Value="#cccccc"></Setter>
+		</Style>		
+		
+		<Style x:Key="modalFooter" >
+			<Setter Property="Grid.VerticalAlignment" Value="Center"></Setter>
+			<Setter Property="TextBlock.FontSize" Value="20"></Setter>
+		</Style>
+		
 		<Style x:Key="modalBG" TargetType="TextBlock">
 			<Setter Property="Background" Value="#333333"></Setter>
-			<Setter Property="Opacity" Value=".7"></Setter>
+			<Setter Property="Opacity" Value=".625"></Setter>
 		</Style>
 		
 		<Style x:Key="modalBody" TargetType="TextBlock">
@@ -40,7 +64,7 @@
 			<Setter Property="Background" Value="#ffffff"></Setter>
 			<Setter Property="Width" Value="600"></Setter>
 			<Setter Property="Height" Value="100"></Setter>
-			<Setter Property="Padding" Value="0,25,0,0"></Setter>
+			<Setter Property="Padding" Value="10,25,10,0"></Setter>
 			<Setter Property="Visibility" Value="Collapsed"></Setter>
 		</Style>
 		
@@ -396,11 +420,38 @@
 				</Grid>
 				
 				<Grid Style="{StaticResource ResourceKey=modalGrid}" x:Name="modalDialog" Grid.Column="0">
+				
 					<TextBlock Style="{StaticResource ResourceKey=modalBG}"></TextBlock>
-					<TextBlock Style="{StaticResource ResourceKey=modalBody}" x:Name="modalBody">Loading...Please Wait!</TextBlock>
-					<Border Style="{StaticResource ResourceKey=modalPanel}" x:Name="modalPanel">
-						<StackPanel Grid.Column="0" Grid.Row="0" />
-					</Border>
+					
+					<Grid Style="{StaticResource ResourceKey=modalWindow}">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="600" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="52"></RowDefinition>
+							<RowDefinition Height="Auto"></RowDefinition>
+							<RowDefinition Height="50"></RowDefinition>
+						</Grid.RowDefinitions>
+						
+						<Grid Grid.Row="0" Style="{StaticResource ResourceKey=modalHeader}">
+							<Border Style="{StaticResource ResourceKey=modalBorder}" CornerRadius="10,10,0,0">
+								<TextBlock x:Name="modalHeader">Header</TextBlock>
+							</Border>
+						</Grid>
+						<Grid Grid.Row="1">
+							<TextBlock Style="{StaticResource ResourceKey=modalBody}" x:Name="modalBody">Loading...Please Wait!</TextBlock>
+							<Border Style="{StaticResource ResourceKey=modalPanel}" x:Name="modalPanel">
+								<StackPanel Grid.Column="0" Grid.Row="0" />
+							</Border>
+						</Grid>
+						<Grid Grid.Row="2" Style="{StaticResource ResourceKey=modalFooter}">
+							<Border Style="{StaticResource ResourceKey=modalBorder}"  CornerRadius="0,0,10,10">
+								<TextBlock x:Name="modalFooter">Footer</TextBlock>
+							</Border>
+						</Grid>
+						
+						
+					</Grid>
 				</Grid>
 				
 				
