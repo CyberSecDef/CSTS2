@@ -82,7 +82,15 @@ begin{
 					$Null = $CellNode.AppendChild($CellNodeIs)
 					
 					$CellNodeIsT = $WorkSheetXmlDoc.CreateElement('t', $WorkSheetXmlDoc.DocumentElement.Item("sheetData").NamespaceURI)
-					$CellNodeIsT.InnerText = [String]$row.$($prop)
+					
+					#make sure the cell content isn't too long for excel to handle
+					$innerText = [String]$row.$($prop)
+					if($innerText.length -gt 32000){
+						$innerText = $innerText.substring(0,32000)
+					}
+					
+					$CellNodeIsT.InnerText = $innerText
+					
 					$Null = $CellNodeIs.AppendChild($CellNodeIsT)
 					
 					$Null = $WorkSheetXmlDoc.DocumentElement.Item("sheetData").AppendChild($RowNode)
@@ -292,7 +300,7 @@ begin{
 			
 			
 			$style_xml = [xml]@"
-<?xml version="1.0" encoding="utf-16" standalone="yes"?> <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"> <fonts count="1"> <font /> </fonts> <fills count="1"> <fill /> </fills> <borders count="1"> <border /> </borders> <cellStyleXfs count="1"> <xf /> </cellStyleXfs> <cellXfs count="2" > <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" /> <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1" > <alignment wrapText="1" /> </xf> </cellXfs> </styleSheet>
+<?xml version="1.0" encoding="utf-16" standalone="yes"?> <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"> <fonts count="1"> <font> <sz val="8"/> <name val="Calibri"/> <family val="2"/> </font> </fonts> <fills count="1"> <fill /> </fills> <borders count="1"> <border /> </borders> <cellStyleXfs count="1"> <xf /> </cellStyleXfs> <cellXfs count="2" > <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" /> <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1" > <alignment wrapText="1" /> </xf> </cellXfs> </styleSheet>
 "@
 			$Uri_xl_styles_xml = New-Object System.Uri -ArgumentList ("/xl/styles.xml", [System.UriKind]::Relative)
 			$Part_xl_styles_xml = $exPkg.CreatePart($Uri_xl_styles_xml, "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml")
