@@ -120,7 +120,7 @@ begin{
 			}
 		
 			iex "[GUI]::Get().GetColors();"
-			
+			# iex "[GUI]::Get().ShowModal('test');"
 		}
 		
 		[void] Dispose(){
@@ -148,24 +148,17 @@ process{
 	
 	$global:csts.init() | out-null
 	
-	#this tests the sql installation
-	# $test = [SQL]::Get( $global:csts.db ).query("SELECT name FROM sqlite_master WHERE type='table' AND name='test2'").execAssoc()
-	# if($test -eq $null){
-		# [SQL]::Get( $global:csts.db ).query("create table test2( id integer primary key, name text not null)").execNonQuery()
-		# [SQL]::Get( $global:csts.db ).query("insert into test2(name) values ('test') ").execNonQuery()
-	# }else{
-		# [SQL]::Get( $global:csts.db ).query("insert into test2(name) values ('test') ").execNonQuery()
-	# }
-
-	# [SQL]::Get( $global:csts.db ).query("SELECT * FROM test2").execAssoc().ForEach({[PSCustomObject]$_}) | Format-Table -AutoSize
-
 	#show the form.  This is a dialog, so after this all actions must be event calls or based off the heart beat.
 	[GUI]::Get().ShowContent("/views/home.xaml") | out-null
 	[GUI]::Get().ShowDialog() | out-null
 }
 end{
 	$global:csts.IsActive = $false;
-	[SQL]::Get( $global:csts.db ).Close() | out-null
+	
+	gci "$($global:csts.execPath)\db\*.dat" | %{
+		[SQL]::Get( $_.name ).Close() | out-null
+	}
+	
 	[Log]::Get().save();
 	$global:csts.Dispose();
 	[System.GC]::Collect() | out-null
