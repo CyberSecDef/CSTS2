@@ -121,112 +121,60 @@
 				
 			</ribbon:RibbonTab>
 
-			<ribbon:RibbonTab x:Name="rtabAccounts">
-				<RibbonTab.Header>
-					<TextBlock Text="Accounts" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="rGrpADAttributes">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnADEditor" Label="AD Attribute Editor"  SmallImageSource="{{{pwd}}}\images\ribbon\accounts\editAccount.png" LargeImageSource="{{{pwd}}}\images\ribbon\accounts\editAccount.png" />
-				</ribbon:RibbonGroup>
-				<ribbon:RibbonGroup x:Name="rGrpDormantAccounts">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFindDormantAccounts" Label="Find Dormant Accounts" SmallImageSource="{{{pwd}}}\images\ribbon\accounts\findDormantAccounts.png" LargeImageSource="{{{pwd}}}\images\ribbon\accounts\findDormantAccounts.png" />
-				</ribbon:RibbonGroup>
-				<ribbon:RibbonGroup x:Name="rGrpManageLocalAdmins">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnManageLocalAdmins" Label="Manage Local Administrators" SmallImageSource="{{{pwd}}}\images\ribbon\accounts\manageAccounts.png" LargeImageSource="{{{pwd}}}\images\ribbon\accounts\manageAccounts.png"/>
-				</ribbon:RibbonGroup>
-				<ribbon:RibbonGroup x:Name="rGrpUserCounts">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUserCounts" Label="User Counts" SmallImageSource="{{{pwd}}}\images\ribbon\accounts\userCount.png" LargeImageSource="{{{pwd}}}\images\ribbon\accounts\userCount.png"/>
-				</ribbon:RibbonGroup>
-			</ribbon:RibbonTab>
-
-			<ribbon:RibbonTab x:Name="rtabEventLogs">
-				<RibbonTab.Header>
-					<TextBlock Text="Event Logs" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="rgrpParseEventLogs">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnParseEventLogs" Label="Parse Event Logs" SmallImageSource="{{{pwd}}}\images\ribbon\eventLogs\parseEventLogs.png" LargeImageSource="{{{pwd}}}\images\ribbon\eventLogs\parseEventLogs.png" />
-				</ribbon:RibbonGroup>
-				<ribbon:RibbonGroup x:Name="rgrpArchiveEventLogs">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnArchiveEventLogs" Label="Archive Event Logs" SmallImageSource="{{{pwd}}}\images\ribbon\eventLogs\archiveEventLogs.png" LargeImageSource="{{{pwd}}}\images\ribbon\eventLogs\archiveEventLogs.png" />
-				</ribbon:RibbonGroup>
-			</ribbon:RibbonTab>
-
-			<ribbon:RibbonTab x:Name="rtabPackages">
-				<RibbonTab.Header>
-					<TextBlock Text="Packages" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="rgrpPackageManger" >
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPackage" Label="Package Manager" SmallImageSource="{{{pwd}}}\images\ribbon\packages\PackageManger.png" LargeImageSource="{{{pwd}}}\images\ribbon\packages\PackageManger.png"/>
-				</ribbon:RibbonGroup>
-			</ribbon:RibbonTab>
-
-			<ribbon:RibbonTab x:Name="rtabPolicies">
-				<RibbonTab.Header>
-					<TextBlock Text="Policies" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="policyMgr">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPolicyManager" Label="Policy Manager" SmallImageSource="{{{pwd}}}\images\ribbon\policies\PolicyManager.png" LargeImageSource="{{{pwd}}}\images\ribbon\policies\PolicyManager.png"/>
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpScap2Gpo">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScap2Gpo" Label="Scap To Gpo" SmallImageSource="{{{pwd}}}\images\ribbon\policies\Scap2Gpo.png" LargeImageSource="{{{pwd}}}\images\ribbon\policies\Scap2Gpo.png" />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpVram2Acas">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnVram2Acas" Label="Vram to Acas" SmallImageSource="{{{pwd}}}\images\ribbon\policies\Vram2Acas.png" LargeImageSource="{{{pwd}}}\images\ribbon\policies\Vram2Acas.png" />
-				</ribbon:RibbonGroup>
-
-			</ribbon:RibbonTab>
-
-			<ribbon:RibbonTab x:Name="rtabScans">
-				<RibbonTab.Header>
-					<TextBlock Text="Scans" Style="{DynamicResource rTabBindings}" />
-				</RibbonTab.Header>
-
-				<ribbon:RibbonGroup x:Name="rgrpCleanScap">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnCleanScap" Label="Clean SCAP Folder" SmallImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpHwSwScan">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnHwSwScan" Label="Hardware Software List" SmallImageSource="{{{pwd}}}\images\ribbon\scans\hwSwList.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\hwSwList.png" />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpPatchStatus">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPatchStatus" Label="Patch Status" SmallImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" Tag="portScanner.Test" />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpScan2Poam">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScanToPoam" Label="Scans to Poam" SmallImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png"  />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpSw2Stig">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSw2Stig" Label="Software to STIG" SmallImageSource="{{{pwd}}}\images\ribbon\scans\sw2Stig.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\sw2Stig.png"  />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpUpdateStig">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUpdateStig" Label="Update STIG" SmallImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png"  />
-				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpVramFindings">
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="brnVramFindings" Label="VRAM Open Findings" SmallImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png"  />
-				</ribbon:RibbonGroup>
-			</ribbon:RibbonTab>
-
 			<ribbon:RibbonTab x:Name="rtabScapStig">
 				<RibbonTab.Header>
-					<TextBlock Text="SCAP/STIG" Style="{DynamicResource rTabBindings}" />
+					<TextBlock Text="Packages, Scans, STIGs" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
-				<ribbon:RibbonGroup x:Name="diacapControls" Style="{ DynamicResource textElements }">
+				
+				<ribbon:RibbonGroup x:Name="rgpPackages" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png">
+					<RibbonGroup.Header>
+						<TextBlock Text="Packages" Style="{DynamicResource rTabBindings}" />
+					</RibbonGroup.Header>
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPackageManager" Label="Package Manager" SmallImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png"/>
+				</ribbon:RibbonGroup>
+				
+				<ribbon:RibbonGroup x:Name="rgpPolicies" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\PackageManger.png">
+					<RibbonGroup.Header>
+						<TextBlock Text="Policies" Style="{DynamicResource rTabBindings}" />
+					</RibbonGroup.Header>
+
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPolicyManager" Label="Policy Manager" SmallImageSource="{{{pwd}}}\images\ribbon\scans\PolicyManager.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\PolicyManager.png"/>
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScap2Gpo" Label="Scap To Gpo" SmallImageSource="{{{pwd}}}\images\ribbon\scans\Scap2Gpo.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\Scap2Gpo.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnVram2Acas" Label="Vram to Acas" SmallImageSource="{{{pwd}}}\images\ribbon\scans\Vram2Acas.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\Vram2Acas.png" />
+					
+				</ribbon:RibbonGroup>
+				
+				<ribbon:RibbonGroup x:Name="rgrpScans" Style="{ DynamicResource textElements }">
+					<RibbonGroup.Header >
+						<TextBlock Text="Scans" />
+					</RibbonGroup.Header>
+					
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnCleanScap" Label="Clean SCAP Folder" SmallImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\cleanScap.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnHwSwScan" Label="Hardware Software List" SmallImageSource="{{{pwd}}}\images\ribbon\scans\hwSwList.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\hwSwList.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPatchStatus" Label="Patch Status" SmallImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\patchStatus.png" Tag="portScanner.Test" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnScanToPoam" Label="Scans to Poam" SmallImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\scan2poam.png"  />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSw2Stig" Label="Software to STIG" SmallImageSource="{{{pwd}}}\images\ribbon\scans\sw2Stig.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\sw2Stig.png"  />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUpdateStig" Label="Update STIG" SmallImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\updateStig.png"  />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="brnVramFindings" Label="VRAM Open Findings" SmallImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\vramFindings.png"  />
+					
+				</ribbon:RibbonGroup>
+				
+				<ribbon:RibbonGroup x:Name="rgrpDiacapControls" Style="{ DynamicResource textElements }">
 				
 					<RibbonGroup.Header >
 						<TextBlock Text="Viewers" />
 					</RibbonGroup.Header>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnDiacapControls" Label="DIACAP" SmallImageSource="{{{pwd}}}\images\ribbon\scapStig\DIACAP.png" LargeImageSource="{{{pwd}}}\images\ribbon\scapStig\DIACAP.png" />
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnRmfControls" Label="RMF" SmallImageSource="{{{pwd}}}\images\ribbon\scapStig\RMF.png" LargeImageSource="{{{pwd}}}\images\ribbon\scapStig\RMF.png" />
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnDiacapControls" Label="DIACAP" SmallImageSource="{{{pwd}}}\images\ribbon\scans\DIACAP.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\DIACAP.png" />
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnRmfControls" Label="RMF" SmallImageSource="{{{pwd}}}\images\ribbon\scans\RMF.png" LargeImageSource="{{{pwd}}}\images\ribbon\scans\RMF.png" />
 									
 					<ribbon:RibbonComboBox x:Name="cboSTIG"  Label="STIG:" IsEditable="True" Foreground="Black" SelectionBoxWidth="80" Resources="{StaticResource AlignmentDictionary}">
 						<ribbon:RibbonGallery x:Name="rGalSTIG" SelectedValuePath="Name" MaxColumnCount="1" >
@@ -239,8 +187,6 @@
 							<ribbon:RibbonGalleryCategory x:Name="rGCatSCAP"/>
 						</ribbon:RibbonGallery>
 					</ribbon:RibbonComboBox>
-					
-					
 				</ribbon:RibbonGroup>
 			</ribbon:RibbonTab>
 
@@ -249,28 +195,21 @@
 					<TextBlock Text="Systems" Style="{DynamicResource rTabBindings}" />
 				</RibbonTab.Header>
 
-				<ribbon:RibbonGroup x:Name="rgrpConfigurations" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png">
+				<ribbon:RibbonGroup x:Name="rgrpAccounts" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\manageAccounts.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\manageAccounts.png">
 					<RibbonGroup.Header>
-						<TextBlock Text="Configurations" />
+						<TextBlock Text="systems"/>
 					</RibbonGroup.Header>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnApplyPolicies" Label="Apply Policies" SmallImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFixDotNet" Label="Fix Dot Net" SmallImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPreventSleep" Label="Prevent Sleep" SmallImageSource="{{{pwd}}}\images\ribbon\systems\preventSleep.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\preventSleep.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSslCertificates" Label="SSL Certificates" SmallImageSource="{{{pwd}}}\images\ribbon\systems\ssl.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\ssl.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnServiceQuotes" Label="Service Quotes" SmallImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png"/>
+					
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnADEditor" Label="AD Attribute Editor"  SmallImageSource="{{{pwd}}}\images\ribbon\systems\editAccount.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\editAccount.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFindDormantAccounts" Label="Find Dormant Accounts" SmallImageSource="{{{pwd}}}\images\ribbon\systems\findDormantAccounts.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\findDormantAccounts.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnManageLocalAdmins" Label="Manage Local Administrators" SmallImageSource="{{{pwd}}}\images\ribbon\systems\manageAccounts.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\manageAccounts.png"/>
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUserCounts" Label="User Counts" SmallImageSource="{{{pwd}}}\images\ribbon\systems\userCount.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\userCount.png"/>
+					
 				</ribbon:RibbonGroup>
-
-				<ribbon:RibbonGroup x:Name="rgrpResources" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\resources.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\resources.png">
-					<RibbonGroup.Header>
-						<TextBlock Text="Resources" />
-					</RibbonGroup.Header>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSystemMgr" Label="System Manager" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFileSystem" Label="File System" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnRegistry" Label="Registry" 			SmallImageSource="{{{pwd}}}\images\ribbon\systems\registry.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\registry.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnProcesses" Label="Processes" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\processes.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\processes.png"/>
-					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSysInfo" Label="System Info" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png"/>
-				</ribbon:RibbonGroup>
-
+				
 				<ribbon:RibbonGroup x:Name="rgrpActions" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\actions.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\actions.png">
 					<RibbonGroup.Header>
 						<TextBlock Text="Actions"/>
@@ -290,6 +229,63 @@
 					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnUpdate" Label="Update Host" 				SmallImageSource="{{{pwd}}}\images\ribbon\systems\updateHost.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\updateHost.png"/>
 
 				</ribbon:RibbonGroup>
+				
+				
+				<ribbon:RibbonGroup x:Name="rgrpConfigurations" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\configurations.png">
+					<RibbonGroup.Header>
+						<TextBlock Text="Configurations" />
+					</RibbonGroup.Header>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnApplyPolicies" Label="Apply Policies" SmallImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\applyPolicies.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFixDotNet" Label="Fix Dot Net" SmallImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fixDotNet.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnPreventSleep" Label="Prevent Sleep" SmallImageSource="{{{pwd}}}\images\ribbon\systems\preventSleep.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\preventSleep.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSslCertificates" Label="SSL Certificates" SmallImageSource="{{{pwd}}}\images\ribbon\systems\ssl.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\ssl.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnServiceQuotes" Label="Service Quotes" SmallImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\serviceQuotes.png"/>
+				</ribbon:RibbonGroup>
+
+				
+				
+				
+				<ribbon:RibbonGroup x:Name="rgrpEventlogs" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\parseEventLogs.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\parseEventLogs.png">
+					<RibbonGroup.Header>
+						<TextBlock Text="Event Logs" Style="{DynamicResource rTabBindings}" />
+					</RibbonGroup.Header>
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnParseEventLogs" Label="Parse Event Logs" SmallImageSource="{{{pwd}}}\images\ribbon\systems\parseEventLogs.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\parseEventLogs.png" />
+				
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnArchiveEventLogs" Label="Archive Event Logs" SmallImageSource="{{{pwd}}}\images\ribbon\systems\archiveEventLogs.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\archiveEventLogs.png" />
+				</ribbon:RibbonGroup> 
+			
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				<ribbon:RibbonGroup x:Name="rgrpResources" Style="{ DynamicResource textElements }" SmallImageSource="{{{pwd}}}\images\ribbon\systems\resources.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\resources.png">
+					<RibbonGroup.Header>
+						<TextBlock Text="Resources" />
+					</RibbonGroup.Header>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSystemMgr" Label="System Manager" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\systemManager.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnFileSystem" Label="File System" 	SmallImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\fileSystem.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnRegistry" Label="Registry" 			SmallImageSource="{{{pwd}}}\images\ribbon\systems\registry.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\registry.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnProcesses" Label="Processes" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\processes.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\processes.png"/>
+					<ribbon:RibbonButton Style="{DynamicResource ribbonButtonTheme}" x:Name="btnSysInfo" Label="System Info" 		SmallImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png" LargeImageSource="{{{pwd}}}\images\ribbon\systems\sysInfo.png"/>
+				</ribbon:RibbonGroup>
+
+				
 			</ribbon:RibbonTab>
 
 			<ribbon:RibbonTab x:Name="rtabDeveloper">
@@ -428,10 +424,15 @@
 							<ColumnDefinition Width="600" />
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
-							<RowDefinition Height="52"></RowDefinition>
+							<RowDefinition Height="50"></RowDefinition>
 							<RowDefinition Height="Auto"></RowDefinition>
 							<RowDefinition Height="50"></RowDefinition>
 						</Grid.RowDefinitions>
+						
+						<Grid Grid.Row="0" Grid.RowSpan="3">
+							<Border Background="#cccccc" Margin="0,10,0,10"/>
+								
+						</Grid>
 						
 						<Grid Grid.Row="0" Style="{StaticResource ResourceKey=modalHeader}">
 							<Border Style="{StaticResource ResourceKey=modalBorder}" CornerRadius="10,10,0,0">
