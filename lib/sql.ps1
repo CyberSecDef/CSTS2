@@ -49,6 +49,19 @@ begin{
 			return $this
 		}
 		
+		[Object[]] execSingle(){
+			$dbReader = $this.dbCommand.executeReader()
+
+			$row = @{}
+			for($f=0; $f -lt $dbReader.fieldCount; $f++){
+				$row.$($dbReader.getName($f)) = $dbReader.getValue($f)
+			}
+				
+			
+			$dbReader.close()
+			return $row
+		}
+		
 		[Object[]] execAssoc(){
 			$dbReader = $this.dbCommand.executeReader()
 			$results = @()
