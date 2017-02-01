@@ -31,6 +31,7 @@ begin{
 			ckl = @{};
 		}
 		$poamArr = @{}
+		$poamKeys = @();
 		$scapOpen = @()
 		$cklOpen = @()
 
@@ -109,6 +110,7 @@ begin{
 					$summary = @()
 					$issues = @()
 					
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting RAR and POAM"; Progress = 65 } ), "Exporting Results" )
 					foreach($finding in ($this.poamArr.keys)){
 						$rule = $this.poamArr.$finding
 
@@ -174,6 +176,7 @@ Plugin ID: $($rule.PluginId)
 						}
 					}
 
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Test Plan"; Progress = 75 } ), "Exporting Results" )
 					$tmpAcas = @()
 					foreach($acasScan in ( $this.scans.acas | sort -property scanDate )){
 						$tmpAcas += "$($acasScan.scanDate.toString('MM/dd/yyyy') )|$($acasScan.scanOs)|$($acasScan.scanFile)|$($acasScan.engine)|$($acasScan.host)"
@@ -218,6 +221,7 @@ Plugin ID: $($rule.PluginId)
 						}
 					}
 
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Summary"; Progress = 80 } ), "Exporting Results" )
 					foreach($acasScan in ( $this.scans.acas | sort -property scanDate )){
 						$summary += [psCustomObject]@{
 							'Type' = "ACAS"
@@ -278,6 +282,7 @@ Plugin ID: $($rule.PluginId)
 						}
 					}
 					
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Issues"; Progress = 85 } ), "Exporting Results" )
 					foreach($scap in $this.scapOpen){
 						$cnt = $this.cklOpen | ? { $_.grpID -eq $scap.grpId -and $_.vulnId -eq $scap.vulnId -and $_.ruleId -eq $scap.ruleId}
 						if($cnt -eq $null){
@@ -317,10 +322,22 @@ Plugin ID: $($rule.PluginId)
 						}
 					}
 					
+					write-host "Summary: $($summary.count)"
+					write-host "Issues: $($issues.count)"
+					write-host "Test: $($tests.count)"
+					write-host "POAM: $($poam.count)"
+					write-host "RAR: $($rar.count)"
+					
+					
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Summary Spreadhseet"; Progress = 90 } ), "Exporting Results" )
 					$global:csts.libs.Export.Excel( $summary, $fileName, $false, 'Summary', @( 15,20,60,70,15,15,15,15,15,15,25) )
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Issues Spreadhseet"; Progress = 92 } ), "Exporting Results" )
 					$global:csts.libs.Export.Excel( $issues, $fileName, $true, 'Issues', @( 75, 25, 50, 25, 15,15,15,20,20,75,75 ) )
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Testplan Spreadhseet"; Progress = 94 } ), "Exporting Results" )
 					$global:csts.libs.Export.Excel( $tests, $fileName, $true, 'Test Plan', @(75,15,35,75,35))
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting POAM Spreadhseet"; Progress = 96 } ), "Exporting Results" )
 					$global:csts.libs.Export.Excel( $poam, $fileName,$true, 'POAM', @(40,15,25,30,15,40,15,25,15,25,25,30,15,35))
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting RAR Spreadhseet"; Progress = 98 } ), "Exporting Results" )
 					$global:csts.libs.Export.Excel( $rar, $fileName,$true, 'RAR', @(15,15,45,40,40,30,30,15,45,45,15,15,30,30,30,15,15,45,20,40,40,40,40))
 				}
 			}
@@ -357,16 +374,16 @@ Plugin ID: $($rule.PluginId)
 					$i++
 					[Log]::Get().msg( "$($i) / $($t) : Parsing Scan $($_.fullname)", 0, $this)
 					[GUI]::Get().sbarMsg("$($i) / $($t) : Parsing Scan $($_.name)")
-					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "$($i) / $($t) : Parsing Scan:`n$($_.name)"; Progress = 10 + ( 80 * ( $i/$t) ) } ), "Parsing Scan Files" )
-					[GUI]::Get().sbarProg( 10 + ( 80 * ( $i/$t) ) )
+					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "$($i) / $($t) : Parsing Scan:`n$($_.name)"; Progress = 10 + ( 50 * ( $i/$t) ) } ), "Parsing Scan Files" )
+					[GUI]::Get().sbarProg( 10 + ( 50 * ( $i/$t) ) )
 					$this.parseFile( (get-item $_.fullname ) )
 					$global:csts.controllers.scans.updateScansToPoamUI()
 				}
 
 				[Log]::Get().msg( "Exporting Results", 0, $this)
 				[GUI]::Get().sbarMsg("Exporting Results")
-				[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Results"; Progress = 95 } ), "Exporting Results" )
-				[GUI]::Get().sbarProg( 95 )
+				[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Results"; Progress = 65 } ), "Exporting Results" )
+				[GUI]::Get().sbarProg( 65 )
 
 				$this.ExportData("$([CSTS_Export]::XLSX)")
 			}else{
@@ -453,18 +470,18 @@ Plugin ID: $($rule.PluginId)
 				if([Utils]::isBlank("$($reportItem.VulnId)$($reportItem.RuleId)$($reportItem.PluginId)".trim()) -eq $false){
 					$key = "$($reportItem.VulnId)-$($reportItem.RuleId)-$($reportItem.PluginId)"
 
-					# if the vulnerability already exists, just add new hosts
-					if($this.poamArr.ContainsKey( $key ) ){
+					
+					if($this.poamKeys -contains $key ){
 						if($this.poamArr.$key.hosts -notcontains ("$h".ToLower()) ){
 							$this.poamArr.$key.hosts += "$h".ToLower()
 						}
 
-						#see if the IA Controls need to be added to the record
+					
 						if([Utils]::isBlank( $reportItem.IA_Controls) -eq $false){
 							$this.poamArr.$key.IA_Controls = $reportItem.IA_Controls
 						}
 
-						#see if the comments need to be added to the record
+					
 						if([Utils]::isBlank($reportItem.Comments) -eq $false){
 							$this.poamArr.$key.Comments = "$($this.poamArr.$key.Comments)\n\n$($reportItem.Comments)"
 						}
@@ -473,6 +490,7 @@ Plugin ID: $($rule.PluginId)
 							$this.poamArr.$key.sources += ( $reportItem.shortSource )
 						}
 					}else{
+						$this.poamKeys += $key
 						$reportItem.Sources = @()
 						$reportItem.Sources += $reportItem.shortSource
 						$reportItem.hosts = @()
