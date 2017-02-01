@@ -1,5 +1,6 @@
 [CmdletBinding()]param()
 begin{
+	
 	Class SQL{
 		static [SQL] $db = $null;
 		$dbConnection = $null;
@@ -7,6 +8,10 @@ begin{
 		
 		SQL(){
 		
+		}
+		
+		__($methodName, $parameters){
+			write-host "$($methodName) was called with parameters: $($parameters)"
 		}
 		
 		SQL( $sqlFile ){
