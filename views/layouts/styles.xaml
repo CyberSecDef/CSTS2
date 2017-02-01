@@ -66,7 +66,7 @@
 		<Setter Property="Template"> 
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#143045" Background="#337ab7">
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#143045" Background="#337ab7" CornerRadius="5">
 						<Grid>
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#286090" Foreground="#ffffff" />
 						</Grid>	
@@ -80,7 +80,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#cccccc" Background="#ffffff" >
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#cccccc" Background="#ffffff" CornerRadius="5" >
 						<Grid>
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#ffffff"  Foreground="#333333"  />
 						</Grid>	
@@ -94,7 +94,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#4cae4c" Background="#5cb85c">
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#4cae4c" Background="#5cb85c" CornerRadius="5">
 						<Grid >
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#5cb85c"  Foreground="#FFFFFF" />
 						</Grid>	
@@ -108,7 +108,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#46b8da" Background="#5bc0de">
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#46b8da" Background="#5bc0de" CornerRadius="5">
 						<Grid >
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#5bc0de"  Foreground="#FFFFFF" />
 						</Grid>	
@@ -122,7 +122,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#eea236" Background="#f0ad4e">
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#eea236" Background="#f0ad4e" CornerRadius="5">
 						<Grid >
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#f0ad4e"  Foreground="#FFFFFF" />
 						</Grid>	
@@ -136,7 +136,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Border Style="{StaticResource btnBorder}" BorderBrush="#d43f3a" Background="#d9534f">
+					<Border Style="{StaticResource btnBorder}" BorderBrush="#d43f3a" Background="#d9534f" CornerRadius="5">
 						<Grid >
 							<ContentControl Style="{StaticResource btnText}" Content="{TemplateBinding Content}" Background="#d9534f"  Foreground="#FFFFFF" />
 						</Grid>	
@@ -149,7 +149,8 @@
 	<Style x:Key="form" TargetType="{x:Type Border}">
 		<Setter Property="BorderThickness" Value="1"></Setter>
 		<Setter Property="BorderBrush" Value="#e1e1e8"></Setter>
-		<Setter Property="Margin" Value="0"></Setter>
+		<Setter Property="Margin" Value="0,10,0,0"></Setter>
+		
 	</Style>
 	
 	<Style x:Key="lblFormBold" TargetType="{x:Type Label}">
@@ -159,7 +160,7 @@
 					<Border 
 						BorderThickness="0"
 						Cursor="Hand"
-						Height="30"
+						
 						Margin="5">
 						<Grid >
 							<ContentControl 
@@ -185,7 +186,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type TextBox}">
 					<TextBox 
-						Height="30"
+						
 						VerticalContentAlignment="Center"
 						
 						Text="{TemplateBinding Text}" 
@@ -202,4 +203,20 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
+	
+	<Style x:Key="tblHeader">
+		<Setter Property="Label.FontWeight" Value="500"></Setter>
+		<Setter Property="Label.FontSize" Value="14"></Setter>
+		
+		
+		<Setter Property="TextBlock.FontWeight" Value="500"></Setter>
+		<Setter Property="TextBlock.FontSize" Value="14"></Setter>
+		<Setter Property="TextBlock.Margin" Value="0,10,0,0"></Setter>
+				
+		<Setter Property="TextBox.FontWeight" Value="500"></Setter>
+		<Setter Property="TextBox.FontSize" Value="14"></Setter>
+		<Setter Property="TextBox.VerticalContentAlignment" Value="Center"></Setter>
+	</Style>
+	
+	
 </ResourceDictionary>
