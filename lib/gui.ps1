@@ -5,8 +5,7 @@ begin{
 		$window;
 		
 		GUI(){
-			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)/views/layouts/csts.xaml" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
-			$this.window = Get-XAML( $xaml );
+			$this.window = $this.parseXaml( "$($global:csts.execPath)/views/layouts/csts.xaml" )
 			$this.window.FindName('btnHostExpand').add_Click({
 				[GUI]::Get().expandHost();
 			})
@@ -16,6 +15,11 @@ begin{
 			$this.window.add_SizeChanged( { 
 				[GUI]::Get().window.findName('rgrpSpace').Width = $_.NewSize.width - 175 
 			} )
+		}
+		
+		[object] parseXaml( $xamlPath ){
+			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc $xamlPath ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
+			return ( Get-XAML( $xaml ) );
 		}
 		
 		[GUI] static Get(  ){
@@ -31,8 +35,8 @@ begin{
 		}
 		
 		[void] changeTheme($theme){
-			$xaml =  [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execPath)\views\themes\$($theme)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
-			$theme = Get-XAML( $xaml );
+			$theme = [GUI]::Get().parseXaml( "$($global:csts.execPath)\views\themes\$($theme)" )
+			
 			[GUI]::Get().window.resources.MergedDictionaries.Clear();
 			[GUI]::Get().window.resources.MergedDictionaries.Add($theme);
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
@@ -60,8 +64,7 @@ begin{
 		}
 		
 		[void] ShowContent($path){
-			$content = [xml]( iex ('@"' + "`n" + ( (gc "$($global:csts.execpath)/$($path)" ) -replace "{{{pwd}}}",$global:csts.execPath ) + "`n" + '"@') )
-			$uc = Get-XAML( $content )
+			$uc = [GUI]::Get().parseXaml( "$($global:csts.execpath)/$($path)" )
 			
 			try{
 				if([GUI]::Get().window.FindName('contentContainer').FindName( 'UC' )){
@@ -75,6 +78,28 @@ begin{
 			[GUI]::Get().window.FindName('contentContainer').RegisterName( 'UC', $uc )
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
+		
+		[void] ShowContent($path, $viewModel){
+			if($viewModel -ne $null){
+				[GUI]::Get().window.DataContext = $viewModel
+			}
+			$uc = [GUI]::Get().parseXaml( "$($global:csts.execpath)/$($path)" )
+			
+			try{
+				if([GUI]::Get().window.FindName('contentContainer').FindName( 'UC' )){
+					[GUI]::Get().window.FindName('contentContainer').UnregisterName( 'UC' )
+				}
+			}catch{
+				
+			}
+			[GUI]::Get().window.FindName('contentContainer').children.clear()
+			[GUI]::Get().window.FindName('contentContainer').addChild($uc)
+			[GUI]::Get().window.FindName('contentContainer').RegisterName( 'UC', $uc )
+			[System.Windows.Forms.Application]::DoEvents()  | out-null
+			
+		}
+		
+		
 		
 		[void] showModal([System.Object[]]$msg, [String]$header){
 			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
