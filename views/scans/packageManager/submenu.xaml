@@ -1,0 +1,102 @@
+<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Name="ucPkgTopMenu"
+	xmlns:util="clr-namespace:Wpf.Util;assembly=GridViewSort"
+>
+
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries >       
+				<ResourceDictionary Source="{{{pwd}}}\views\layouts\styles.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	
+	<Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Style="{StaticResource ResourceKey=bsTopSubNavBar}">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+		
+			
+			<TextBlock Grid.ColumnSpan="9" Grid.Column="0" Style="{StaticResource ResourceKey=bsTopSubNavBar}" ></TextBlock>
+			<TextBlock Grid.Column="0">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Hardware" x:Name="mnuHardware" />
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="1">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Software" />
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="2">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Requirements" />
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="3">
+
+			<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+				<MenuItem Header="_Scans">
+					<MenuItem Header="ACAS" Style="{StaticResource ResourceKey=bsSubMenu}"/>
+					<MenuItem Header="CKL" Style="{StaticResource ResourceKey=bsSubMenu}" />
+					<MenuItem Header="SCAP" Style="{StaticResource ResourceKey=bsSubMenu}" />
+				</MenuItem>
+			</Menu>				
+	
+			</TextBlock>
+			<TextBlock Grid.Column="4">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Findings" />
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="5">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Details">
+						<MenuItem Header="HBSS" Style="{StaticResource ResourceKey=bsSubMenu}"/>
+						<MenuItem Header="IAVM" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="Operating Systems" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="PKI" Style="{StaticResource ResourceKey=bsSubMenu}" />
+					</MenuItem>
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="6">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Evidence" />
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="7">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Reports">
+						<MenuItem Header="ACAS Reports" Style="{StaticResource ResourceKey=bsSubMenu}"/>
+						<MenuItem Header="Asset Overview" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="DADMS" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="Discrepencies" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="Finding Review" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="HW/SW List" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="Package Summary" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="POAM" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="RAR" Style="{StaticResource ResourceKey=bsSubMenu}" />
+						<MenuItem Header="Test Plan" Style="{StaticResource ResourceKey=bsSubMenu}" />
+					</MenuItem>
+				</Menu>
+			</TextBlock>
+			<TextBlock Grid.Column="8">
+				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
+					<MenuItem Header="_Archives" />
+				</Menu>
+			</TextBlock>
+		</Grid>
+		
+</UserControl>

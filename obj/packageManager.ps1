@@ -74,7 +74,18 @@ begin{
 		
 		
 		
-		
+		[void] addPackage(){
+			$params = @{
+				'@Name' = [GUI]::Get().window.findName('UC').findName('txtPkgName').Text;
+				'@Acronym' = [GUI]::Get().window.findName('UC').findName('txtPkgAcronym').Text;
+			}
+			
+			if([Utils]::IsBlank( $params.'@Name') -eq $false -and [Utils]::IsBlank( $params.'@Acronym') -eq $false  ){
+				$query = "Insert into packages (name, acronym) values (@Name, @Acronym);"
+				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery()	
+			}
+			
+		}
 		
 		
 		# =========================================================		
@@ -136,7 +147,7 @@ begin{
 			$this.verifyDatabase();
 		}
 		
-		[object[]] getPackageDashboard(){
+		[object[]] getPackageInfo(){
 			$query = @"
 Select 
     p.id, 

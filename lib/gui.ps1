@@ -79,7 +79,18 @@ begin{
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
 		
+		[void] cboSelectItem($cbo, $item){
+			$i = 0
+			$cbo.Items | % {
+				if($item -eq $_.id){
+					$cbo.selectedIndex = $i
+				}
+				$i++
+			}
+		}
+		
 		[void] ShowContent($path, $viewModel){
+			
 			if($viewModel -ne $null){
 				[GUI]::Get().window.DataContext = $viewModel
 			}

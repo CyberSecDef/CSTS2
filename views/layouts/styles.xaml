@@ -13,6 +13,28 @@
 		<Setter Property="FontFamily" Value="Calibri"></Setter>
 	</Style>
 	
+	<Style x:Key="bsTopSubNavBar">
+		<Setter Property="TextBlock.Margin" Value="0"></Setter>
+		<Setter Property="TextBlock.Padding" Value="10"></Setter>
+		<Setter Property="TextBlock.Background" Value="#666666"></Setter>
+		<Setter Property="TextBlock.Foreground" Value="#f5f5f5"></Setter>
+		<Setter Property="TextBlock.FontSize" Value="12pt"></Setter>
+		<Setter Property="TextBlock.FontFamily" Value="Calibri"></Setter>
+		<Setter Property="TextBlock.TextAlignment" Value="Center"></Setter>
+	</Style>
+	
+	<Style x:Key="bsTopMenu">
+		<Setter Property="Menu.Padding" Value="10"></Setter>
+		<Setter Property="Menu.FontSize" Value="14pt"></Setter>
+		<Setter Property="Menu.Background" Value="Transparent"></Setter>
+		<Setter Property="Menu.Foreground" Value="#f5f5f5"></Setter>
+	</Style>
+	<Style x:Key="bsSubMenu">
+		<Setter Property="MenuItem.Foreground" Value="#000000"></Setter>
+		<Setter Property="TextBlock.TextAlignment" Value="Left"></Setter>
+	</Style>
+	
+	
 	<Style x:Key="panelHeader" TargetType="{x:Type Border}">
 		<Setter Property="BorderThickness" Value="1"></Setter>
 		<Setter Property="BorderBrush" Value="#e1e1e8"></Setter>
@@ -194,7 +216,7 @@
 						BorderBrush="#333333" 
 						Margin="10,0,10,0" 
 						Padding="0" 
-						Background="#f5f5f5" 
+						Background="#fcfcfc" 
 						Foreground="#000000" 
 						FontSize="12"  
 						FontFamily="Calibri"						
@@ -202,6 +224,13 @@
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
+	</Style>
+	
+	<Style x:Key="normalText">
+		<Setter Property="TextBlock.FontWeight" Value="100"></Setter>
+		<Setter Property="TextBlock.FontSize" Value="14px"></Setter>
+		<Setter Property="TextBlock.LineHeight" Value="1.428"></Setter>
+		<Setter Property="TextBlock.Margin" Value="10"></Setter>
 	</Style>
 	
 	<Style x:Key="tblHeader">
