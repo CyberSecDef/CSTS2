@@ -13,7 +13,7 @@
 	</UserControl.Resources>
 		
 	<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-		<Grid x:Name="ContentGrid">
+		<Grid x:Name="ContentGrid" >
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="1*"/>
 				<ColumnDefinition Width="18*"/>
@@ -22,6 +22,8 @@
 			<Grid.RowDefinitions>
 				<RowDefinition Height="50"/>
 				<RowDefinition Height="50"/>
+				<RowDefinition Height="50"/>
+				<RowDefinition Height="45"/>
 				<RowDefinition MinHeight="250" Height="Auto"/>
 				<RowDefinition Height="50"/>
 			</Grid.RowDefinitions>
@@ -55,7 +57,25 @@
 			
 			<Grid x:Name="pkgTopMenu" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Style="{StaticResource ResourceKey=bsTopSubNavBar}" />
 				
-			<Grid Grid.Column="1"  Grid.Row="2" x:Name="packageDisplayTable">
+		
+			<Grid Grid.Column="1"  Grid.Row="3" x:Name="pkgHardwareControls">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				
+				<Button x:Name="btnImportFromAd" Style="{StaticResource btnInfo}" Content="Import" Grid.Row="1" Grid.Column="0"/>
+				<Button x:Name="btnAddHosts" Style="{StaticResource btnPrimary}" Content="Add" Grid.Row="1" Grid.Column="1"/>
+				<Button x:Name="btnRemoveHosts" Style="{StaticResource btnDanger}" Content="Remove" Grid.Row="1" Grid.Column="2"/>
+				<Button x:Name="btnReloadMetadata" Style="{StaticResource btnSuccess}" Content="Reload Metadata" Grid.Row="1" Grid.Column="3"/>
+				<Button x:Name="btnReloadSoftware" Style="{StaticResource btnInfo}" Content="Reload Software" Grid.Row="1" Grid.Column="4"/>
+				
+			</Grid>
+			
+			<Grid Grid.Column="0" Grid.ColumnSpan="3"  Grid.Row="4" x:Name="packageDisplayTable">
 				<Grid.Resources>
 					<AlternationConverter x:Key="BackgroundConverter">
 						<SolidColorBrush>#f9f9f9</SolidColorBrush>
@@ -68,93 +88,80 @@
 					</Style>
 				</Grid.Resources>
 				
-				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc">
+				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc"  Width="{Binding ElementName=contentDiv, Path=ActualWidth}">
 					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-						</Grid.ColumnDefinitions>
 						
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-						</Grid.RowDefinitions>
-					
-					<ListBox Margin="10" ItemsSource="{Binding packageAssets}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5">
-						<ListBox.Template>
-							<ControlTemplate>
-								<DockPanel LastChildFill="True">
-									<Grid DockPanel.Dock="Top" Height="30" Style="{StaticResource tblHeader}">
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="1*"/>
-											<ColumnDefinition Width="3*"/>
-											<ColumnDefinition Width="3*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-										</Grid.ColumnDefinitions>
-										<Label Grid.Column="0">[]</Label>
-										<Label Grid.Column="1">Hostname</Label>
-										<Label Grid.Column="2">IP</Label>
-										<Label Grid.Column="3">Device Type</Label>
-										<Label Grid.Column="4">Operating System</Label>
-										<Label Grid.Column="5">Manufacturer</Label>
-										<Label Grid.Column="6">Model</Label>
-										<Label Grid.Column="7">Firmware</Label>
-										<Label Grid.Column="8">Location</Label>
-										<Label Grid.Column="9">Description</Label>
-									</Grid>
-									<ItemsPresenter></ItemsPresenter>
-								</DockPanel>
-							</ControlTemplate>
-						</ListBox.Template>
-					
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<Border BorderThickness="0,1,0,0"  BorderBrush="#cccccc"  >
-									<Grid  >
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="1*"/>
-											<ColumnDefinition Width="3*"/>
-											<ColumnDefinition Width="3*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-											<ColumnDefinition Width="2*"/>
-										</Grid.ColumnDefinitions>
-											<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Number}" Grid.Column="0"/>
-											<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Acronym}"  Grid.Column="1"/>
-											<Button Style="{StaticResource btnDefault}" Content="{Binding Path=Hardware}"  Grid.Column="2" Padding="5"/>
-											<Button Style="{StaticResource btnDefault}" Content="{Binding Path=Software}"  Grid.Column="3" Padding="5"/>
-											<Button Style="{StaticResource btnPrimary}" Content="{Binding ACAS}" Grid.Column="4" Padding="5" />
-											<Button Style="{StaticResource btnInfo}" Content="{Binding Path=CKL}"  Grid.Column="5" Padding="5"/>
-											<Button Style="{StaticResource btnSuccess}" Content="{Binding Path=SCAP}"  Grid.Column="6" Padding="5"/>
-											<Button Style="{StaticResource btnDanger}" Content="{Binding Path=Open}"  Grid.Column="8" Padding="5"/>
-											<Button Style="{StaticResource btnWarning}" Content="{Binding Path=NotReviewed}"  Grid.Column="9" Padding="5"/>
-											<Button Style="{StaticResource btnSuccess}" Content="{Binding Path=Completed}"  Grid.Column="10" Padding="5"/>
-											<Button Style="{StaticResource btnInfo}" Content="{Binding Path=NotApplicable}"  Grid.Column="11" Padding="5"/>
-									</Grid>
-								</Border>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-				
-					
+						<ListBox Margin="10" ItemsSource="{Binding pkgHardware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" >
+							<ListBox.Template>
+								<ControlTemplate>
+									<DockPanel LastChildFill="True">
+										<Grid DockPanel.Dock="Top" Height="30" Style="{StaticResource tblHeader}">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="25"/>
+												<ColumnDefinition Width="150"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="75"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<Label Grid.Column="0" Width="25">[ ]</Label>
+											<Label Grid.Column="1" Width="150">Hostname</Label>
+											<Label Grid.Column="2" Width="100">IP</Label>
+											<Label Grid.Column="3" Width="100">Device Type</Label>
+											<Label Grid.Column="4" Width="100">OS</Label>
+											<Label Grid.Column="5" Width="100">Vendor</Label>
+											<Label Grid.Column="6" Width="100">Model</Label>
+											<Label Grid.Column="7" Width="75">Firmware</Label>
+											<Label Grid.Column="9" >Description</Label>
+										</Grid>
+										<ItemsPresenter></ItemsPresenter>
+									</DockPanel>
+								</ControlTemplate>
+							</ListBox.Template>
+						
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<Border BorderThickness="0,1,0,0"  BorderBrush="#cccccc"  >
+										<Grid  >
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="25"/>
+												<ColumnDefinition Width="150"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="75"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+												<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Id}" Grid.Column="0"/>
+												<TextBlock  Style="{StaticResource linkText}" Text="{Binding Path=Hostname}"  Grid.Column="1"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=IP}"  Grid.Column="2"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=DeviceType}"  Grid.Column="3"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=OS}" TextWrapping="Wrap"  Grid.Column="4"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}"  Grid.Column="5"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Model}" TextWrapping="Wrap" Grid.Column="6"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=firmware}"  Grid.Column="7"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=description}" TextWrapping="Wrap"  Grid.Column="9"/>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
 				</Grid>
 				</Border>
 			</Grid>
 			
+			
+			
+			
 		</Grid>
+		
+		
+			
+			
 	</ScrollViewer>
 </UserControl>

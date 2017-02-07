@@ -12,6 +12,7 @@ begin{
 			$this.viewModel | add-member -memberType NoteProperty -name 'cboPkgs' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'packageSummaries' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'pkgSelItem' -value @()
+			$this.viewModel | add-member -memberType NoteProperty -name 'pkgHardware' -value @()
 		}
 		
 		[void] Poll(){
@@ -55,7 +56,6 @@ begin{
 			
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Dashboard.xaml", $this.viewModel) | out-null
 			$this.addMenu();
-			$this.updateViewModel()
 
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( {
 				if($this.selectedItem.id -ne $null){
@@ -68,9 +68,38 @@ begin{
 		}
 		
 		[void] showHardware(){
+			$this.viewModel.pkgHardware = @();
+			$this.viewModel.pkgHardware += [psCustomObject]@{ 
+				Id = 1;
+				Hostname = 'Test'.ToUpper();
+				IP = '127.0.0.1';
+				deviceType = 'Server';
+				OS = 'RHEL 5';
+				Vendor = 'Dell';
+				Model = 'Test-123';
+				Firmware = '1A';
+				Location = '';
+				Description = 'Test System with a really long description that should wrap';
+			}
+			
+			
+			$this.viewModel.pkgHardware += [psCustomObject]@{ 
+				Id = 2;
+				Hostname = 'AnotherHost'.ToUpper();
+				IP = '127.0.0.1';
+				deviceType = 'Work Station';
+				OS = 'Windows 10';
+				Vendor = 'HP';
+				Model = 'NMCI-123';
+				Firmware = '2A';
+				Location = '';
+				Description = 'Another Test System';
+			}
+			
+			
+			$this.updateViewModel()
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.viewModel) | out-null
 			$this.addMenu();
-			$this.updateViewModel()
 			
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( {
 				if($this.selectedItem.id -ne $null){
@@ -82,25 +111,22 @@ begin{
 		}
 		
 		[void] showAddNewPackage(){
+			$this.updateViewModel()
 			[GUI]::Get().ShowContent("/views/scans/packageManager/AddPackage.xaml", $this.viewModel) | out-null
 			$this.addMenu();
-			$this.updateViewModel()
-			$v = $this.viewModel
+			
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( {
 				if($this.selectedItem.id -ne $null){
 					 $global:csts.controllers.Packages.viewModel.pkgSelItem = $($this.selectedItem.Id)
 				}
 			} ) | out-null
 			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.Packages.showPkgMgrDashBoard(); } );
-			
 			[GUI]::Get().window.findName('UC').findName('txtPkgName').add_TextChanged( {
 				$this.text = $_.OriginalSource.text
 			} )
-			
 			[GUI]::Get().window.findName('UC').findName('txtPkgAcronym').add_TextChanged( {
 				$this.text = $_.OriginalSource.text
 			} )
-			
 			[GUI]::Get().window.findName('UC').findName('btnAddPackage').add_Click( {
 				$global:csts.objs.PackageManager.addPackage() 
 				$global:csts.controllers.Packages.showPkgMgrDashBoard();
@@ -112,7 +138,7 @@ begin{
 			$uc = [GUI]::Get().parseXaml("$($global:csts.execPath)/views/scans/packageManager/submenu.xaml")
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').children.clear()
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').addChild($uc)
-			$uc.findName('mnuHardware').add_Click({ $global:csts.controllers.Packages.showPkgMgrDashBoard() })
+			$uc.findName('mnuHardware').add_Click({ $global:csts.controllers.Packages.showHardware() })
 			
 			
 			

@@ -231,21 +231,28 @@
 		<Setter Property="TextBlock.FontSize" Value="14px"></Setter>
 		<Setter Property="TextBlock.LineHeight" Value="1.428"></Setter>
 		<Setter Property="TextBlock.Margin" Value="10"></Setter>
+		<Setter Property="TextBlock.TextAlignment" Value="Left"></Setter>
+	</Style>
+	
+	<Style x:Key="linkText">
+		<Setter Property="TextBlock.FontWeight" Value="100"></Setter>
+		<Setter Property="TextBlock.FontSize" Value="14px"></Setter>
+		<Setter Property="TextBlock.LineHeight" Value="1.428"></Setter>
+		<Setter Property="TextBlock.Margin" Value="10"></Setter>
+		<Setter Property="TextBlock.Foreground" Value="#8080ff"></Setter>
+		<Setter Property="TextBlock.TextDecorations" Value="Underline"></Setter>
+		<Setter Property="TextBlock.TextAlignment" Value="Left"></Setter>
 	</Style>
 	
 	<Style x:Key="tblHeader">
 		<Setter Property="Label.FontWeight" Value="500"></Setter>
 		<Setter Property="Label.FontSize" Value="14"></Setter>
-		
-		
 		<Setter Property="TextBlock.FontWeight" Value="500"></Setter>
 		<Setter Property="TextBlock.FontSize" Value="14"></Setter>
 		<Setter Property="TextBlock.Margin" Value="0,10,0,0"></Setter>
-				
 		<Setter Property="TextBox.FontWeight" Value="500"></Setter>
 		<Setter Property="TextBox.FontSize" Value="14"></Setter>
 		<Setter Property="TextBox.VerticalContentAlignment" Value="Center"></Setter>
 	</Style>
-	
-	
+
 </ResourceDictionary>
