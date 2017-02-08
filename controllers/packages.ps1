@@ -97,6 +97,40 @@ begin{
 			}
 			
 			
+			$query = @"
+				select 
+					a.id, 
+					a.model, 
+					a.firmware, 
+					a.hostname, 
+					a.ip, 
+					a.description, 
+					a.osKey, 
+					a.location, 
+					(select name from operatingSystems where id = a.operatingSystemId) as operatingSystem,
+					(select name from deviceTypes where id = a.deviceTypeId) as deviceType,
+					(select name from vendors where id = a.vendorId) as Vendor
+				from 
+					assets a
+"@
+			$assets = [SQL]::Get( 'packages.dat' ).query( $query ).execAssoc()
+			
+			$assets | %{
+				$this.viewModel.pkgHardware += [psCustomObject]@{ 
+					Id = $_.id;
+					Hostname = $_.hostname.ToUpper();
+					IP = $_.ip;
+					deviceType = $_.deviceType;
+					OS = $_.operatingSystem;
+					Vendor = $_.vendor;
+					Model = $_.model;
+					Firmware = $_.firmware;
+					Location = $_.location;
+					Description = "$($_.description)";
+				}
+			}
+			
+			
 			$this.updateViewModel()
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.viewModel) | out-null
 			$this.addMenu();
@@ -108,6 +142,11 @@ begin{
 			} ) | out-null
 			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.Packages.showPkgMgrDashBoard(); } );
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.viewModel.pkgSelItem )
+			
+			[GUI]::Get().window.findName('UC').findName('btnImportFromAd').add_Click( { $global:csts.objs.PackageManager.importHosts() } )
+			
+			
+			
 		}
 		
 		[void] showAddNewPackage(){

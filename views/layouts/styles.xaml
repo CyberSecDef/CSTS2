@@ -226,6 +226,12 @@
 		</Setter>
 	</Style>
 	
+	
+	<Style x:Key="formChk" >	
+		<Setter Property="CheckBox.VerticalContentAlignment" Value="Center"></Setter>
+		<Setter Property="CheckBox.VerticalAlignment" Value="Center"></Setter>
+	</Style>
+	
 	<Style x:Key="normalText">
 		<Setter Property="TextBlock.FontWeight" Value="100"></Setter>
 		<Setter Property="TextBlock.FontSize" Value="14px"></Setter>
@@ -242,6 +248,7 @@
 		<Setter Property="TextBlock.Foreground" Value="#8080ff"></Setter>
 		<Setter Property="TextBlock.TextDecorations" Value="Underline"></Setter>
 		<Setter Property="TextBlock.TextAlignment" Value="Left"></Setter>
+		<Setter Property="TextBlock.VerticalAlignment" Value="Center"></Setter>
 	</Style>
 	
 	<Style x:Key="tblHeader">

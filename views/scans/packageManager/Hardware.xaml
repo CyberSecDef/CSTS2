@@ -64,14 +64,12 @@
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
 				
 				<Button x:Name="btnImportFromAd" Style="{StaticResource btnInfo}" Content="Import" Grid.Row="1" Grid.Column="0"/>
-				<Button x:Name="btnAddHosts" Style="{StaticResource btnPrimary}" Content="Add" Grid.Row="1" Grid.Column="1"/>
-				<Button x:Name="btnRemoveHosts" Style="{StaticResource btnDanger}" Content="Remove" Grid.Row="1" Grid.Column="2"/>
-				<Button x:Name="btnReloadMetadata" Style="{StaticResource btnSuccess}" Content="Reload Metadata" Grid.Row="1" Grid.Column="3"/>
-				<Button x:Name="btnReloadSoftware" Style="{StaticResource btnInfo}" Content="Reload Software" Grid.Row="1" Grid.Column="4"/>
+				<Button x:Name="btnRemoveHosts" Style="{StaticResource btnDanger}" Content="Remove" Grid.Row="1" Grid.Column="1"/>
+				<Button x:Name="btnReloadMetadata" Style="{StaticResource btnSuccess}" Content="Reload Metadata" Grid.Row="1" Grid.Column="2"/>
+				<Button x:Name="btnReloadSoftware" Style="{StaticResource btnInfo}" Content="Reload Software" Grid.Row="1" Grid.Column="3"/>
 				
 			</Grid>
 			
@@ -104,7 +102,7 @@
 												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="100"/>
-												<ColumnDefinition Width="75"/>
+												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
 											<Label Grid.Column="0" Width="25">[ ]</Label>
@@ -114,7 +112,7 @@
 											<Label Grid.Column="4" Width="100">OS</Label>
 											<Label Grid.Column="5" Width="100">Vendor</Label>
 											<Label Grid.Column="6" Width="100">Model</Label>
-											<Label Grid.Column="7" Width="75">Firmware</Label>
+											<Label Grid.Column="7" Width="100">Firmware</Label>
 											<Label Grid.Column="9" >Description</Label>
 										</Grid>
 										<ItemsPresenter></ItemsPresenter>
@@ -134,17 +132,17 @@
 												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="100"/>
-												<ColumnDefinition Width="75"/>
+												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
-												<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Id}" Grid.Column="0"/>
+												<CheckBox   Style="{StaticResource formChk}" Grid.Column="0" Tag="{Binding Path=Id}" />
 												<TextBlock  Style="{StaticResource linkText}" Text="{Binding Path=Hostname}"  Grid.Column="1"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=IP}"  Grid.Column="2"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=DeviceType}"  Grid.Column="3"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=DeviceType}" TextWrapping="Wrap" Grid.Column="3"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=OS}" TextWrapping="Wrap"  Grid.Column="4"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}"  Grid.Column="5"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}" TextWrapping="Wrap" Grid.Column="5"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Model}" TextWrapping="Wrap" Grid.Column="6"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=firmware}"  Grid.Column="7"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=firmware}" TextWrapping="Wrap" Grid.Column="7"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=description}" TextWrapping="Wrap"  Grid.Column="9"/>
 										</Grid>
 									</Border>

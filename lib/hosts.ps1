@@ -40,7 +40,7 @@ begin{
 							$ip = ''
 						}
 					
-						$this.hostTable.Add( $adHost, @{"Software" = @(); "Stigs" = @(); IP = $ip; } ) | out-null
+						$this.hostTable.Add( $adHost, @{ IP = $ip; } ) | out-null
 					}
 				}
 			} | out-null
@@ -55,7 +55,7 @@ begin{
 			foreach($c in $txt.split(",")){
 				if($c -ne "" -and $c -ne $null){
 					if( $c -ne $null -and $this.hostTable.keys -notcontains $c.Trim() ){
-						$this.hostTable.Add($c.Trim(), @{"Software" = @(); "Stigs" = @(); IP = ([System.Net.Dns]::GetHostAddresses($c.Trim()).IPAddressToString | select -first 1); } )
+						$this.hostTable.Add($c.Trim(), @{ IP = ([System.Net.Dns]::GetHostAddresses($c.Trim()).IPAddressToString | select -first 1); } )
 					}
 				}
 			}

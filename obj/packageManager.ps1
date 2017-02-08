@@ -40,7 +40,7 @@ begin{
 			"packages"               = "CREATE TABLE packages (id CHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) NOT NULL, acronym VARCHAR (32) NOT NULL);";
 			
 			"applications"           = "CREATE TABLE applications (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE, version VARCHAR (32) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
-			"assets"                 = "CREATE TABLE assets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), model VARCHAR (64), firmware VARCHAR (64), hostname VARCHAR (64), fqdn VARCHAR (256), ip VARCHAR (16), description BLOB, osKey VARCHAR (256), location VARCHAR (256), operatingSystemId VARCHAR (36) REFERENCES operatingSystems (id) NOT NULL, deviceTypeId VARCHAR (36) REFERENCES deviceTypes (id) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
+			"assets"                 = "CREATE TABLE assets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), model VARCHAR (64), firmware VARCHAR (64), hostname VARCHAR (64), ip VARCHAR (16), description BLOB, osKey VARCHAR (256), location VARCHAR (256), operatingSystemId VARCHAR (36) REFERENCES operatingSystems (id) NOT NULL, deviceTypeId VARCHAR (36) REFERENCES deviceTypes (id) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
 			"findings"               = "CREATE TABLE findings (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), iaControl VARCHAR (16), grpId VARCHAR (128), vulnId VARCHAR (64), ruleId VARCHAR (64), pluginId VRCHAR (32), impact VARCHAR (16), likelihood VARCHAR (16), rawRisk INT, description BLOB, correctiveAction BLOB, riskStatement BLOB, findingTypeId VARCHAR (36) REFERENCES scanTypes (id) NOT NULL);";
 			"milestones"             = "CREATE TABLE milestones (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (128), scd DATE, statusId VARCHAR (36) REFERENCES statuses (id) NOT NULL);"
 			"mitigations"            = "CREATE TABLE mitigations (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), residualRisk INT, remediated BOOLEAN, mitigation BLOB, comments BLOB);"
@@ -195,6 +195,128 @@ order by
 				}
 			}
 		}
+
+		[void] importHosts(){
+
+			#GET THE MAC ADDRESS
+			#hostname, ip, os, oskey, device type, manufacturer, model, firmware, location, description
+				
+			$hosts = $global:csts.libs.hosts.Get()
+			$hosts.keys | sort | % {
+				
+				$ip = [System.Net.Dns]::GetHostAddresses($_)[0].IPAddressToString;
+
+				if( $_ -match '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'){
+					$hostname = ([System.Net.Dns]::gethostentry($ip)).hostName;
+				}else{
+					$hostname = $_
+				}
+				
+				$ping = [Net]::Ping($hostname)
+				if( ($ping.StatusCode -eq 0 -or $ping.StatusCode -eq $null ) -and [Utils]::isBlank($ping.IPV4Address) -eq $false ) {
+					try{
+						$os = gwmi win32_operatingSystem -computer $hostname
+					}catch{
+						$os = [psCustomObject]@{Caption = 'UNKNOWN'; OSArchitecture = 'UNKNOWN'; }
+					}
+				
+					$params = @{
+						"@Name" = $os.Caption
+						"@Version" = $os.Version
+					}
+					$query = "select id from operatingSystems where name = @Name and version = @Version;"
+					$osid = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+					
+					if( [Utils]::IsBlank($osid[0]) ){
+						$query = "select id from vendors where name = 'Microsoft';"
+						$osVendor = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()
+						
+						$params = @{
+							'@Name' = $os.Caption;
+							'@Version' = $os.Version;
+							'@Vendor' = $osVendor;
+						}
+						
+						$query = "insert into operatingSystems (Name, Version, VendorId) values (@Name, @Version, @Vendor)"
+						[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
+
+						$params = @{
+							"@Name" = $os.Caption
+							"@Version" = $os.Version
+						}						
+						$query = "select id from operatingSystems where name = @Name and version = @version;"
+						$osid = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()						
+					}
+					
+				
+					if($os.caption -like '*server*'){
+						$query = "select id from deviceTypes where name = 'Server';"
+						$dt = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+					}else{
+						$query = "select id from deviceTypes where name = 'Workstation';"
+						$dt = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+					}
+				
+					$compSys = gwmi Win32_ComputerSystem -computer $hostname
+					$vendor = $compSys.Manufacturer
+					$params = @{
+						'@Vendor' = $vendor
+					}
+					$query = "select id from vendors where name = @Vendor;"
+					$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+					
+					$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$hostName)
+                    If ($OS.OSArchitecture -eq '64-bit') {
+                        $value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
+						$osKey = [Utils]::decodeProductKey($value)
+					} ElseIf($OS.OSArchitecture -eq '32-bit') {                        
+                        $value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId')
+						$osKey = [Utils]::decodeProductKey($value)
+                    }else{
+						$osKey = ""
+					}
+					
+					if( [Utils]::IsBlank($vid[0]) ){
+						$query = "insert into vendors (name) Values (@Vendor)"
+						[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
+						$query = "select id from vendors where name = @Vendor;"
+						$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+					}
+	 				
+					$hostData = @{
+						'@IP' = $ip
+						'@Hostname' = $hostname;
+						'@operatingSystemId' = $osid[0];
+						'@osKey' = $osKey;
+						'@deviceTypeId' = $dt[0];
+						'@vendorId' = $vid[0];
+						'@model' = $compSys.Model;
+						'@firmware' = ( gwmi win32_bios -computer $hostname | select -expand Version);
+						'@location' = "";
+						'@description' = "";
+					}					
+				}else{
+					$hostData = @{
+						'@IP' = $ip
+						'@Hostname' = $hostname;
+						'@operatingSystemId' = "";
+						'@osKey' = "";
+						'@deviceTypeId' = "";
+						'@vendorId' = "";
+						'@model' = "";
+						'@firmware' = "";
+						'@location' = "";
+						'@description' = "";
+					}
+				}
+
+				$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
+				[SQL]::Get( 'packages.dat' ).query( $query,$hostData ).execNonQuery()
+				
+				[Utils]::List($hostData);
+			}
+		}
+
 		
 		[void] verifyDatabase(){
 			$this.tables.keys | % {

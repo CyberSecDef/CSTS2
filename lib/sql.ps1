@@ -67,6 +67,13 @@ begin{
 			return $row
 		}
 		
+		[Object[]] execOne(){
+			$dbReader = $this.dbCommand.executeReader()
+			$val = $dbReader.getValue(0)
+			$dbReader.close()
+			return $val
+		}
+		
 		[Object[]] execAssoc(){
 			$dbReader = $this.dbCommand.executeReader()
 			$results = @()
