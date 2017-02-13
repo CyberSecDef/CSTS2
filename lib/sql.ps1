@@ -41,16 +41,18 @@ begin{
 		}
 		
 		[SQL] query( $sql, $parms){
+			
 			$this.dbCommand = New-Object -TypeName System.Data.SQLite.SQLiteCommand
 			$this.dbCommand.Connection = $this.dbConnection
 			$this.dbCommand.CommandText = $sql
 			if($parms -ne $null){
 				foreach($par in ($parms.getEnumerator() ) ){
+
 					$this.dbCommand.Parameters.Add(  ( new-object -TypeName System.Data.SQLite.SQLiteParameter( "$($par.name)", ($par.value)  ) ) ) | out-null
+
 				}
 				$this.dbCommand.prepare()
 			}
-
 			return $this
 		}
 		
@@ -67,9 +69,9 @@ begin{
 			return $row
 		}
 		
-		[Object[]] execOne(){
+		[String] execOne(){
 			$dbReader = $this.dbCommand.executeReader()
-			$val = $dbReader.getValue(0)
+			$val = [String]($dbReader.getValue(0))
 			$dbReader.close()
 			return $val
 		}
@@ -89,8 +91,15 @@ begin{
 			return $results
 		}
 	
-		[void] execNonQuery(){			
+		[Int] execNonQuery(){				
 			$this.dbCommand.ExecuteNonQuery()
+			$rowid = $this.query('select last_insert_rowid() as id').execOne() 
+			
+			if( $rowid -ne $null){
+				return ($rowid)
+			}else{
+				return 0
+			}			
 		}
 		
 		[SQL] close(){		

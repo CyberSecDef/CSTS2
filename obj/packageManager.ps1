@@ -67,13 +67,6 @@ begin{
 			'vendors' = @('Microsoft', 'Oracle', 'HP', 'Dell');
 		}
 		
-		
-		
-		
-		
-		
-		
-		
 		[void] addPackage(){
 			$params = @{
 				'@Name' = [GUI]::Get().window.findName('UC').findName('txtPkgName').Text;
@@ -196,125 +189,203 @@ order by
 			}
 		}
 
-		[void] importHosts(){
+		[void] pkgDelete($packageId){
+			$params = @{
+				'@packageId' = $packageId;
+			}
+			$query = "delete from {{{table}}} where packageId = @packageId"
+			@('requirements', 'xPackageContacts', 'xFindingsResources', 'xFindingsMitigations', 'xMitigationsMilestones', 'xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
+				[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
+			}
 
-			#GET THE MAC ADDRESS
-			#hostname, ip, os, oskey, device type, manufacturer, model, firmware, location, description
-				
-			$hosts = $global:csts.libs.hosts.Get()
-			$hosts.keys | sort | % {
-				
-				$ip = [System.Net.Dns]::GetHostAddresses($_)[0].IPAddressToString;
-
-				if( $_ -match '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'){
-					$hostname = ([System.Net.Dns]::gethostentry($ip)).hostName;
-				}else{
-					$hostname = $_
+			[SQL]::Get( 'packages.dat' ).query( "delete from packages where id = @packageId" , $params ).execNonQuery()
+			$global:csts.controllers.Packages.showPkgMgrDashBoard()
+		}
+		
+		[void] removeHosts(){
+			
+			[GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems | % {
+				$params = @{
+					'@assetId' = $_.Id;
+					'@packageId' = $global:csts.controllers.Packages.viewModel.pkgSelItem;
 				}
 				
-				$ping = [Net]::Ping($hostname)
-				if( ($ping.StatusCode -eq 0 -or $ping.StatusCode -eq $null ) -and [Utils]::isBlank($ping.IPV4Address) -eq $false ) {
-					try{
-						$os = gwmi win32_operatingSystem -computer $hostname
-					}catch{
-						$os = [psCustomObject]@{Caption = 'UNKNOWN'; OSArchitecture = 'UNKNOWN'; }
-					}
-				
-					$params = @{
-						"@Name" = $os.Caption
-						"@Version" = $os.Version
-					}
-					$query = "select id from operatingSystems where name = @Name and version = @Version;"
-					$osid = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
-					
-					if( [Utils]::IsBlank($osid[0]) ){
-						$query = "select id from vendors where name = 'Microsoft';"
-						$osVendor = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()
-						
-						$params = @{
-							'@Name' = $os.Caption;
-							'@Version' = $os.Version;
-							'@Vendor' = $osVendor;
-						}
-						
-						$query = "insert into operatingSystems (Name, Version, VendorId) values (@Name, @Version, @Vendor)"
-						[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
+				$query = "delete from {{{table}}} where packageId = @packageId and assetId = @assetId"
+				@('xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
+					[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
+				}
 
-						$params = @{
-							"@Name" = $os.Caption
-							"@Version" = $os.Version
-						}						
-						$query = "select id from operatingSystems where name = @Name and version = @version;"
-						$osid = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()						
-					}
+				$params = @{
+					'@assetId' = $_.Id;
+				}
+				[SQL]::Get( 'packages.dat' ).query( "delete from assets where id = @assetId" , $params ).execNonQuery()
+
+			}
+
+			$global:csts.controllers.Packages.showHardware()
+		}
+		
+		[Object[]] getMetadata($h){
+			$hostData = [psCustomObject]@{
+				'@ip' = [Net]::getIp($h)
+				'@hostname' = [Net]::getHostName($h);
+				'@operatingSystemId' = "";
+				'@osKey' = "";
+				'@deviceTypeId' = "";
+				'@vendorId' = "";
+				'@model' = "";
+				'@firmware' = "";
+				'@location' = "";
+				'@description' = "";
+			}
+			$ping = [Net]::Ping($h)
+			if( ($ping.StatusCode -eq 0 -or $ping.StatusCode -eq $null ) -and [Utils]::isBlank($ping.IPV4Address) -eq $false ) {
+				try{
+					$os = gwmi win32_operatingSystem -computer $h
+				}catch{
+					$os = [psCustomObject]@{Caption = 'UNKNOWN'; OSArchitecture = 'UNKNOWN'; }
+				}
+				
+				try{
+					$hostData.'@firmware' = (gwmi win32_bios -computer $h).version
+				}catch{
+					$hostData.'@firmware' = ""
+				}
+				
+				try{
+					$hostData.'@model' = (gwmi win32_computerSystem -computer $h).model
+				}catch{
+					$hostData.'@model' = ""
+				}
+				
+				$params = @{"@Name" = $os.Caption; "@Version" = $os.Version}				
+				$query = "select id from operatingSystems where name = @Name and version = @Version;"
+				$hostData.'@operatingSystemId' = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+				if( [Utils]::IsBlank($hostData.'@operatingSystemId') ){
+					$query = "select id from vendors where name = 'Microsoft';"
+					$osVendor = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()
 					
+					$params = @{ '@Name' = $os.Caption; '@Version' = $os.Version; '@Vendor' = $osVendor; } 					
+					$query = "insert into operatingSystems (Name, Version, VendorId) values (@Name, @Version, @Vendor)"
+					[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
+
+					$params = @{ "@Name" = $os.Caption; "@Version" = $os.Version; }						
+					$query = "select id from operatingSystems where name = @Name and version = @version;"
+					$hostData.'@operatingSystemId' = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()						
+				}
 				
-					if($os.caption -like '*server*'){
-						$query = "select id from deviceTypes where name = 'Server';"
-						$dt = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
-					}else{
-						$query = "select id from deviceTypes where name = 'Workstation';"
-						$dt = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
-					}
+				if($os.caption -like '*server*'){
+					$query = "select id from deviceTypes where name = 'Server';"
+					$hostData.'@deviceTypeId' = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+				}else{
+					$query = "select id from deviceTypes where name = 'Workstation';"
+					$hostData.'@deviceTypeId' = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+				}
 				
-					$compSys = gwmi Win32_ComputerSystem -computer $hostname
-					$vendor = $compSys.Manufacturer
-					$params = @{
-						'@Vendor' = $vendor
-					}
+				$compSys = gwmi Win32_ComputerSystem -computer $h
+				$vendor = $compSys.Manufacturer
+				$params = @{ '@Vendor' = $vendor; }
+				$query = "select id from vendors where name = @Vendor;"
+				$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+				
+				if( [Utils]::IsBlank($vid) ){
+					$query = "insert into vendors (name) Values (@Vendor)"
+					[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
 					$query = "select id from vendors where name = @Vendor;"
 					$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
-					
-					$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$hostName)
-                    If ($OS.OSArchitecture -eq '64-bit') {
-                        $value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
-						$osKey = [Utils]::decodeProductKey($value)
-					} ElseIf($OS.OSArchitecture -eq '32-bit') {                        
-                        $value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId')
-						$osKey = [Utils]::decodeProductKey($value)
-                    }else{
-						$osKey = ""
-					}
-					
-					if( [Utils]::IsBlank($vid[0]) ){
-						$query = "insert into vendors (name) Values (@Vendor)"
-						[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
-						$query = "select id from vendors where name = @Vendor;"
-						$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
-					}
-	 				
-					$hostData = @{
-						'@IP' = $ip
-						'@Hostname' = $hostname;
-						'@operatingSystemId' = $osid[0];
-						'@osKey' = $osKey;
-						'@deviceTypeId' = $dt[0];
-						'@vendorId' = $vid[0];
-						'@model' = $compSys.Model;
-						'@firmware' = ( gwmi win32_bios -computer $hostname | select -expand Version);
-						'@location' = "";
-						'@description' = "";
-					}					
+				}
+				$hostdata.'@vendorId' = $vid
+				
+				$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$h)
+				If ($OS.OSArchitecture -eq '64-bit') {
+					$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
+					$hostData.'@osKey' = [Utils]::decodeProductKey($value)
+				} ElseIf($OS.OSArchitecture -eq '32-bit') {                        
+					$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId')
+					$hostData.'@osKey' = [Utils]::decodeProductKey($value)
 				}else{
-					$hostData = @{
-						'@IP' = $ip
-						'@Hostname' = $hostname;
-						'@operatingSystemId' = "";
-						'@osKey' = "";
-						'@deviceTypeId' = "";
-						'@vendorId' = "";
-						'@model' = "";
-						'@firmware' = "";
-						'@location' = "";
-						'@description' = "";
-					}
+					$hostData.'@osKey' = ""
+				}
+			}
+			
+			return ,$hostData
+		}
+
+		[void] reloadMetadata(){
+			[GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems | % {
+				$assetId = $_.Id
+				$metaData = $this.getMetaData($_.hostname)
+				$query = @"
+update 
+		assets 
+	set 
+		hostname = @hostname, 
+		ip = @ip, 
+		model = @model, 
+		firmware = @firmWare, 
+		osKey = @osKey, 
+		description = @description, 
+		location = @location, 
+		operatingSystemId = @operatingSystemId, 
+		deviceTypeId = @deviceTypeId, 
+		vendorId = @vendorId
+	where
+		id = @assetId
+"@
+				$params = @{
+					'@ip' = $metaData.'@ip';
+					'@hostname' = $metaData.'@hostname';
+					'@model' = $metaData.'@model';
+					'@firmware' = $metaData.'@firmware';
+					'@osKey' = $metaData.'@osKey';
+					'@description' = $metaData.'@description';
+					'@location' = $metaData.'@location';
+					'@operatingSystemId' = $metaData.'@operatingSystemId';
+					'@deviceTypeId' = $metaData.'@deviceTypeId';
+					'@vendorId' = $metaData.'@vendorId';
+					'@assetId' = $assetId;
 				}
 
-				$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
-				[SQL]::Get( 'packages.dat' ).query( $query,$hostData ).execNonQuery()
-				
-				[Utils]::List($hostData);
+				[SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()				
 			}
+		}
+		
+		[void] importHosts(){
+
+			$hosts = $global:csts.libs.hosts.Get()
+			$hosts.keys | sort | % {
+				$ip = [Net]::getIp($_)
+				$hostname = [Net]::getHostName($_)
+				$ping = [Net]::Ping($hostname)
+				
+				$metaData = $this.getMetaData($hostname)
+				$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
+
+				$params = @{
+					'@ip' = $metaData.'@ip';
+					'@hostname' = $metaData.'@hostname';
+					'@model' = $metaData.'@model';
+					'@firmware' = $metaData.'@firmware';
+					'@osKey' = $metaData.'@osKey';
+					'@description' = $metaData.'@description';
+					'@location' = $metaData.'@location';
+					'@operatingSystemId' = $metaData.'@operatingSystemId';
+					'@deviceTypeId' = $metaData.'@deviceTypeId';
+					'@vendorId' = $metaData.'@vendorId';
+				}
+
+				$assetRowid = [SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()
+				
+				$params=@{'@rowid' = $assetRowid}
+				$assetGuid = [SQL]::Get( 'packages.dat').query( 'select id from assets where rowid = @rowid', $params).ExecOne()
+				$packageGuid = $global:csts.controllers.Packages.viewModel.pkgSelItem
+				
+				$params = @{'@packageId' = $packageGuid; '@assetId' = $assetGuid;}
+				$query = "insert into xPackagesAssets (packageId, assetId) values (@packageId,@assetId)"
+				[SQL]::Get( 'packages.dat').query( $query, $params).ExecNonQuery()
+			}
+			
+			$global:csts.controllers.Packages.showHardware()
 		}
 
 		

@@ -10,6 +10,23 @@ begin{
 			return Get-WmiObject -Class win32_pingstatus -Filter "address='$($hostname.trim())'"
 		}
 		
+		[String] static getIP( $h ){
+			try{
+				$ip = [System.Net.Dns]::GetHostAddresses($h)[0].IPAddressToString;
+			}catch{
+				$ip = ""
+			}
+			return $ip
+		}
+		
+		[String] static getHostName( $h ){
+			if( $_ -match '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'){
+				$hostname = ([System.Net.Dns]::gethostentry($h)).hostName;
+			}else{
+				$hostname = $h
+			}
+			return $hostname
+		}
 		
 	}
 }

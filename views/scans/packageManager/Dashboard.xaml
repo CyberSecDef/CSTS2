@@ -86,7 +86,7 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 					
-					<ListBox Margin="10" ItemsSource="{Binding packageSummaries}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8">
+					<ListBox x:Name="pkgAvailable" Margin="10" ItemsSource="{Binding packageSummaries}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8">
 						<ListBox.Template>
 							<ControlTemplate>
 								<DockPanel LastChildFill="True">
@@ -94,6 +94,7 @@
 										<Grid.ColumnDefinitions>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="2*"/>
+											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="2*"/>
@@ -109,21 +110,49 @@
 										<Label Grid.Column="1">Package</Label>
 										<Label Grid.Column="2">HW</Label>
 										<Label Grid.Column="3">SW</Label>
-										<Label Grid.Column="4" Grid.ColumnSpan="3" >Scans</Label>
-										<Label Grid.Column="8" Grid.ColumnSpan="4">Findings</Label>
+										<Label Grid.Column="4"></Label>
+										<Label Grid.Column="5">ACAS</Label>
+										<Label Grid.Column="6">CKL</Label>
+										<Label Grid.Column="7">SCAP</Label>
+										<Label Grid.Column="8"></Label>
+										<Label Grid.Column="9">Open</Label>
+										<Label Grid.Column="10">NR</Label>
+										<Label Grid.Column="11">Closed</Label>
+										<Label Grid.Column="12">NA</Label>
 									</Grid>
 									<ItemsPresenter></ItemsPresenter>
 								</DockPanel>
 							</ControlTemplate>
 						</ListBox.Template>
 					
+						<ListBox.ContextMenu>
+							<ContextMenu x:Name="pkgContext">                                                        
+								<MenuItem Header="Delete" x:Name="btnDelPkg"/>
+								<MenuItem Header="Show Hardware" x:Name="btnShowHw"/>
+								<MenuItem Header="Show Software" x:Name="btnShowSw"/>
+								<MenuItem Header=""/>
+								<MenuItem Header="Show ACAS" x:Name="btnShowAcas"/>
+								<MenuItem Header="Show CKL" x:Name="btnShowCkl"/>
+								<MenuItem Header="Show SCAP" x:Name="btnShowScap"/>
+								<MenuItem Header=""/>
+								<MenuItem Header="Show Open" x:Name="btnShowOpen"/>
+								<MenuItem Header="Show Not Reviewed" x:Name="btnShowNR"/>
+								<MenuItem Header="Show Closed" x:Name="btnShowClosed"/>
+								<MenuItem Header="Show Not Applicable" x:Name="btnShowNA"/>
+								
+							</ContextMenu>
+						</ListBox.ContextMenu>
+			
+
 						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<Border BorderThickness="0,1,0,0"  BorderBrush="#cccccc"  >
+							<DataTemplate >							
+								<Border Tag="{Binding Path=Id}" BorderThickness="0,1,0,0"  BorderBrush="#cccccc"  >
+								
 									<Grid  >
 										<Grid.ColumnDefinitions>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="2*"/>
+											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="1*"/>
 											<ColumnDefinition Width="2*"/>
@@ -135,17 +164,18 @@
 											<ColumnDefinition Width="2*"/>
 											<ColumnDefinition Width="2*"/>
 										</Grid.ColumnDefinitions>
+											
 											<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Number}" Grid.Column="0"/>
 											<TextBlock  Style="{StaticResource tblHeader}" Text="{Binding Path=Acronym}"  Grid.Column="1"/>
-											<Button Style="{StaticResource btnDefault}" Content="{Binding Path=Hardware}"  Grid.Column="2" Padding="5"/>
-											<Button Style="{StaticResource btnDefault}" Content="{Binding Path=Software}"  Grid.Column="3" Padding="5"/>
-											<Button Style="{StaticResource btnPrimary}" Content="{Binding ACAS}" Grid.Column="4" Padding="5" />
-											<Button Style="{StaticResource btnInfo}" Content="{Binding Path=CKL}"  Grid.Column="5" Padding="5"/>
-											<Button Style="{StaticResource btnSuccess}" Content="{Binding Path=SCAP}"  Grid.Column="6" Padding="5"/>
-											<Button Style="{StaticResource btnDanger}" Content="{Binding Path=Open}"  Grid.Column="8" Padding="5"/>
-											<Button Style="{StaticResource btnWarning}" Content="{Binding Path=NotReviewed}"  Grid.Column="9" Padding="5"/>
-											<Button Style="{StaticResource btnSuccess}" Content="{Binding Path=Completed}"  Grid.Column="10" Padding="5"/>
-											<Button Style="{StaticResource btnInfo}" Content="{Binding Path=NotApplicable}"  Grid.Column="11" Padding="5"/>
+											<TextBlock  Text="{Binding Path=Hardware}"  Grid.Column="2" Padding="5"/>
+											<TextBlock  Text="{Binding Path=Software}"  Grid.Column="3" Padding="5"/>											
+											<TextBlock  Text="{Binding ACAS}" Grid.Column="5" Padding="5" />
+											<TextBlock  Text="{Binding Path=CKL}"  Grid.Column="6" Padding="5"/>
+											<TextBlock  Text="{Binding Path=SCAP}"  Grid.Column="7" Padding="5"/>
+											<TextBlock  Text="{Binding Path=Open}"  Grid.Column="9" Padding="5"/>
+											<TextBlock  Text="{Binding Path=NotReviewed}"  Grid.Column="10" Padding="5"/>
+											<TextBlock  Text="{Binding Path=Completed}"  Grid.Column="11" Padding="5"/>
+											<TextBlock  Text="{Binding Path=NotApplicable}"  Grid.Column="12" Padding="5"/>
 									</Grid>
 								</Border>
 							</DataTemplate>

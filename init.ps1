@@ -26,5 +26,7 @@ function Get-XAML( $content ){ ([Windows.Markup.XamlReader]::Load((New-Object Sy
 function Get-Object( $object ){ return  new-object "$object" }
 function Get-PlusMinus(){ return [System.Windows.Forms.TreeViewHitTestLocations]::PlusMinus }
 
+
+
 #enums are defined here
 . "$($PSScriptRoot)\types\enums.ps1"
