@@ -109,6 +109,8 @@ begin{
 						assets a
 					where
 						a.id in (select assetId from xPackagesAssets where packageId = @PackageId)
+					order by 
+						trim(lower(a.hostname))
 "@
 				$params = @{
 					"@PackageId" = $this.viewModel.pkgSelItem
@@ -116,7 +118,7 @@ begin{
 				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execAssoc() | %{
 					$this.viewModel.pkgHardware += [psCustomObject]@{ 
 						Id = $_.id;
-						Hostname = $_.hostname.ToUpper();
+						Hostname = "$($_.hostname)".ToUpper();
 						IP = $_.ip;
 						deviceType = $_.deviceType;
 						OS = $_.operatingSystem;

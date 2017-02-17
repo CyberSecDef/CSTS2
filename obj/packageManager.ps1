@@ -40,7 +40,7 @@ begin{
 			"packages"               = "CREATE TABLE packages (id CHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) NOT NULL, acronym VARCHAR (32) NOT NULL);";
 			
 			"applications"           = "CREATE TABLE applications (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE, version VARCHAR (32) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
-			"assets"                 = "CREATE TABLE assets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), model VARCHAR (64), firmware VARCHAR (64), hostname VARCHAR (64), ip VARCHAR (16), description BLOB, osKey VARCHAR (256), location VARCHAR (256), operatingSystemId VARCHAR (36) REFERENCES operatingSystems (id) NOT NULL, deviceTypeId VARCHAR (36) REFERENCES deviceTypes (id) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
+			"assets"                 = "CREATE TABLE assets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), model VARCHAR (64), firmware VARCHAR (64), hostname VARCHAR (64), ip VARCHAR (16), description BLOB, osKey VARCHAR (256), location VARCHAR (256), operatingSystemId VARCHAR (36) REFERENCES operatingSystems (id), deviceTypeId VARCHAR (36) REFERENCES deviceTypes (id), vendorId VARCHAR (36) REFERENCES vendors (id));";
 			"findings"               = "CREATE TABLE findings (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), iaControl VARCHAR (16), grpId VARCHAR (128), vulnId VARCHAR (64), ruleId VARCHAR (64), pluginId VRCHAR (32), impact VARCHAR (16), likelihood VARCHAR (16), rawRisk INT, description BLOB, correctiveAction BLOB, riskStatement BLOB, findingTypeId VARCHAR (36) REFERENCES scanTypes (id) NOT NULL);";
 			"milestones"             = "CREATE TABLE milestones (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (128), scd DATE, statusId VARCHAR (36) REFERENCES statuses (id) NOT NULL);"
 			"mitigations"            = "CREATE TABLE mitigations (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), residualRisk INT, remediated BOOLEAN, mitigation BLOB, comments BLOB);"
@@ -238,6 +238,7 @@ order by
 				'@location' = "";
 				'@description' = "";
 			}
+			
 			$ping = [Net]::Ping($h)
 			if( ($ping.StatusCode -eq 0 -or $ping.StatusCode -eq $null ) -and [Utils]::isBlank($ping.IPV4Address) -eq $false ) {
 				try{
@@ -296,14 +297,19 @@ order by
 				}
 				$hostdata.'@vendorId' = $vid
 				
+				try{
+				
 				$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$h)
-				If ($OS.OSArchitecture -eq '64-bit') {
-					$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
-					$hostData.'@osKey' = [Utils]::decodeProductKey($value)
-				} ElseIf($OS.OSArchitecture -eq '32-bit') {                        
-					$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId')
-					$hostData.'@osKey' = [Utils]::decodeProductKey($value)
-				}else{
+					If ($OS.OSArchitecture -eq '64-bit') {
+						$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
+						$hostData.'@osKey' = [Utils]::decodeProductKey($value)
+					} ElseIf($OS.OSArchitecture -eq '32-bit') {                        
+						$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId')
+						$hostData.'@osKey' = [Utils]::decodeProductKey($value)
+					}else{
+						$hostData.'@osKey' = ""
+					}
+				}catch{
 					$hostData.'@osKey' = ""
 				}
 			}
@@ -351,38 +357,49 @@ update
 		}
 		
 		[void] importHosts(){
-
+			$packageGuid = $global:csts.controllers.Packages.viewModel.pkgSelItem
 			$hosts = $global:csts.libs.hosts.Get()
 			$hosts.keys | sort | % {
 				$ip = [Net]::getIp($_)
 				$hostname = [Net]::getHostName($_)
 				$ping = [Net]::Ping($hostname)
 				
-				$metaData = $this.getMetaData($hostname)
-				$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
-
+				$query = "select id from xPackagesAssets where packageId = @packageId and assetId in (select id from assets where hostname = @hostname) "
 				$params = @{
-					'@ip' = $metaData.'@ip';
-					'@hostname' = $metaData.'@hostname';
-					'@model' = $metaData.'@model';
-					'@firmware' = $metaData.'@firmware';
-					'@osKey' = $metaData.'@osKey';
-					'@description' = $metaData.'@description';
-					'@location' = $metaData.'@location';
-					'@operatingSystemId' = $metaData.'@operatingSystemId';
-					'@deviceTypeId' = $metaData.'@deviceTypeId';
-					'@vendorId' = $metaData.'@vendorId';
+					'@packageId' = $packageGuid;
+					'@hostname' = $hostname;
 				}
+				
+				$exists = [SQL]::Get( 'packages.dat').query( $query, $params).ExecOne()
+				
+				if($exists.length -eq 0){
+					
+					$metaData = $this.getMetaData($hostname)
+					$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
 
-				$assetRowid = [SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()
-				
-				$params=@{'@rowid' = $assetRowid}
-				$assetGuid = [SQL]::Get( 'packages.dat').query( 'select id from assets where rowid = @rowid', $params).ExecOne()
-				$packageGuid = $global:csts.controllers.Packages.viewModel.pkgSelItem
-				
-				$params = @{'@packageId' = $packageGuid; '@assetId' = $assetGuid;}
-				$query = "insert into xPackagesAssets (packageId, assetId) values (@packageId,@assetId)"
-				[SQL]::Get( 'packages.dat').query( $query, $params).ExecNonQuery()
+					$params = @{
+						'@ip' = $ip;
+						'@hostname' = $hostname;
+						'@model' = $metaData.'@model';
+						'@firmware' = $metaData.'@firmware';
+						'@osKey' = $metaData.'@osKey';
+						'@description' = $metaData.'@description';
+						'@location' = $metaData.'@location';
+						'@operatingSystemId' = $metaData.'@operatingSystemId';
+						'@deviceTypeId' = $metaData.'@deviceTypeId';
+						'@vendorId' = $metaData.'@vendorId';
+					}
+
+					$assetRowid = [SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()
+					
+					$params=@{'@rowid' = $assetRowid}
+					$assetGuid = [SQL]::Get( 'packages.dat').query( 'select id from assets where rowid = @rowid', $params).ExecOne()
+					
+					
+					$params = @{'@packageId' = $packageGuid; '@assetId' = $assetGuid;}
+					$query = "insert into xPackagesAssets (packageId, assetId) values (@packageId,@assetId)"
+					[SQL]::Get( 'packages.dat').query( $query, $params).ExecNonQuery()
+				}
 			}
 			
 			$global:csts.controllers.Packages.showHardware()

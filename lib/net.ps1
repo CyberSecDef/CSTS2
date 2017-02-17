@@ -12,7 +12,13 @@ begin{
 		
 		[String] static getIP( $h ){
 			try{
-				$ip = [System.Net.Dns]::GetHostAddresses($h)[0].IPAddressToString;
+				$hostAddr = [System.Net.Dns]::GetHostAddresses($h);
+				try{
+					$ip = $hostAddr[0].IPAddressToString;
+				}catch{
+					$ip = ""
+				}
+				
 			}catch{
 				$ip = ""
 			}

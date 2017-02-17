@@ -284,7 +284,7 @@ Plugin ID: $($rule.PluginId)
 					
 					[GUI]::Get().showModal( @( [pscustomobject]@{ Text = "Exporting Issues"; Progress = 85 } ), "Exporting Results" )
 					foreach($scap in $this.scapOpen){
-						$cnt = $this.cklOpen | ? { $_.grpID -eq $scap.grpId -and $_.vulnId -eq $scap.vulnId -and $_.ruleId -eq $scap.ruleId}
+						$cnt = $this.cklOpen | ? { $_.vulnId -eq $scap.vulnId -and $_.ruleId -eq $scap.ruleId}
 						if($cnt -eq $null){
 							$issues += [psCustomObject]@{					
 								'SCAP/STIG' = $scap.file
@@ -303,7 +303,7 @@ Plugin ID: $($rule.PluginId)
 					}
 					
 					foreach($ckl in $this.cklOpen){
-						$cnt = $this.scapOpen | ? { $_.grpID -eq $ckl.grpId -and $_.vulnId -eq $ckl.vulnId -and $_.ruleId -eq $ckl.ruleId}
+						$cnt = $this.scapOpen | ? { $_.vulnId -eq $ckl.vulnId -and $_.ruleId -eq $ckl.ruleId}
 						$scapRun = $this.scapOpen | ? { $_.file -eq $ckl.file }
 						if($cnt -eq $null -and $scapRun -ne $null ){
 							$issues += [psCustomObject]@{					
@@ -396,6 +396,9 @@ Plugin ID: $($rule.PluginId)
 		}
 
 		[void]parseFile($file){
+			if($file -is [String]){
+				$file = get-item $file
+			}
 
 			switch($file.extension){
 				".zip" 		{
@@ -419,6 +422,7 @@ Plugin ID: $($rule.PluginId)
 				".ckl" 		{ [xml]$scanData = Get-Content $file.fullname }
 				default 	{ $scanData = $null }
 			}
+
 
 			if($scanData.Benchmark -ne $null){
 				$this.parseXCCDFResult($scanData)
@@ -483,7 +487,7 @@ Plugin ID: $($rule.PluginId)
 
 					
 						if([Utils]::isBlank($reportItem.Comments) -eq $false){
-							$this.poamArr.$key.Comments = "$($this.poamArr.$key.Comments)\n\n$($reportItem.Comments)"
+							$this.poamArr.$key.Comments = "$($this.poamArr.$key.Comments)`n`n$($reportItem.Comments)"
 						}
 
 						if($this.poamArr.$key.sources -notcontains ( $reportItem.shortSource ) ){
@@ -940,12 +944,12 @@ Plugin ID: $($rule.PluginId)
 			$hosts = Select-Xml "/NessusClientData_v2/Report/ReportHost" $xml
 
 			foreach($h in $hosts){
-				$hostScanDate =  ([dateTime]::ParseExact( ($h.Node.SelectSingleNode("//HostProperties/tag[@name='HOST_START']").'#text').replace('  ',' '), 'ddd MMM d HH:mm:ss yyyy', $null) )
-				$hostScanOs = ($h.Node.SelectSingleNode("//HostProperties/tag[@name='operating-system']").'#text') + ' ' + ($h.Node.SelectSingleNode("//HostProperties/tag[@name='os']").'#text')
+				$hostScanDate =  ([dateTime]::ParseExact( ($h.Node.SelectSingleNode("./HostProperties/tag[@name='HOST_START']").'#text').replace('  ',' '), 'ddd MMM d HH:mm:ss yyyy', $null) )
+				$hostScanOs = ($h.Node.SelectSingleNode("./HostProperties/tag[@name='operating-system']").'#text') + ' ' + ($h.Node.SelectSingleNode("./HostProperties/tag[@name='os']").'#text')
 
 				$hostScanEngine = "0.0"
 				$hostScanCred = $false
-				($h.Node.SelectSingleNode("//ReportItem[@pluginID='19506']/plugin_output").'#text') -split "`n"   | % {
+				($h.Node.SelectSingleNode("./ReportItem[@pluginID='19506']/plugin_output").'#text') -split "`n"   | % {
 					if ( (($_ -split ":")[0]) -like 'Nessus version*'){
 						$hostScanEngine =  ( [regex]::matches(  (($_ -split ":")[1]).Trim() , "(^[0-9\.]+)" ) | select -first 1 )
 					}
@@ -971,6 +975,7 @@ Plugin ID: $($rule.PluginId)
 
 
 				foreach($report in $h.Node.ReportItem){
+					
 					#create a report item
 					$reportItem = @{}
 					$reportItem.CCI = "";
