@@ -22,7 +22,7 @@ begin{
 		$activeModule = $null;
 		$isActive = $true;
 		$safe = (Get-Variable -Name 'safe' -ErrorAction SilentlyContinue).value;
-		
+				
 		CSTS(){
 			$this.execPath = $PSScriptRoot;
 			$this.self = $this
@@ -108,7 +108,16 @@ begin{
 			$active = (iex "[GUI]::Get().window.isActive")
 			if($active){
 				#dont poll if the a textbox has keyboard focus
-				$focused = ( (iex "(([System.Windows.Input.Keyboard]::FocusedElement).GetType()).Name ") -eq "TextBox")
+				
+				
+				$focused = $false
+				if(  (iex "[System.Windows.Input.Keyboard]::FocusedElement") -ne $null ){
+					$focused = ( (iex "(([System.Windows.Input.Keyboard]::FocusedElement).GetType()).Name ") -eq "TextBox")
+				}
+				
+				
+				
+				
 				if(! ([bool]$focused) ){
 					#run through all the controllers poll methods
 					$global:csts.controllers.keys | %{
