@@ -133,7 +133,7 @@ Rule ID: $($rule.RuleId)
 Plugin ID: $($rule.PluginId)
 "@;
 							'Raw Severity Value' = $rule.RawRisk;
-							'Mitigations' = $rule.comments;
+							'Mitigations' = $rule.mitigations;
 							'Severity Value' = $rule.RawRisk;
 							'Resources Required' = $rule.Responsibility;
 							'Scheduled Completion Date' = "";
@@ -141,7 +141,11 @@ Plugin ID: $($rule.PluginId)
 							'Milestone Changes' = "";
 							'Source Identifying Control Vulnerability' = "$( ( $rule.sources | sort ) -join '/' ): $($rule.Source)";
 							'Status' = $rule.Status;
-							'Comments' = $($rule.hosts -join "`n");
+							'Comments' = @"
+$($rule.comments)
+
+$($rule.hosts -join "`n");
+"@
 						}
 
 						$rar += [pscustomObject]@{
@@ -159,7 +163,7 @@ Plugin ID: $($rule.PluginId)
 							"Security Objectives (C-I-A) (16c)" = "";
 							"Raw Test Result (16d)" = $rule.RawRisk;
 							"Predisposing Condition(s) (16d.1)" = "";
-							"Technical Mitigation(s)/Remediation(s) (16d.2)" = $rule.comments
+							"Technical Mitigation(s)/Remediation(s) (16d.2)" = $rule.mitigations;
 							"Severity or Pervasiveness (VL-VH) (16d.3)" = "";
 							"Relevance of Threat (VL-VH) (16e)" = "";
 							'Threat Description (16e.1)' = $rule.description;
@@ -171,7 +175,7 @@ Plugin ID: $($rule.PluginId)
 							"Proposed Mitigations (From POA&M) (16j)" = "";
 							"Residual Risk (After Proposed Mitigations) (16k)" = "";
 							'Status' = $rule.status;
-							'Recommendations (16l)' = "$($rule.fixid) $($rule.solution)";
+							'Recommendations (16l)' = "$($rule.comments)`n`n$($rule.fixid) $($rule.solution)";
 
 						}
 					}
@@ -574,6 +578,7 @@ Plugin ID: $($rule.PluginId)
 				$reportItem = @{}
 
 				$reportItem.Comments = ""
+				$reportItem.Mitigations = ""
 				$reportItem.FindingDetails = $vulns[$i].Node.outerXml
 				$reportItem.CCI = "$($rule.Node.ident.'#text')"
 				$reportItem.FixId = "$($rule.Node.fixtext.fixref)"
@@ -733,7 +738,9 @@ Plugin ID: $($rule.PluginId)
 
 					$reportItem = @{}
 					$reportItem.CCI = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='CCI_REF']/ATTRIBUTE_DATA" $xml)
-					$reportItem.Comments = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/COMMENTS" $xml)
+					$reportItem.Comments = ""
+					$reportItem.Mitigations = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/COMMENTS" $xml)
+					
 					$reportItem.FindingDetails = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/FINDING_DETAILS" $xml)
 					
 					$reportItem.Description = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
@@ -875,7 +882,10 @@ Plugin ID: $($rule.PluginId)
 
 					$reportItem = @{}
 					$reportItem.CCI = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='CCI_REF']/ATTRIBUTE_DATA" $xml)
-					$reportItem.Comments = (Select-Xml "/CHECKLIST/VULN[$i]/COMMENTS" $xml)
+
+					$reportItem.Comments = ""
+					$reportItem.Mitigations = (Select-Xml "/CHECKLIST/STIGS/iSTIG/VULN[$i]/COMMENTS" $xml)
+					
 					$reportItem.FindingDetails = (Select-Xml "/CHECKLIST/VULN[$i]/FINDING_DETAILS" $xml)
 					$reportItem.Description = (Select-Xml "/CHECKLIST/VULN[$i]/STIG_DATA[VULN_ATTRIBUTE='Vuln_Discuss']/ATTRIBUTE_DATA" $xml)
 					$reportItem.FixId= ""
@@ -980,6 +990,7 @@ Plugin ID: $($rule.PluginId)
 					$reportItem = @{}
 					$reportItem.CCI = "";
 					$reportItem.Comments = $report.plugin_output
+					$reportItem.Mitigations = ""
 					$reportItem.findingDetails = ""
 					$reportItem.Description = $report.synopsis
 					$reportItem.FixId= ""
