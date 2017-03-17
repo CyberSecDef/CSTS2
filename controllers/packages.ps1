@@ -136,6 +136,62 @@ begin{
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.viewModel) | out-null
 			$this.addMenu();
 			
+			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Edit' } ).add_Click({
+				$query = @"
+Select 
+	a.id, 
+	a.model, 
+	a.firmware, 
+	a.hostname, 
+	a.ip, 
+	a.description, 
+	a.osKey, 
+	a.location, 
+	a.operatingSystemId, 
+	a.deviceTypeId,
+	a.vendorId,
+	(select name from operatingSystems where id = a.operatingSystemId) as operatingSystem,
+	(select name from deviceTypes where id = a.deviceTypeId) as deviceType,
+	(select name from vendors where id = a.vendorId) as Vendor
+from 
+	assets a
+where 
+	a.id = @id
+"@
+				$params = @{
+					"@id" = [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id
+				}
+				$selAsset = ( [SQL]::Get( 'packages.dat' ).query( $query, $params ).execSingle() )
+				# $selAsset | ft | out-string | write-host
+				
+				
+				$fields = @( 
+					[pscustomobject]@{Type = "Textbox";Label = "Hostname";Text = $selAsset.hostname; Name = "Hostname";}
+					[pscustomobject]@{Type = "Textbox";Label = "IP Address";Text = $selAsset.IP; Name = "IP";}
+					
+					[pscustomobject]@{Type = "ComboBox";Label = "Device Type"; Name = "deviceType"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from deviceTypes order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.deviceTypeId}
+					
+					[pscustomobject]@{Type = "ComboBox";Label = "Manufacturer"; Name = "Manufacturer"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from Vendors order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.vendorId}
+					
+					[pscustomobject]@{Type = "Textbox";Label = "Model";Text = $selAsset.Model; Name = "Model";},
+					[pscustomobject]@{Type = "Textbox";Label = "Firmware";Text = $selAsset.Firmware; Name = "Firmware";}
+					[pscustomobject]@{Type = "Textbox";Label = "Location";Text = $selAsset.Location; Name = "Location";}
+					[pscustomobject]@{Type = "Textbox";Label = "Description";Text = $selAsset.Description; Name = "Description";}
+					
+					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from operatingSystems order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId}
+					[pscustomobject]@{Type = "Textbox";Label = "OS Key";Text = $selAsset.osKey; Name = "osKey";}
+					
+					[pscustomobject]@{Type = "Actions"; Execute = { $global:csts.controllers.Packages.testMe() } }
+					
+				)
+				
+				[GUI]::Get().showModal( $fields, "Edit Asset" )
+				
+				write-host ([GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem)
+
+			})
+			
+			
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( {
 				if($this.selectedItem.id -ne $null){
 					$global:csts.controllers.Packages.viewModel.pkgSelItem = $($this.selectedItem.Id)	
@@ -150,6 +206,10 @@ begin{
 			
 			
 			
+		}
+		
+		[void] testMe(){
+			write-host 'test'
 		}
 		
 		[void] showAddNewPackage(){

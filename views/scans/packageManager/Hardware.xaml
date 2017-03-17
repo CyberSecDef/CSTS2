@@ -122,7 +122,7 @@
 							</ListBox.Template>
 
 							<ListBox.ContextMenu>
-								<ContextMenu x:Name="pkgContext">
+								<ContextMenu x:Name="pkgHardwareContext">
 									<MenuItem Header="Edit" x:Name="btnEditAsset"/>
 									<MenuItem Header="Remove" x:Name="btnRemoveAsset"/>
 									<MenuItem Header="Reload Metadata" x:Name="btnReloadMeta"/>
@@ -145,14 +145,14 @@
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
 
-												<TextBlock  Style="{StaticResource linkText}" Text="{Binding Path=Hostname}"  Grid.Column="0"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Hostname}"  Grid.Column="0"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=IP}"  Grid.Column="1"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=DeviceType}" TextWrapping="Wrap" Grid.Column="2"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=OS}" TextWrapping="Wrap"  Grid.Column="3"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}" TextWrapping="Wrap" Grid.Column="4"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Model}" TextWrapping="Wrap" Grid.Column="5"/>
 												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=firmware}" TextWrapping="Wrap" Grid.Column="6"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=description}" TextWrapping="Wrap"  Grid.Column="8"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=description}" TextWrapping="Wrap"  Grid.Column="7"/>
 										</Grid>
 									</Border>
 								</DataTemplate>

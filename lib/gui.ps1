@@ -110,7 +110,143 @@ begin{
 			
 		}
 		
-		
+		[void] showModalObject($obj){
+			switch($obj.Type){
+				"Progress" {
+					[GUI]::Get().window.findName('modalPanel').Height += 35
+					$pbar = new-object "system.windows.controls.ProgressBar"
+					$pbar.height = 15
+					$pbar.width = 500
+					$pbar.value = $obj.Progress
+					$pbar.margin = "0,0,0,10"
+					[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
+					
+					$textBlock = new-object "system.windows.controls.textblock"
+					$textBlock.FontSize = 14
+					$textBlock.Text = $obj.Text
+					$textBlock.Name = $obj.Name
+					[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
+				}
+				"Textbox" {
+					[GUI]::Get().window.findName('modalPanel').Height += 35
+					$grid = new-object "system.windows.controls.grid"
+					$grid.Margin = 4
+					$grid.width = 590
+					
+					$gc1 = new-object "system.windows.controls.ColumnDefinition"
+					$gc1.Width = 100
+					$gc2 = new-object "system.windows.controls.ColumnDefinition"
+					$gc2.Width = 470
+					$grid.ColumnDefinitions.Add($gc1)
+					$grid.ColumnDefinitions.Add($gc2)
+					
+					$label = new-object "system.windows.controls.label"
+					$label.width = "100"
+					
+					$label.Content = $obj.label
+					$label.SetValue([Windows.Controls.Grid]::ColumnProperty,0)
+					
+					$grid.Children.Add($label)
+					
+					$Textbox = new-object "system.windows.controls.Textbox"
+					$Textbox.FontSize = 14
+					$Textbox.Text = $obj.Text
+					$Textbox.Name = $obj.Name
+					$Textbox.SetValue([Windows.Controls.Grid]::ColumnProperty,1)
+					
+					
+					$grid.Children.Add($Textbox)
+					[GUI]::Get().window.findName('modalPanel').child.children.Add($grid)
+				}
+				"Actions" {
+					[GUI]::Get().window.findName('modalPanel').Height += 35
+					$grid = new-object "system.windows.controls.grid"
+					$grid.Margin = 4
+					$grid.width = 575
+					
+					$gc1 = new-object "system.windows.controls.ColumnDefinition"
+					$gc1.Width = '*'
+					$gc2 = new-object "system.windows.controls.ColumnDefinition"
+					$gc2.Width = 'Auto'
+					$grid.ColumnDefinitions.Add($gc1)
+					$grid.ColumnDefinitions.Add($gc2)
+					
+					$stack = new-object "system.windows.controls.stackpanel"
+					$stack.SetValue([Windows.Controls.Grid]::ColumnProperty,1)
+					$stack.Orientation = 'Horizontal'
+					
+					$btnExec = new-object "system.windows.controls.button"
+					$btnExec.Style = [GUI]::Get().window.findName('UC').FindResource("btnPrimary")
+					$btnExec.HorizontalAlignment="Right"
+					
+					$btnExec.FontSize = 14
+					if( $obj.Execute -ne $null ){
+						$btnExec.add_click( ($obj.Execute) )
+					}
+					$btnExec.Width = 150
+					$btnExec.Content = "Execute"
+					$btnExec.Name = "modalWindowExec"
+					$btnExec.SetValue([Windows.Controls.Grid]::ColumnProperty,1)
+					$stack.Children.Add($btnExec)
+					
+					$btnCancel = new-object "system.windows.controls.button"
+					$btnCancel.Style = [GUI]::Get().window.findName('UC').FindResource("btnDefault")
+					$btnCancel.HorizontalAlignment="Right"
+					$btnCancel.Width = 150
+					$btnCancel.FontSize = 14
+					$btnCancel.Content = "Cancel"
+					$btnCancel.Name = "modalWindowExec"
+					$btnCancel.SetValue([Windows.Controls.Grid]::ColumnProperty,1)
+					
+					$btnCancel.add_click({[GUI]::Get().hideModal()})
+					$stack.Children.Add($btnCancel)
+					$grid.Children.Add($stack)
+					
+					[GUI]::Get().window.findName('modalPanel').child.children.Add($grid)
+				}
+				
+				"ComboBox" {
+					[GUI]::Get().window.findName('modalPanel').Height += 35
+					$grid = new-object "system.windows.controls.grid"
+					$grid.Margin = 4
+					$grid.width = 590
+					
+					$gc1 = new-object "system.windows.controls.ColumnDefinition"
+					$gc1.Width = 100
+					$gc2 = new-object "system.windows.controls.ColumnDefinition"
+					$gc2.Width = 470
+					$grid.ColumnDefinitions.Add($gc1)
+					$grid.ColumnDefinitions.Add($gc2)
+					
+					$label = new-object "system.windows.controls.label"
+					$label.width = "100"
+					
+					$label.Content = $obj.label
+					$label.SetValue([Windows.Controls.Grid]::ColumnProperty,0)
+					
+					$grid.Children.Add($label)
+					
+					$ComboBox = new-object "system.windows.controls.ComboBox"
+					$comboBox.IsEditable = $true
+					$ComboBox.FontSize = 14
+					
+					$obj.Values | % { 
+						$item = new-object "system.windows.controls.ComboboxItem"
+						$item.Content = $_.text
+						$item.tag = $_.value
+						if($item.tag -eq $obj.Selected){
+							$item.IsSelected = $true;
+						}
+						$ComboBox.Items.Add( $item ) 
+					}
+					
+					$ComboBox.SetValue([Windows.Controls.Grid]::ColumnProperty,1)
+					$grid.Children.Add($ComboBox)
+
+					[GUI]::Get().window.findName('modalPanel').child.children.Add($grid)
+				}
+			}
+		}
 		
 		[void] showModal([System.Object[]]$msg, [String]$header){
 			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
@@ -125,20 +261,9 @@ begin{
 			
 			[GUI]::Get().window.findName('modalHeader').Text = $header
 			[GUI]::Get().window.findName('modalPanel').child.children.clear()
-			
-			foreach($m in $msg){
-				$pbar = new-object "system.windows.controls.ProgressBar"
-				$pbar.height = 15
-				$pbar.width = 500
-				$pbar.value = $m.Progress
-				$pbar.margin = "0,0,0,10"
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
+			[GUI]::Get().window.findName('modalPanel').Height = 15
+			$msg | % { $this.showModalObject( $_ ) }
 				
-				$textBlock = new-object "system.windows.controls.textblock"
-				$textBlock.FontSize = 14
-				$textBlock.Text = $m.Text
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
-			}
 			[GUI]::Get().window.findName('modalFooter').Text = $header
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
@@ -156,20 +281,9 @@ begin{
 			
 			[GUI]::Get().window.findName('modalHeader').Text = $header
 			[GUI]::Get().window.findName('modalPanel').child.children.clear()
+			[GUI]::Get().window.findName('modalPanel').Height = 15
+			$msg | % { $this.showModalObject( $_ ) }
 			
-			foreach($m in $msg){
-				$pbar = new-object "system.windows.controls.ProgressBar"
-				$pbar.height = 15
-				$pbar.width = 500
-				$pbar.value = $m.Progress
-				$pbar.margin = "0,0,0,10"
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
-				
-				$textBlock = new-object "system.windows.controls.textblock"
-				$textBlock.FontSize = 14
-				$textBlock.Text = $m.Text
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
-			}
 			[GUI]::Get().window.findName('modalFooter').Text = $footer
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
@@ -187,23 +301,27 @@ begin{
 			
 			[GUI]::Get().window.findName('modalHeader').Text = "Please Wait..."
 			[GUI]::Get().window.findName('modalPanel').child.children.clear()
+			[GUI]::Get().window.findName('modalPanel').Height = 15
+			$msg | % { $this.showModalObject( $_ ) }
 			
-			foreach($m in $msg){
-				$pbar = new-object "system.windows.controls.ProgressBar"
-				$pbar.height = 15
-				$pbar.width = 500
-				$pbar.value = $m.Progress
-				$pbar.margin = "0,0,0,10"
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($pbar)
-				
-				$textBlock = new-object "system.windows.controls.textblock"
-				$textBlock.FontSize = 14
-				$textBlock.Text = $m.Text
-				[GUI]::Get().window.findName('modalPanel').child.children.Add($textBlock)
-			}
 			[GUI]::Get().window.findName('modalFooter').Text = "Please Wait..."
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		[void] showModal([String]$msg){
 			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){

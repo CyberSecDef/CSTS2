@@ -129,7 +129,6 @@ begin{
 			}
 		
 			iex "[GUI]::Get().GetColors();"
-			# iex "[GUI]::Get().ShowModal('test');"
 		}
 		
 		[void] Dispose(){

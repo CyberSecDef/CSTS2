@@ -55,7 +55,7 @@
 			
 			<Grid x:Name="pkgTopMenu" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Style="{StaticResource ResourceKey=bsTopSubNavBar}" />
 				
-			<Grid Grid.Column="1"  Grid.Row="2" x:Name="packageDisplayTable">
+			<Grid Grid.Column="0"  Grid.ColumnSpan="3" Grid.Row="2" x:Name="packageDisplayTable">
 				<Grid.Resources>
 					<AlternationConverter x:Key="BackgroundConverter">
 						<SolidColorBrush>#f9f9f9</SolidColorBrush>
@@ -79,6 +79,10 @@
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
 						
 						<Grid.RowDefinitions>
@@ -86,7 +90,7 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 					
-					<ListBox x:Name="pkgAvailable" Margin="10" ItemsSource="{Binding packageSummaries}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8">
+					<ListBox x:Name="pkgAvailable" Margin="10" ItemsSource="{Binding packageSummaries}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="10">
 						<ListBox.Template>
 							<ControlTemplate>
 								<DockPanel LastChildFill="True">
