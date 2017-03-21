@@ -14,6 +14,7 @@ begin{
 			$this.viewModel | add-member -memberType NoteProperty -name 'packageSummaries' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'pkgSelItem' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'pkgHardware' -value @()
+			
 		}
 		
 		[void] Poll(){
@@ -181,14 +182,11 @@ where
 					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from operatingSystems order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId}
 					[pscustomobject]@{Type = "Textbox";Label = "OS Key";Text = $selAsset.osKey; Name = "osKey";}
 					
-					[pscustomobject]@{Type = "Actions"; Execute = { $global:csts.controllers.Packages.testMe() } }
+					[pscustomobject]@{Type = "Actions"; Execute = { $global:csts.controllers.Packages.updateAssetData() } }
 					
 				)
 				
 				[GUI]::Get().showModal( $fields, "Edit Asset" )
-				
-				write-host ([GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem)
-
 			})
 			
 			
@@ -208,8 +206,16 @@ where
 			
 		}
 		
-		[void] testMe(){
-			write-host 'test'
+		[void] updateAssetData(){
+			
+			$children = [GUI]::Get().findChildren( [GUI]::Get().window.findName('modalPanel') )			
+			$children = $children | ? { [Utils]::IsBlank( $_.name) -eq $false } | select Name, Text, @{Name='Tag';Expression={ $_.SelectedValue.Tag }}  
+			
+			$children | ft | out-string | write-host
+		
+			write-host ([Utils]::ObjHash($children,'IP').Text)
+			write-host ([Utils]::ObjHash($children,'deviceType').Text)
+			write-host ([Utils]::ObjHash($children,'deviceType').Tag)
 		}
 		
 		[void] showAddNewPackage(){

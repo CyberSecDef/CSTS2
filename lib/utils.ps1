@@ -173,6 +173,10 @@ begin{
 			
 			return $ret
 		}
+
+		static [Object] objHash($obj, $name){
+			return ($obj | ? { $_.name -eq $name })
+		}
 		
 		static [void] list($par){
 			$par | fl | out-string | write-host

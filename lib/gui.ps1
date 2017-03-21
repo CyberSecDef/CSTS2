@@ -227,6 +227,7 @@ begin{
 					$grid.Children.Add($label)
 					
 					$ComboBox = new-object "system.windows.controls.ComboBox"
+					$comboBox.Name = $obj.Name
 					$comboBox.IsEditable = $true
 					$ComboBox.FontSize = 14
 					
@@ -246,6 +247,18 @@ begin{
 					[GUI]::Get().window.findName('modalPanel').child.children.Add($grid)
 				}
 			}
+		}
+		
+		[Object[]] findChildren($obj){
+		
+			$children = @()
+			$obj.child.children | % { $children += $_ }
+
+			$children | % {
+				$_.children | % { $children += $_ }
+			}
+			
+			return $children
 		}
 		
 		[void] showModal([System.Object[]]$msg, [String]$header){
