@@ -321,6 +321,7 @@ order by
 			[GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems | % {
 				$assetId = $_.Id
 				$metaData = $this.getMetaData($_.hostname)
+				
 				$query = @"
 update 
 		assets 
@@ -354,6 +355,10 @@ update
 
 				[SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()				
 			}
+			
+			$global:csts.controllers.Packages.showHardware()
+			[GUI]::Get().hideModal()
+				
 		}
 		
 		[void] importHosts(){

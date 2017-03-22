@@ -228,7 +228,10 @@ begin{
 					
 					$ComboBox = new-object "system.windows.controls.ComboBox"
 					$comboBox.Name = $obj.Name
-					$comboBox.IsEditable = $true
+					if( $obj.ReadOnly -ne $true){
+						$comboBox.IsEditable = $true
+					}
+					
 					$ComboBox.FontSize = 14
 					
 					$obj.Values | % { 
@@ -320,21 +323,7 @@ begin{
 			[GUI]::Get().window.findName('modalFooter').Text = "Please Wait..."
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 		
 		[void] showModal([String]$msg){
 			if( [GUI]::Get().window.findName('modalDialog').Visibility -ne 'Visible'){
@@ -383,18 +372,7 @@ begin{
 			[GUI]::Get().window.findName('modalFooter').Text = $footer
 			[System.Windows.Forms.Application]::DoEvents()  | out-null
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 		
 		[void] hideModal(){
 			[GUI]::Get().window.findName('modalBody').Text = ''

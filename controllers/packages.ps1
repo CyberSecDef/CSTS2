@@ -14,7 +14,7 @@ begin{
 			$this.viewModel | add-member -memberType NoteProperty -name 'packageSummaries' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'pkgSelItem' -value @()
 			$this.viewModel | add-member -memberType NoteProperty -name 'pkgHardware' -value @()
-			
+			$this.viewModel | add-member -memberType NoteProperty -name 'assetSelItem' -value @()
 		}
 		
 		[void] Poll(){
@@ -117,6 +117,7 @@ begin{
 					"@PackageId" = $this.viewModel.pkgSelItem
 				}
 				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execAssoc() | %{
+
 					$this.viewModel.pkgHardware += [psCustomObject]@{ 
 						Id = $_.id;
 						Hostname = "$($_.hostname)".ToUpper();
@@ -127,7 +128,7 @@ begin{
 						Model = $_.model;
 						Firmware = $_.firmware;
 						Location = $_.location;
-						Description = "$($_.description)";
+						Description = ( [System.Text.Encoding]::Ascii.GetString($_.description) );
 					}
 				}
 			}
@@ -136,6 +137,18 @@ begin{
 			$this.updateViewModel()
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.viewModel) | out-null
 			$this.addMenu();
+			
+			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Reload Metadata' } ).add_Click({ $global:csts.objs.PackageManager.reloadMetadata() })
+			
+			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Remove' } ).add_Click({
+				$query = "Delete from assets where id = @id"
+				$params = @{ "@id" = [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id}
+				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery()
+
+				$global:csts.controllers.Packages.showHardware()
+				[GUI]::Get().hideModal()
+			})
+			
 			
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Edit' } ).add_Click({
 				$query = @"
@@ -163,8 +176,11 @@ where
 					"@id" = [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id
 				}
 				$selAsset = ( [SQL]::Get( 'packages.dat' ).query( $query, $params ).execSingle() )
-				# $selAsset | ft | out-string | write-host
 				
+				$desc = ""
+				if( [Utils]::IsBlank( $selAsset.Description ) -eq $false){
+					$desc = "$( [System.Text.Encoding]::Ascii.GetString( $selAsset.Description ) )"
+				}
 				
 				$fields = @( 
 					[pscustomobject]@{Type = "Textbox";Label = "Hostname";Text = $selAsset.hostname; Name = "Hostname";}
@@ -177,9 +193,11 @@ where
 					[pscustomobject]@{Type = "Textbox";Label = "Model";Text = $selAsset.Model; Name = "Model";},
 					[pscustomobject]@{Type = "Textbox";Label = "Firmware";Text = $selAsset.Firmware; Name = "Firmware";}
 					[pscustomobject]@{Type = "Textbox";Label = "Location";Text = $selAsset.Location; Name = "Location";}
-					[pscustomobject]@{Type = "Textbox";Label = "Description";Text = $selAsset.Description; Name = "Description";}
 					
-					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from operatingSystems order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId}
+					
+					[pscustomobject]@{Type = "Textbox";Label = "Description";Text = $desc ; Name = "Description";}
+					
+					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [SQL]::Get('packages.dat').query("SELECT id, Name from operatingSystems order by Name").execAssoc() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId; "ReadOnly" = $true}
 					[pscustomobject]@{Type = "Textbox";Label = "OS Key";Text = $selAsset.osKey; Name = "osKey";}
 					
 					[pscustomobject]@{Type = "Actions"; Execute = { $global:csts.controllers.Packages.updateAssetData() } }
@@ -202,20 +220,70 @@ where
 			[GUI]::Get().window.findName('UC').findName('btnRemoveHosts').add_Click( { $global:csts.objs.PackageManager.removeHosts() } )
 			[GUI]::Get().window.findName('UC').findName('btnReloadMetadata').add_Click( { $global:csts.objs.PackageManager.reloadMetadata() } )
 			
-			
-			
 		}
 		
 		[void] updateAssetData(){
 			
 			$children = [GUI]::Get().findChildren( [GUI]::Get().window.findName('modalPanel') )			
 			$children = $children | ? { [Utils]::IsBlank( $_.name) -eq $false } | select Name, Text, @{Name='Tag';Expression={ $_.SelectedValue.Tag }}  
+
+			#if deviceTypeTag is blank...that means a new one was added....add it to the db
+			if( [Utils]::IsBlank([Utils]::ObjHash($children,'deviceType').Tag) -eq $true){
+				$query = "insert into deviceTypes (name) values (@name);"
+				$params = @{ "@name" = [Utils]::ObjHash($children,'deviceType').Text }
+				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery() 
+				
+				$query = "select id from deviceTypes where name = @name"
+				$params = @{ "@name" = [Utils]::ObjHash($children,'deviceType').Text}
+				[Utils]::ObjHash($children,'deviceType').Tag = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+			}
 			
-			$children | ft | out-string | write-host
-		
-			write-host ([Utils]::ObjHash($children,'IP').Text)
-			write-host ([Utils]::ObjHash($children,'deviceType').Text)
-			write-host ([Utils]::ObjHash($children,'deviceType').Tag)
+			if( [Utils]::IsBlank([Utils]::ObjHash($children,'Manufacturer').Tag) -eq $true){
+				$query = "insert into vendors (name) values (@name);"
+				$params = @{ "@name" = [Utils]::ObjHash($children,'Manufacturer').Text }
+				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery() 
+				
+				$query = "select id from vendors where name = @name"
+				$params = @{ "@name" = [Utils]::ObjHash($children,'Manufacturer').Text}
+				[Utils]::ObjHash($children,'Manufacturer').Tag = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+			}
+			
+			$query = @"
+update assets
+	set 
+		model = @model,
+		firmware = @firmware,
+		hostname = @hostname,
+		ip = @ip,
+		description = @description,
+		osKey = @osKey,
+		location = @location,
+		operatingSystemId = @operatingSystemId,
+		deviceTypeId = @deviceTypeId,
+		vendorId = @vendorId
+	where
+		id = @assetId
+"@
+			$params = @{
+				"@model" = ([Utils]::ObjHash($children,'Model').Text);
+				"@firmware" = ([Utils]::ObjHash($children,'Firmware').Text);
+				"@hostname" = ([Utils]::ObjHash($children,'Hostname').Text);
+				"ip" = ([Utils]::ObjHash($children,'IP').Text);
+				"@description" = ([Utils]::ObjHash($children,'Description').Text);
+				"@osKey" = ([Utils]::ObjHash($children,'osKey').Text);
+				"@location" = ([Utils]::ObjHash($children,'Location').Text);
+				"@operatingSystemId" = ([Utils]::ObjHash($children,'OS').Tag);
+				"@deviceTypeId" = ([Utils]::ObjHash($children,'deviceType').Tag);
+				"@vendorId" = ([Utils]::ObjHash($children,'Manufacturer').Tag);
+				"@assetId" = $this.viewModel.assetSelItem.Id;
+			}
+			
+			if([Utils]::IsBlank($this.viewModel.assetSelItem.Id) -ne $true){
+				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery()
+			}
+			
+			$global:csts.controllers.Packages.showHardware()
+			[GUI]::Get().hideModal()
 		}
 		
 		[void] showAddNewPackage(){

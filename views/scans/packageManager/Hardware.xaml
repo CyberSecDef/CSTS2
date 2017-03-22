@@ -91,7 +91,7 @@
 				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc"  Width="{Binding ElementName=contentDiv, Path=ActualWidth}">
 					<Grid>
 
-						<ListBox x:Name="pkgHwList" Margin="10" ItemsSource="{Binding pkgHardware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended">
+						<ListBox x:Name="pkgHwList" Margin="10" ItemsSource="{Binding pkgHardware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended"  SelectedItem="{Binding Path=assetSelItem, Mode=TwoWay}" >
 							<ListBox.Template>
 								<ControlTemplate>
 									<DockPanel LastChildFill="True">
