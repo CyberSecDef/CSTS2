@@ -131,7 +131,7 @@ begin{
 				#get accounts on selected host
 				$ping = [Net]::Ping($h)
 				if( ($ping.StatusCode -eq 0 -or $ping.StatusCode -eq $null ) -and [Utils]::isBlank($ping.IPV4Address) -eq $false ) {
-					$global:csts.objs.FindDormant.getLocalAccounts($h, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ))
+					$global:csts.vms.FindDormant.getLocalAccounts($h, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ))
 					[System.Windows.Forms.Application]::DoEvents()  | out-null		
 					$global:csts.controllers.accounts.updateFindDormantUI()
 				}
@@ -140,9 +140,9 @@ begin{
 				$global:csts.controllers.accounts.updateFindDormantUI()
 			}
 			
-			if( $global:csts.objs.AD -ne $null){
-				$global:csts.objs.AD.getCheckedItems() | % {
-					$global:csts.objs.FindDormant.getDomainAccounts( $_.tag, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ) )
+			if( $global:csts.vms.AD -ne $null){
+				$global:csts.vms.AD.getCheckedItems() | % {
+					$global:csts.vms.FindDormant.getDomainAccounts( $_.tag, [int]( [GUI]::Get().window.findName('UC').findName('txtNumOfDays').Text ) )
 				}
 			}
 			

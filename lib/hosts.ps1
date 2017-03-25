@@ -80,9 +80,9 @@ begin{
 				$this.parseOU( [GUI]::Get().window.findName('treeAD').SelectedItem.tag) | out-null
 			}
 
-			if($global:csts.objs.AD -ne $null){
-				$global:csts.objs.AD.getCheckedItems()
-				$global:csts.objs.AD.checkedItems | % {
+			if($global:csts.vms.AD -ne $null){
+				$global:csts.vms.AD.getCheckedItems()
+				$global:csts.vms.AD.checkedItems | % {
 					$this.parseOU( $_.tag ) | out-null
 				}
 			}

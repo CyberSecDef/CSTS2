@@ -12,12 +12,12 @@ begin{
 		
 		[void] showScansToPoamUI(){
 			[GUI]::Get().ShowContent("/views/scans/scansToPoam.xaml") | out-null
-			if($global:csts.objs.scansToPoam -eq $null){
-				$global:csts.objs.Add('scansToPoam', ( [ScansToPoam]::new()) )
+			if($global:csts.vms.scansToPoam -eq $null){
+				$global:csts.vms.Add('scansToPoam', ( [ScansToPoam]::new()) )
 			}
 			
 			[GUI]::Get().window.findName('UC').findName('btnExecuteScansToPoam').add_click( {
-				$global:csts.objs.scansToPoam.InvokeScansToPoam()
+				$global:csts.vms.scansToPoam.InvokeScansToPoam()
 				$global:csts.controllers.scans.updateScansToPoamUI() 
 			} ) | out-null
 			
@@ -33,13 +33,13 @@ begin{
 				$this.text = $_.OriginalSource.text
 			} )
 			
-			$global:csts.objs.scansToPoam.Initialize()
+			$global:csts.vms.scansToPoam.Initialize()
 		}
 		
 		[void] updateScansToPoamUI(){
 			if( [GUI]::Get().window.findName('UC').findName('dgScansToPoam') -ne $null){
 				[GUI]::Get().window.findName('UC').findName('dgScansToPoam').Items.Clear()
-				$global:csts.objs.scansToPoam.data | ? { $_.rawRisk -ne 'IV' } | sort { $_.raw, $_.control} | % {
+				$global:csts.vms.scansToPoam.data | ? { $_.rawRisk -ne 'IV' } | sort { $_.raw, $_.control} | % {
 					[GUI]::Get().window.findName('UC').findName('dgScansToPoam').Items.add($_)
 				}
 				[GUI]::Get().window.findName('UC').findName('dgScansToPoam').Items.Refresh()

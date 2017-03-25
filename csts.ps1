@@ -12,7 +12,7 @@ begin{
 	Class CSTS{
 		[String] $execPath;
 		[HashTable]$controllers = @{};
-		[HashTable]$objs = @{};
+		[HashTable]$vms = @{};
 		[HashTable]$libs = @{};
 		$timer = (New-Object System.Windows.Forms.Timer);
 		$self;
@@ -43,8 +43,8 @@ begin{
 			iex '[GUI]::Get().window.findName("btnXls").add_click( { $global:csts.exportXls() } ) | out-null'
 		
 			if ((gwmi win32_computersystem).partofdomain -eq $true) {
-				$global:csts.objs.add('AD', (Get-Object('ActiveDirectory')))
-				$global:csts.objs.AD.buildAdTree()
+				$global:csts.vms.add('AD', (Get-Object('ActiveDirectory')))
+				$global:csts.vms.AD.buildAdTree()
 				
 				# should this be a deselected Item?
 				$global:csts.findName('treeAD').add_MouseUp({
@@ -62,14 +62,14 @@ begin{
 				# load next nodes on select
 				$global:csts.findName('treeAD').add_SelectedItemChanged({
 					if($this.selectedItem){
-						$global:csts.objs.AD.loadLevel($this.selectedItem)
+						$global:csts.vms.AD.loadLevel($this.selectedItem)
 					}
 				})
 				
 				# load next nodes on node expand
 				$global:csts.findName('treeAD').items.add_Expanded({
 					param($e, $s)
-					$global:csts.objs.AD.loadLevel($s.originalSource)
+					$global:csts.vms.AD.loadLevel($s.originalSource)
 				})
 			}
 	
@@ -107,16 +107,12 @@ begin{
 			#only poll if the tool suite has focus
 			$active = (iex "[GUI]::Get().window.isActive")
 			if($active){
+			
 				#dont poll if the a textbox has keyboard focus
-				
-				
 				$focused = $false
 				if(  (iex "[System.Windows.Input.Keyboard]::FocusedElement") -ne $null ){
 					$focused = ( (iex "(([System.Windows.Input.Keyboard]::FocusedElement).GetType()).Name ") -eq "TextBox")
 				}
-				
-				
-				
 				
 				if(! ([bool]$focused) ){
 					#run through all the controllers poll methods
@@ -144,8 +140,13 @@ process{
 	# load any libraries
 	(gci "$($global:csts.execPath)\lib") | % { . "$($_.FullName)" }
 	
+	# load any model definitions
+	(gci "$($global:csts.execPath)\models") | % { . "$($_.FullName)" }
+	
 	# load any object definitions
-	(gci "$($global:csts.execPath)\obj") | % { . "$($_.FullName)" }
+	(gci "$($global:csts.execPath)\viewModels") | % { . "$($_.FullName)" }
+	
+	
 	
 	# load all the controllers
 	(gci "$($global:csts.execPath)\controllers") | % { 

@@ -4,9 +4,9 @@ begin{
 	Class Systems{
 	
 		[void] Poll(){
-			if($global:csts.objs.PreventSleep -ne $null){
-				$global:csts.objs.PreventSleep.pollEvents()
-				if($global:csts.objs.PreventSleep.IsChanged -eq $true){
+			if($global:csts.vms.PreventSleep -ne $null){
+				$global:csts.vms.PreventSleep.pollEvents()
+				if($global:csts.vms.PreventSleep.IsChanged -eq $true){
 					$global:csts.controllers.systems.updatePreventSleepUI()
 				}
 			}
@@ -20,24 +20,24 @@ begin{
 			[GUI]::Get().ShowContent("/views/systems/preventSleep.xaml") | out-null
 			
 			[GUI]::Get().window.findName('UC').findName('btnPrepPrevSleep').add_click( {
-				$global:csts.objs.PreventSleep.Initialize()
+				$global:csts.vms.PreventSleep.Initialize()
 				$global:csts.controllers.systems.updatePreventSleepUI() 
 			} ) | out-null
 			
 			[GUI]::Get().window.findName('UC').findName('btnExecPrevSleep').add_click( { 
-				$global:csts.objs.PreventSleep.InvokePreventSleep()
+				$global:csts.vms.PreventSleep.InvokePreventSleep()
 				$global:csts.controllers.systems.updatePreventSleepUI() 
 			} ) | out-null
 			
-			if($global:csts.objs.PreventSleep -eq $null){
-				$global:csts.objs.Add('PreventSleep', ( [PreventSleep]::new()) )
+			if($global:csts.vms.PreventSleep -eq $null){
+				$global:csts.vms.Add('PreventSleep', ( [PreventSleep]::new()) )
 			}
 		}
 		
 		[void] updatePreventSleepUI(){
 			if( [GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts') -ne $null){
 				[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.Clear()
-				$global:csts.objs.PreventSleep.data | sort { $_.hostname} | % {
+				$global:csts.vms.PreventSleep.data | sort { $_.hostname} | % {
 					[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.add($_)
 				}
 				[GUI]::Get().window.findName('UC').findName('dgPreventSleepHosts').Items.Refresh()

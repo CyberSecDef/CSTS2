@@ -89,10 +89,9 @@ begin{
 			}
 		}
 		
-		[void] ShowContent($path, $viewModel){
-			
-			if($viewModel -ne $null){
-				[GUI]::Get().window.DataContext = $viewModel
+		[void] ShowContent($path, $dataContext){
+			if($dataContext -ne $null){
+				[GUI]::Get().window.DataContext = $dataContext
 			}
 			$uc = [GUI]::Get().parseXaml( "$($global:csts.execpath)/$($path)" )
 			
