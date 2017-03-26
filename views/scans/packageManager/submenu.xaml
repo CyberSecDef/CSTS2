@@ -37,7 +37,7 @@
 			</TextBlock>
 			<TextBlock Grid.Column="1">
 				<Menu Style="{StaticResource ResourceKey=bsTopMenu}">
-					<MenuItem Header="_Software" />
+					<MenuItem Header="_Software" x:Name="mnuSoftware" />
 				</Menu>
 			</TextBlock>
 			<TextBlock Grid.Column="2">

@@ -15,6 +15,8 @@ begin{
 			$this.dataContext | add-member -memberType NoteProperty -name 'pkgSelItem' -value @()
 			$this.dataContext | add-member -memberType NoteProperty -name 'pkgHardware' -value @()
 			$this.dataContext | add-member -memberType NoteProperty -name 'assetSelItem' -value @()
+			$this.dataContext | add-member -memberType NoteProperty -name 'pkgSoftware' -value @()
+
 		}
 		
 		[void] Poll(){
@@ -66,10 +68,36 @@ begin{
 			[GUI]::Get().window.findName('UC').findName('btnAddNewPackage').add_Click( { $global:csts.controllers.PackageManager.showAddNewPackage(); } ) | out-null
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
 			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Delete' } ).add_Click({ $global:csts.vms.ViewModel_PackageManager.deletePkg( [GUI]::Get().window.findName('UC').findName('pkgAvailable').selectedItem.Tag ) }) 
-			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Show Hardware' } ).add_Click({ $global:csts.controllers.PackageManager.showHardware() }) 
+			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Show Hardware' } ).add_Click({ $global:csts.controllers.PackageManager.showHardware() })
+
+			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Show Software' } ).add_Click({ $global:csts.controllers.PackageManager.showSoftware() })
+
+
+			
 			[GUI]::Get().window.findName('UC').findName('pkgAvailable').add_SelectionChanged( { if($_.addedItems.Tag -ne $null){ [GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'), $_.addedItems.Tag ) } } ); 		
 		}
 		
+		[void] showSoftware(){
+			$this.viewPage = 'showSoftware'
+			$this.dataContext.pkgSoftware = @();
+			
+			$global:csts.vms.ViewModel_PackageManager.getPackageSoftware( $this.dataContext.pkgSelItem ) | % {
+				$this.dataContext.pkgSoftware += [psCustomObject]@{ 
+					Id = $_.id;
+					Name = $_.name;
+					Version = $_.version;
+					Vendor = $_.Vendor;
+					Hosts = ( [Model_XAssetsApplications]::Get().Hosts( ($global:csts.controllers.PackageManager.dataContext.pkgSelItem), $_.id ) | % { $_.hostname } ) -join ','
+				}
+			}
+			
+			$this.updateDataContext()
+			[GUI]::Get().ShowContent("/views/scans/packageManager/Software.xaml", $this.dataContext) | out-null
+			$this.showMenu();
+		}
+			
+			
+			
 		[void] showHardware(){
 			$this.viewPage = 'showHardware'
 			$this.dataContext.pkgHardware = @();
@@ -103,7 +131,6 @@ begin{
 			
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Reload Software' } ).add_Click({
 				$global:csts.vms.ViewModel_PackageManager.getHostSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id)
-				# $global:csts.controllers.PackageManager.showHardware()
 			})
 			
 			
@@ -164,7 +191,8 @@ begin{
 			$uc = [GUI]::Get().parseXaml("$($global:csts.execPath)/views/scans/packageManager/submenu.xaml")
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').children.clear()
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').addChild($uc)
-			$uc.findName('mnuHardware').add_Click({ $global:csts.controllers.PackageManager.showHardware() })	
+			$uc.findName('mnuHardware').add_Click({ $global:csts.controllers.PackageManager.showHardware() })
+			$uc.findName('mnuSoftware').add_Click({ $global:csts.controllers.PackageManager.showSoftware() })			
 		}	
 	}
 }

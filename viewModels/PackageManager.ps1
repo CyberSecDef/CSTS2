@@ -390,6 +390,32 @@ update
 			$global:csts.controllers.PackageManager.showHardware()
 		}
 
+		[Object[]] getPackageSoftware($packageId){
+			if(![Utils]::IsBlank($packageId)){
+				$query = @"
+					select 
+						a.id, 
+						a.name, 
+						a.version, 
+						a.vendorId, 
+						(select name from vendors where id = a.vendorId) as Vendor
+					from 
+						applications a
+					where
+						a.id in (select applicationId from xAssetsApplications where packageId = @PackageId)
+					order by 
+						trim(lower(a.name))
+"@
+				$params = @{
+					"@PackageId" = $packageId
+				}
+				return ([SQL]::Get( 'packages.dat' ).query( $query, $params ).execAssoc())
+			}else{
+				return @()
+			}
+		}
+		
+		
 		[Object[]] getPackageHardware($packageId){
 			if(![Utils]::IsBlank($packageId)){
 				$query = @"
@@ -495,7 +521,12 @@ update
 				try{
 					$remoteRegistry = [microsoft.win32.registrykey]::OpenRemoteBaseKey('LocalMachine',"$($asset.hostname)")
 					$apps = @()
-					
+
+					#delete all applications currently associated with 'this' host
+					[Model_XAssetsApplications]::Get().FindBy('assetId', @($assetId)) | % {
+						[Model_XAssetsApplications]::Get().Remove($_.id)
+					}
+
 					foreach($regPath in $regPaths){
 						[System.Windows.Forms.Application]::DoEvents()
 						$remoteRegistryKey = $remoteRegistry.OpenSubKey($regPath)
@@ -508,10 +539,10 @@ update
 								$remoteSoftwareKey = $remoteRegistry.OpenSubKey("$regPath\\$_")
 								if( $remoteSoftwareKey.GetValue("DisplayName") -and $remoteSoftwareKey.GetValue("UninstallString") ){
 									$remReg = @{
-										"Name"  = $remoteSoftwareKey.GetValue("DisplayName") -replace '[^a-zA-Z0-9\- \.]','';
-										"Vendor" = $remoteSoftwareKey.GetValue("Publisher") ;
-										"InstallDate" = $remoteSoftwareKey.GetValue("InstallDate") -replace '[^a-zA-Z0-9\- \.]','';
-										"Version" =$remoteSoftwareKey.GetValue("DisplayVersion") -replace '[^a-zA-Z0-9\- \.]','';
+										"Name"  		= $remoteSoftwareKey.GetValue("DisplayName") -replace '[^a-zA-Z0-9\- \.]','';
+										"Vendor" 		= $remoteSoftwareKey.GetValue("Publisher") ;
+										"InstallDate" 	= $remoteSoftwareKey.GetValue("InstallDate") -replace '[^a-zA-Z0-9\- \.]','';
+										"Version" 		= $remoteSoftwareKey.GetValue("DisplayVersion") -replace '[^a-zA-Z0-9\- \.]','';
 									}
 									if( $remReg.name -notlike '*gdr*' -and $remReg.name -notlike '*security*' -and $remReg.name -notlike '*update*' -and $remReg.name -notlike '*driver*' -and $remReg.name -notlike '*runtime*' -and $remReg.name -notlike '*redistributable*' -and $remReg.name -notlike '*framework*'-and $remReg.name -notlike '*hotfix*'  -and $remReg.name -notlike '*plugin*' -and $remReg.name -notlike '*plug-in*' -and $remReg.name -notlike '*debug*' -and $remReg.name -notlike '*addin*' -and $remReg.name -notlike '*add-in*' -and $remReg.name -notlike '*library*' -and $remReg.name -notlike '*add-on*' -and $remReg.name -notlike '*extension*' -and $remReg.name -notlike '*setup*' -and $remReg.name -notlike '*installer*'){
 										$apps += $remReg
@@ -521,13 +552,71 @@ update
 						}
 					}
 					
-					$apps | ft | out-string | write-host
+					
+					#check for IE
+					$remoteRegistryKey = $remoteRegistry.OpenSubKey("SOFTWARE\\Microsoft\\Internet Explorer")
+					if($remoteRegistryKey -ne $null){
+						$apps += @{
+							"Name"  = "Internet Explorer"
+							"Vendor" = "Microsoft"
+							"InstallDate" = ""
+							"Version" = @( $remoteRegistryKey.getValue("svcVersion"),  $remoteRegistryKey.getValue("version") )[ ( $remoteRegistryKey.getValue("version").toString().subString(0,1) -lt 10 ) ]
+						}
+					}
+					
+					#check for java
+					if( ( test-path "\\$($asset.hostname.Trim())\c`$\Program Files (x86)\Java") -eq $true){
+						gci "\\$($asset.hostname.Trim())\c`$\Program Files (x86)\Java" -recurse -include "java.exe" -errorAction silentlyContinue| % {
+							$apps += @{
+								"Name"  = "Java - 32 Bit"
+								"Vendor" = "Oracle"
+								"InstallDate" = ""
+								"Version" = [system.diagnostics.fileversioninfo]::GetVersionInfo( $_.FullName  ).FileVersion
+							}
+						}
+					}
+					#check for java
+					if( ( test-path "\\$($asset.hostname.Trim())\c`$\Program Files\Java") -eq $true){
+						gci "\\$($asset.hostname.trim())\c`$\Program Files\Java" -recurse -include "java.exe" -errorAction silentlyContinue | % {
+							$apps += @{
+								"Name"  = "Java - 64 Bit"
+								"Vendor" = "Oracle"
+								"InstallDate" = ""
+								"Version" = [system.diagnostics.fileversioninfo]::GetVersionInfo( $_.FullName  ).FileVersion
+							}
+						}
+					}
 					
 					
-					
-					
-					
-					
+					$apps | % {
+						$app = [Model_Applications]::Get().FindBy('NameAndVersion',@( $_.Name, $_.Version ) )
+						if([Utils]::IsBlank($app)){
+							$query = "select id from vendors where name = @Vendor;"
+							$params = @{ '@Vendor' = $_.vendor; }
+							$vendorId = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+							if( [Utils]::IsBlank($vendorId) ){
+								$query = "insert into vendors (name) Values (@Vendor)"
+								[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
+								$query = "select id from vendors where name = @Vendor;"
+								$vendorId = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+							}
+
+							$app = [Model_Applications]::Get().create( $_.name, $_.version, $vendorId)
+						}
+						if(($_.installDate -match "^[1-2][0-9]{3}[0-3][0-9][0-1][0-9]$" )){
+							try{
+								$installDate = [datetime]::ParseExact($_.InstallDate,"yyyyMMdd",$null)
+							}catch{
+								$installDate = $null
+							}
+						}else{
+							$installDate = $null
+						}
+						$install = [Model_XAssetsApplications]::Get().FindBy('InstallDateAndApplicationIdAndAssetIdAndPackageId', @( $InstallDate, $app.id, $assetId, $packageId ))
+						if([Utils]::IsBlank($install)){
+							[Model_XAssetsApplications]::Get().Create( $InstallDate, $app.id, $assetId, $packageId )
+						}
+					}
 				}catch{
 				
 				}
