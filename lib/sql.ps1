@@ -29,10 +29,17 @@ begin{
 					[SQL]::db.dbConnection.open()
 				}
 			}
+			
+			$pragma = New-Object -TypeName System.Data.SQLite.SQLiteCommand
+			$pragma.Connection = [SQL]::db.dbConnection
+			$pragma.CommandText = "pragma journal_mode = TRUNCATE"
+			$pragma.ExecuteNonQuery()
+			
 			return [SQL]::db
 		}
 
 		[SQL] query( $sql){
+		
 			$this.dbCommand = New-Object -TypeName System.Data.SQLite.SQLiteCommand
 			$this.dbCommand.Connection = $this.dbConnection
 			$this.dbCommand.CommandText = $sql
@@ -41,6 +48,7 @@ begin{
 		}
 		
 		[SQL] query( $sql, $parms){
+			# write-host $sql
 			
 			$this.dbCommand = New-Object -TypeName System.Data.SQLite.SQLiteCommand
 			$this.dbCommand.Connection = $this.dbConnection
