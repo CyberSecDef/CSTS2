@@ -69,11 +69,7 @@ begin{
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
 			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Delete' } ).add_Click({ $global:csts.vms.ViewModel_PackageManager.deletePkg( [GUI]::Get().window.findName('UC').findName('pkgAvailable').selectedItem.Tag ) }) 
 			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Show Hardware' } ).add_Click({ $global:csts.controllers.PackageManager.showHardware() })
-
 			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Show Software' } ).add_Click({ $global:csts.controllers.PackageManager.showSoftware() })
-
-
-			
 			[GUI]::Get().window.findName('UC').findName('pkgAvailable').add_SelectionChanged( { if($_.addedItems.Tag -ne $null){ [GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'), $_.addedItems.Tag ) } } ); 		
 		}
 		
@@ -87,13 +83,24 @@ begin{
 					Name = $_.name;
 					Version = $_.version;
 					Vendor = $_.Vendor;
-					Hosts = ( [Model_XAssetsApplications]::Get().Hosts( ($global:csts.controllers.PackageManager.dataContext.pkgSelItem), $_.id ) | % { $_.hostname } ) -join ','
+					Hosts = ( [Model_XAssetsApplications]::Get().Hosts( ($global:csts.controllers.PackageManager.dataContext.pkgSelItem), $_.id ) | % { $_.hostname } ) -join ', '
 				}
 			}
 			
 			$this.updateDataContext()
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Software.xaml", $this.dataContext) | out-null
 			$this.showMenu();
+			
+			
+			[GUI]::Get().window.findName('UC').findName('btnRemSoftware').add_Click( { 
+				$global:csts.vms.ViewModel_PackageManager.removeSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgSwList').selectedItems ) 
+			} )
+			
+			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
+			([GUI]::Get().window.findName('UC').findName('pkgSwList').findName('pkgSoftwareContext').Items | ? { $_.header -eq 'Remove' } ).add_Click({
+				$global:csts.vms.ViewModel_PackageManager.removeSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgSwList').selectedItems )
+				$global:csts.controllers.PackageManager.showSoftware()
+			})
 		}
 			
 			
@@ -121,19 +128,23 @@ begin{
 			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.dataContext) | out-null
 			$this.showMenu();
 			
+			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id)	 } } ) | out-null 			
+			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } );
+			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
+			[GUI]::Get().window.findName('UC').findName('btnImportFromAd').add_Click( { $global:csts.vms.ViewModel_PackageManager.importHosts() } )
+			[GUI]::Get().window.findName('UC').findName('btnRemoveHosts').add_Click( { $global:csts.vms.ViewModel_PackageManager.removeHosts( ([GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems) ) } )
+			[GUI]::Get().window.findName('UC').findName('btnReloadMetadata').add_Click( { $global:csts.vms.ViewModel_PackageManager.reloadMetadata( ( [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems ) ) } )
+			
+			
+			#contextMenu Events
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Reload Metadata' } ).add_Click({ $global:csts.vms.ViewModel_PackageManager.reloadMetadata( ( [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems ) ) })
-			
-			
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Remove' } ).add_Click({
 				$global:csts.vms.ViewModel_PackageManager.removeHost( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id)
 				$global:csts.controllers.PackageManager.showHardware()
-			})
-			
+			})		
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Reload Software' } ).add_Click({
 				$global:csts.vms.ViewModel_PackageManager.getHostSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id)
 			})
-			
-			
 			([GUI]::Get().window.findName('UC').findName('pkgHwList').findName('pkgHardwareContext').Items | ? { $_.header -eq 'Edit' } ).add_Click({
 				$selAsset = $global:csts.vms.ViewModel_PackageManager.getHostInfo( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItem.Id)	
 				$desc = ""
@@ -144,26 +155,19 @@ begin{
 				$fields = @( 
 					[pscustomobject]@{Type = "Textbox";Label = "Hostname";Text = $selAsset.hostname; Name = "Hostname";}
 					[pscustomobject]@{Type = "Textbox";Label = "IP Address";Text = $selAsset.IP; Name = "IP";}
-					[pscustomobject]@{Type = "ComboBox";Label = "Device Type"; Name = "deviceType"; Values = @( [Model_DeviceTypes]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.deviceTypeId}
-					[pscustomobject]@{Type = "ComboBox";Label = "Manufacturer"; Name = "Manufacturer"; Values = @( [Model_Vendors]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.vendorId}
+					[pscustomobject]@{Type = "ComboBox";Label = "Device Type"; Name = "deviceType"; Values = @( [Model_DeviceTypes]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | sort { $_.name} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.deviceTypeId}
+					[pscustomobject]@{Type = "ComboBox";Label = "Manufacturer"; Name = "Manufacturer"; Values = @( [Model_Vendors]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | sort { $_.name} |  %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.vendorId}
 					[pscustomobject]@{Type = "Textbox";Label = "Model";Text = $selAsset.Model; Name = "Model";},
 					[pscustomobject]@{Type = "Textbox";Label = "Firmware";Text = $selAsset.Firmware; Name = "Firmware";}
 					[pscustomobject]@{Type = "Textbox";Label = "Location";Text = $selAsset.Location; Name = "Location";}
 					[pscustomobject]@{Type = "Textbox";Label = "Description";Text = $desc ; Name = "Description";}
-					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [Model_OperatingSystems]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId; "ReadOnly" = $true}
+					[pscustomobject]@{Type = "ComboBox";Label = "Operating System"; Name = "OS"; Values = @( [Model_OperatingSystems]::Get().table() | ? { [UTILS]::IsBlank($_.name) -eq $false} | sort { $_.name} | %{ [psCustomObject]@{Text=$_.Name;Value = $_.id} } ) ; Selected = $selAsset.operatingSystemId; "ReadOnly" = $true}
 					[pscustomobject]@{Type = "Textbox";Label = "OS Key";Text = $selAsset.osKey; Name = "osKey";}
 					[pscustomobject]@{Type = "Actions"; Execute = { $global:csts.controllers.PackageManager.updateAsset() } }
 				)
 				
 				[GUI]::Get().showModal( $fields, "Edit Asset" )
 			})
-			
-			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id)	 } } ) | out-null 			
-			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } );
-			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
-			[GUI]::Get().window.findName('UC').findName('btnImportFromAd').add_Click( { $global:csts.vms.ViewModel_PackageManager.importHosts() } )
-			[GUI]::Get().window.findName('UC').findName('btnRemoveHosts').add_Click( { $global:csts.vms.ViewModel_PackageManager.removeHosts( ([GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems) ) } )
-			[GUI]::Get().window.findName('UC').findName('btnReloadMetadata').add_Click( { $global:csts.vms.ViewModel_PackageManager.reloadMetadata( ( [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems ) ) } )
 		}
 		
 		[void] updateAsset(){

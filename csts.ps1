@@ -146,8 +146,6 @@ process{
 	# load any object definitions
 	(gci "$($global:csts.execPath)\viewModels") | % { . "$($_.FullName)" }
 	
-	
-	
 	# load all the controllers
 	(gci "$($global:csts.execPath)\controllers") | % { 
 		. "$($_.FullName)" | out-null

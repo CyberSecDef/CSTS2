@@ -1,7 +1,6 @@
 [CmdletBinding()]param()
 begin{
 	Class ViewModel_PackageManager{
-	
 		static $name = "ViewModel_PackageManager"
 		static $desc = "Verifies package compliance"
 		
@@ -9,49 +8,13 @@ begin{
 		$dataComp = @()
 		$isChanged = $false
 		
-		$tables = @{
-			"deviceTypes"            = "CREATE TABLE deviceTypes (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (32) UNIQUE);";
-			"resources"              = "CREATE TABLE resources (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (32) UNIQUE);";
-			"scanTypes"              = "CREATE TABLE scanTypes (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (32) UNIQUE);";
-			"statuses"               = "CREATE TABLE statuses (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (32) UNIQUE);";
-			"vendors"                = "CREATE TABLE vendors (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE);";
-			"contacts"               = "CREATE TABLE contacts (id CHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), organization VARCHAR (256) NOT NULL, firstName VARCHAR (64) NOT NULL, lastName VARCHAR (64) NOT NULL, phone VARCHAR (32) NOT NULL, email VARCHAR (256) NOT NULL);";
-			"packages"               = "CREATE TABLE packages (id CHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) NOT NULL, acronym VARCHAR (32) NOT NULL);";
-			"applications"           = "CREATE TABLE applications (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE, version VARCHAR (32) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
-			"assets"                 = "CREATE TABLE assets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), model VARCHAR (64), firmware VARCHAR (64), hostname VARCHAR (64), ip VARCHAR (16), description BLOB, osKey VARCHAR (256), location VARCHAR (256), operatingSystemId VARCHAR (36) REFERENCES operatingSystems (id), deviceTypeId VARCHAR (36) REFERENCES deviceTypes (id), vendorId VARCHAR (36) REFERENCES vendors (id));";
-			"findings"               = "CREATE TABLE findings (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), iaControl VARCHAR (16), grpId VARCHAR (128), vulnId VARCHAR (64), ruleId VARCHAR (64), pluginId VRCHAR (32), impact VARCHAR (16), likelihood VARCHAR (16), rawRisk INT, description BLOB, correctiveAction BLOB, riskStatement BLOB, findingTypeId VARCHAR (36) REFERENCES scanTypes (id) NOT NULL);";
-			"milestones"             = "CREATE TABLE milestones (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (128), scd DATE, statusId VARCHAR (36) REFERENCES statuses (id) NOT NULL);"
-			"mitigations"            = "CREATE TABLE mitigations (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), residualRisk INT, remediated BOOLEAN, mitigation BLOB, comments BLOB);"
-			"operatingSystems"       = "CREATE TABLE operatingSystems (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE, version VARCHAR (32) NOT NULL, vendorId VARCHAR (36) REFERENCES vendors (id) NOT NULL);";
-			"scans"                  = "CREATE TABLE scans (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), scanTypeId VARCHAR (36) REFERENCES scanTypes (id) NOT NULL, name VARCHAR (256) UNIQUE, version VARCHAR (16), release VARCHAR (16), filename VARCHAR (256));";
-			"requirements"           = "CREATE TABLE requirements (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), name VARCHAR (256) UNIQUE, version VARCHAR (16), release VARCHAR (16), credentialed BOOLEAN, requirementTypeId VARCHAR (36) REFERENCES scanTypes (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xAssetsFindings"        = "CREATE TABLE xAssetsFindings (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), comments BLOB, assetId VARCHAR (36) REFERENCES assets (id) NOT NULL, findingId VARCHAR (36) REFERENCES findings (id) NOT NULL, scanId VARCHAR (36) REFERENCES scans (id) NOT NULL, statusId VARCHAR (36) REFERENCES statuses (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xAssetRequirements"     = "CREATE TABLE xAssetRequirements (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), assetId VARCHAR (36) REFERENCES assets (id) NOT NULL, requirementId VARCHAR (36) REFERENCES requirements (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xAssetsScans"           = "CREATE TABLE xAssetsScans (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), scanDate DATE, credentialed BOOLEAN, score DOUBLE, filename VARCHAR (256), assetId VARCHAR (36) REFERENCES assets (id) NOT NULL, scanId VARCHAR (36) REFERENCES scans (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xAssetsApplications"    = "CREATE TABLE xAssetsApplications (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), installDate DATE, applicationId VARCHAR (36) REFERENCES applications (id) NOT NULL, assetId VARCHAR (36) REFERENCES assets (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xFindingsMitigations"   = "CREATE TABLE xFindingsMitigations (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), findingId VARCHAR (36) REFERENCES findings (id) NOT NULL, mitigationId VARCHAR (36) REFERENCES mitigations (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id) NOT NULL);"
-			"xFindingsResources"     = "CREATE TABLE xFindingsResources (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), findingId VARCHAR (36) REFERENCES findings (id) NOT NULL, resourceId VARCHAR (36) REFERENCES resources (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id));";
-			"xMitigationsMilestones" = "CREATE TABLE xMitigationsMilestones (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), findingId VARCHAR (36) REFERENCES findings (id) NOT NULL, mitigationId VARCHAR (36) REFERENCES mitigations (id) NOT NULL, milestoneId VARCHAR (36) REFERENCES milestones (id) NOT NULL, packageId VARCHAR (36) REFERENCES packages (id) NOT NULL);"
-			"xPackageContacts"       = "CREATE TABLE xPackageContacts (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), packageId VARCHAR (36) REFERENCES packages (id) NOT NULL, contactId VARCHAR (36) REFERENCES contacts (id) NOT NULL);";
-			"xPackagesAssets"         = "CREATE TABLE xPackagesAssets (id VARCHAR (36) PRIMARY KEY UNIQUE NOT NULL DEFAULT ((lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))), 2) || '-' || substr('89ab', abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))))), packageId VARCHAR (36) REFERENCES packages (id) NOT NULL, assetId VARCHAR (36) REFERENCES assets (id) NOT NULL);"
-		}
-		
-		$defaults = @{
-			'statuses' = @('Ongoing', 'Completed', 'False Positive', 'Not Applicable', 'Error','Not Reviewed');
-			'deviceTypes' = @('Printer', 'Server', 'Workstation', 'Router', 'Switch');
-			'resources' = @('ISSO', 'System Administator', 'Database Administrator');
-			'scanTypes' = @('ACAS', 'CKL', 'SCAP');
-			'vendors' = @('Microsoft', 'Oracle', 'HP', 'Dell');
-		}
-		
 		[void] addPackage($name, $acronym){
 			$params = @{
 				'@Name' = $name.ToUpper()
 				'@Acronym' = $acronym.ToUpper()
 			}
 			if([Utils]::IsBlank( $params.'@Name') -eq $false -and [Utils]::IsBlank( $params.'@Acronym') -eq $false  ){
-				$query = "Insert into packages (name, acronym) values (@Name, @Acronym);"
-				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery()	
+				[Model_Packages]::Get().create( @{ "name" = $name.ToUpper(); "Acronym" = $acronym.ToUpper() } )	
 			}
 		}
 		
@@ -78,7 +41,7 @@ begin{
 		}
 		
 		[void] Initialize(){
-			$this.verifyDatabase();
+
 		}
 		
 		[object[]] getPackageInfo(){
@@ -104,30 +67,7 @@ order by
 			return [SQL]::Get('packages.dat').query($query).execAssoc()
 		}
 		
-		[void] createTable ( $table ){
-			[SQL]::Get( 'packages.dat' ).query( $this.tables[$table] ).execNonQuery()
-		}
-
-		[bool] verifyTableExists( $table ){
-			$query = "SELECT count(*) as ct FROM sqlite_master WHERE type='table' AND name='$table' COLLATE NOCASE;"
-			$results = [SQL]::Get( 'packages.dat' ).query( $query ).execSingle()
-			return ( [bool]( $results.ct ) )
-		}
 		
-		[bool] verifyTablePopulated( $table ){
-			$query = "SELECT count(*) as ct FROM $table;"
-			$results = [SQL]::Get( 'packages.dat' ).query( $query ).execSingle()
-			return ( [bool]( $results.ct ) )
-		}
-		
-		[void] populateTable( $table ){
-			if($this.defaults.$table -ne $null){
-				$this.defaults.$table | %{
-					[SQL]::Get( 'packages.dat' ).query( "insert into $($table) (name) values ('$($_)');" ).execNonQuery()	
-				}
-			}
-		}
-
 		[void] deletePkg($packageId){
 			$params = @{
 				'@packageId' = $packageId;
@@ -137,7 +77,7 @@ order by
 				[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
 			}
 
-			[SQL]::Get( 'packages.dat' ).query( "delete from packages where id = @packageId" , $params ).execNonQuery()
+			[Model_Packages]::Get().delete( $packageId )
 			$global:csts.controllers.PackageManager.showPkgMgrDashBoard()
 		}
 		
@@ -178,7 +118,6 @@ where
 				'@assetId' = $assetId;
 				'@packageId' = $packageId;
 			}
-			
 
 			$query = "delete from {{{table}}} where packageId = @packageId and assetId = @assetId"
 			@('xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
@@ -188,15 +127,29 @@ where
 			$params = @{
 				'@assetId' = $_.Id;
 			}
-			[SQL]::Get( 'packages.dat' ).query( "delete from assets where id = @assetId" , $params ).execNonQuery()
-
+			[Model_Assets]::Get().delete( $_.id )
+		}
+	
+		[void] removeApp($packageId, $applicationId){
+			$params = @{
+				'@applicationId' = $applicationId;
+				'@packageId' = $packageId;
+			}
+			$query = "delete from xAssetsApplications where packageId = @packageId and applicationId = @applicationId"
+			[SQL]::Get( 'packages.dat' ).query( $query  , $params ).execNonQuery()
+		}
+		
+		[void] removeSoftware($packageId, $applications){
+			$applications | % {
+				$this.removeApp($packageId, $_.Id)
+			}
+			$global:csts.controllers.PackageManager.ShowSoftware()
 		}
 		
 		[void] removeHosts($hosts){
 			$hosts | % {
 				$this.removeHost($global:csts.controllers.PackageManager.dataContext.pkgSelItem, $_.Id)
 			}
-
 			$global:csts.controllers.PackageManager.showHardware()
 		}
 		
@@ -234,49 +187,31 @@ where
 					$hostData.'@model' = ""
 				}
 				
-				$params = @{"@Name" = $os.Caption; "@Version" = $os.Version}				
-				
-				$query = "select id from operatingSystems where name = @Name"
-				$hostData.'@operatingSystemId' = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
-				
+				$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().FindBy(@{"Name" = $os.Caption})[0].id
 				if( [Utils]::IsBlank($hostData.'@operatingSystemId') ){
-					$query = "select id from vendors where name = 'Microsoft';"
-					$osVendor = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()
-					
-					$params = @{ '@Name' = $os.Caption; '@Version' = $os.Version; '@Vendor' = $osVendor; } 					
-					$query = "insert into operatingSystems (Name, Version, VendorId) values (@Name, @Version, @Vendor)"
-					[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
-
-					$params = @{ "@Name" = $os.Caption; "@Version" = $os.Version; }						
-					$query = "select id from operatingSystems where name = @Name and version = @version;"
-					$hostData.'@operatingSystemId' = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()						
+					$osVendor = [Model_Vendors]::Get().findBy(@{ "name" = "Microsoft";} )
+					$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().create( @{ "name" = $os.caption; "version" = $os.version; "vendor" = $osVendor } )[0].id					
 				}
 				
 				if($os.caption -like '*server*'){
-					$query = "select id from deviceTypes where name = 'Server';"
-					$hostData.'@deviceTypeId' = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+					$hostData.'@deviceTypeId' = [Model_DeviceTypes]::Get().findBy( @{"name" = "Server";} )[0].id
 				}else{
-					$query = "select id from deviceTypes where name = 'Workstation';"
-					$hostData.'@deviceTypeId' = [SQL]::Get( 'packages.dat' ).query( $query ).execOne()	
+					$hostData.'@deviceTypeId' = [Model_DeviceTypes]::Get().findBy( @{"name" = "Workstation";} )[0].id
 				}
 				
 				$compSys = gwmi Win32_ComputerSystem -computer $h
 				$vendor = $compSys.Manufacturer
-				$params = @{ '@Vendor' = $vendor; }
-				$query = "select id from vendors where name = @Vendor;"
-				$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
 				
-				if( [Utils]::IsBlank($vid) ){
-					$query = "insert into vendors (name) Values (@Vendor)"
-					[SQL]::Get( 'packages.dat' ).query( $query,$params ).execNonQuery()
-					$query = "select id from vendors where name = @Vendor;"
-					$vid = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
+				$vid = [Model_Vendors]::Get().FindBy( @{ "name" = $vendor } )
+				if( $vid.count -eq 0 ){
+					[Model_Vendors]::Get().create( @{ "name" = $vendor } )
+					$vid = [Model_Vendors]::Get().FindBy( @{ "name" = $vendor } )
 				}
-				$hostdata.'@vendorId' = $vid
+				$hostdata.'@vendorId' = $vid[0].id
 				
 				try{
 				
-				$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$h)
+					$remoteReg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,$h)
 					If ($OS.OSArchitecture -eq '64-bit') {
 						$value = $remoteReg.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DigitalProductId4')
 						$hostData.'@osKey' = [Utils]::decodeProductKey($value)
@@ -360,33 +295,24 @@ update
 				if($exists.length -eq 0){
 					
 					$metaData = $this.getMetaData($hostname)
-					$query = "insert into assets (hostname, ip, model, firmware, osKey, description, location, operatingSystemId, deviceTypeId, vendorId) values ( @hostname, @ip, @model, @firmware, @osKey, @description, @location, @operatingSystemId, @deviceTypeId, @vendorId)"
-
-					$params = @{
-						'@ip' = $ip;
-						'@hostname' = $hostname;
-						'@model' = $metaData.'@model';
-						'@firmware' = $metaData.'@firmware';
-						'@osKey' = $metaData.'@osKey';
-						'@description' = $metaData.'@description';
-						'@location' = $metaData.'@location';
-						'@operatingSystemId' = $metaData.'@operatingSystemId';
-						'@deviceTypeId' = $metaData.'@deviceTypeId';
-						'@vendorId' = $metaData.'@vendorId';
-					}
-
-					$assetRowid = [SQL]::Get( 'packages.dat' ).query( $query, $params).execNonQuery()
+					$asset = [Model_Assets]::Get().create(
+						@{
+							'ip' = $ip;
+							'hostname' = $hostname;
+							'model' = $metaData.'@model';
+							'firmware' = $metaData.'@firmware';
+							'osKey' = $metaData.'@osKey';
+							'description' = $metaData.'@description';
+							'location' = $metaData.'@location';
+							'operatingSystemId' = $metaData.'@operatingSystemId';
+							'deviceTypeId' = $metaData.'@deviceTypeId';
+							'vendorId' = $metaData.'@vendorId';
+						}
+					)
 					
-					$params=@{'@rowid' = $assetRowid}
-					$assetGuid = [SQL]::Get( 'packages.dat').query( 'select id from assets where rowid = @rowid', $params).ExecOne()
-					
-					
-					$params = @{'@packageId' = $packageId; '@assetId' = $assetGuid;}
-					$query = "insert into xPackagesAssets (packageId, assetId) values (@packageId,@assetId)"
-					[SQL]::Get( 'packages.dat').query( $query, $params).ExecNonQuery()
+					[Model_XPackagesAssets]::Get().create( @{ "packageId" = $packageId; "assetId" = $asset.id } )
 				}
 			}
-			
 			$global:csts.controllers.PackageManager.showHardware()
 		}
 
@@ -447,41 +373,18 @@ update
 			}
 		}
 		
-		
-		[void] verifyDatabase(){
-			[Model_DeviceTypes]::Get()
-		
-			$this.tables.keys | % {
-				if(!$this.verifyTableExists($_)){
-					
-					$this.createTable($_)
-				}
-				if(!$this.verifyTablePopulated($_) -and $this.defaults.$($_) -ne $null){
-					$this.populateTable($_)
-				}
-			}
-		}
-		
 		[void] updateAssetData($children){
 			#if deviceTypeTag is blank...that means a new one was added....add it to the db
 			if( [Utils]::IsBlank([Utils]::ObjHash($children,'deviceType').Tag) -eq $true){
-				$query = "insert into deviceTypes (name) values (@name);"
-				$params = @{ "@name" = [Utils]::ObjHash($children,'deviceType').Text }
-				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery() 
-				
-				$query = "select id from deviceTypes where name = @name"
-				$params = @{ "@name" = [Utils]::ObjHash($children,'deviceType').Text}
-				[Utils]::ObjHash($children,'deviceType').Tag = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+				[Utils]::ObjHash($children,'deviceType').Tag = [Model_DeviceTypes]::Get().Create( @{ "name" = [Utils]::ObjHash($children,'deviceType').Text } )[0].id
 			}
 			
 			if( [Utils]::IsBlank([Utils]::ObjHash($children,'Manufacturer').Tag) -eq $true){
-				$query = "insert into vendors (name) values (@name);"
-				$params = @{ "@name" = [Utils]::ObjHash($children,'Manufacturer').Text }
-				[SQL]::Get( 'packages.dat' ).query( $query, $params ).execNonQuery() 
-				
-				$query = "select id from vendors where name = @name"
-				$params = @{ "@name" = [Utils]::ObjHash($children,'Manufacturer').Text}
-				[Utils]::ObjHash($children,'Manufacturer').Tag = [SQL]::Get( 'packages.dat' ).query( $query, $params ).execOne()
+				$vendor = [Model_Vendors]::Get().findBy( @{ "name" = [Utils]::ObjHash($children,'Manufacturer').Text } )
+				if($vendor.ct -eq 0){
+					$vendor = [Model_Vendors]::Get().create( @{ "name" = [Utils]::ObjHash($children,'Manufacturer').Text } )
+				}
+				[Utils]::ObjHash($children,'Manufacturer').Tag = $vendor[0].name
 			}
 			
 			$query = " update assets set model = @model, firmware = @firmware, hostname = @hostname, ip = @ip, description = @description, osKey = @osKey, location = @location, operatingSystemId = @operatingSystemId, deviceTypeId = @deviceTypeId, vendorId = @vendorId where id = @assetId "
@@ -522,12 +425,23 @@ update
 					$remoteRegistry = [microsoft.win32.registrykey]::OpenRemoteBaseKey('LocalMachine',"$($asset.hostname)")
 					$apps = @()
 
+					$existing = [Model_XAssetsApplications]::Get().FindBy( @{'assetId' = $assetId } )
 					#delete all applications currently associated with 'this' host
-					[Model_XAssetsApplications]::Get().FindBy('assetId', @($assetId)) | % {
-						[Model_XAssetsApplications]::Get().Remove($_.id)
-					}
+					$i = 0
+					$total = $existing.total + 1
 
+					$existing | % {
+						$i++
+						[GUI]::Get().showModal( @( [pscustomobject]@{ Type="Progress"; Text = "Deleting Existing Software on $($asset.hostname.trim())"; Progress = $($i/$total*33) } ), "Deleting Software" )
+						[Model_XAssetsApplications]::Get().Delete($_.id)
+					}
+	
+					$i = 0
+					$total = $regPaths.count+1
 					foreach($regPath in $regPaths){
+						$i++
+						[GUI]::Get().showModal( @( [pscustomobject]@{ Type="Progress"; Text = "Retrieving Software on $($asset.hostname.trim())"; Progress = $($i/$total*33 + 33) } ), "Retrieving Software" )
+					
 						[System.Windows.Forms.Application]::DoEvents()
 						$remoteRegistryKey = $remoteRegistry.OpenSubKey($regPath)
 						
@@ -538,14 +452,14 @@ update
 								[System.Windows.Forms.Application]::DoEvents()
 								$remoteSoftwareKey = $remoteRegistry.OpenSubKey("$regPath\\$_")
 								if( $remoteSoftwareKey.GetValue("DisplayName") -and $remoteSoftwareKey.GetValue("UninstallString") ){
-									$remReg = @{
+									$_ = @{
 										"Name"  		= $remoteSoftwareKey.GetValue("DisplayName") -replace '[^a-zA-Z0-9\- \.]','';
 										"Vendor" 		= $remoteSoftwareKey.GetValue("Publisher") ;
 										"InstallDate" 	= $remoteSoftwareKey.GetValue("InstallDate") -replace '[^a-zA-Z0-9\- \.]','';
 										"Version" 		= $remoteSoftwareKey.GetValue("DisplayVersion") -replace '[^a-zA-Z0-9\- \.]','';
 									}
-									if( $remReg.name -notlike '*gdr*' -and $remReg.name -notlike '*security*' -and $remReg.name -notlike '*update*' -and $remReg.name -notlike '*driver*' -and $remReg.name -notlike '*runtime*' -and $remReg.name -notlike '*redistributable*' -and $remReg.name -notlike '*framework*'-and $remReg.name -notlike '*hotfix*'  -and $remReg.name -notlike '*plugin*' -and $remReg.name -notlike '*plug-in*' -and $remReg.name -notlike '*debug*' -and $remReg.name -notlike '*addin*' -and $remReg.name -notlike '*add-in*' -and $remReg.name -notlike '*library*' -and $remReg.name -notlike '*add-on*' -and $remReg.name -notlike '*extension*' -and $remReg.name -notlike '*setup*' -and $remReg.name -notlike '*installer*'){
-										$apps += $remReg
+									if( $_.name -notlike '*gdr*' -and $_.name -notlike '*compiler*' -and $_.name -notlike '*tool*' -and $_.name -notlike '*sdk*' -and $_.name -notlike '*security*' -and $_.name -notlike '*update*' -and $_.name -notlike '*driver*' -and $_.name -notlike '*runtime*' -and $_.name -notlike '*redistributable*' -and $_.name -notlike '*framework*'-and $_.name -notlike '*hotfix*'  -and $_.name -notlike '*plugin*' -and $_.name -notlike '*plug-in*' -and $_.name -notlike '*debug*' -and $_.name -notlike '*addin*' -and $_.name -notlike '*add-in*' -and $_.name -notlike '*library*' -and $_.name -notlike '*add-on*' -and $_.name -notlike '*extension*' -and $_.name -notlike '*setup*' -and $_.name -notlike '*installer*'){
+										$apps += $_
 									}
 								}
 							}
@@ -588,7 +502,13 @@ update
 					}
 					
 					
+					$i = 0
+					$total = $apps.count + 1
 					$apps | % {
+						$i ++
+						
+						[GUI]::Get().showModal( @( [pscustomobject]@{ Type="Progress"; Text = "Storing Software on $($asset.hostname.trim())"; Progress = $( $i/$total*33 + 66) } ), "Storing Results" )
+					
 						$app = [Model_Applications]::Get().FindBy('NameAndVersion',@( $_.Name, $_.Version ) )
 						if([Utils]::IsBlank($app)){
 							$query = "select id from vendors where name = @Vendor;"
@@ -601,7 +521,7 @@ update
 								$vendorId = [SQL]::Get( 'packages.dat' ).query( $query,$params ).execOne()
 							}
 
-							$app = [Model_Applications]::Get().create( $_.name, $_.version, $vendorId)
+							$app = [Model_Applications]::Get().create( @{ "name" = $_.name; "version" = $_.version; "vendorId" = $vendorId } )
 						}
 						if(($_.installDate -match "^[1-2][0-9]{3}[0-3][0-9][0-1][0-9]$" )){
 							try{
@@ -612,11 +532,13 @@ update
 						}else{
 							$installDate = $null
 						}
-						$install = [Model_XAssetsApplications]::Get().FindBy('InstallDateAndApplicationIdAndAssetIdAndPackageId', @( $InstallDate, $app.id, $assetId, $packageId ))
+						$install = [Model_XAssetsApplications]::Get().FindBy( @{ "InstallDate" = $installDate; "applicationId" = $app.id; "assetId" = $assetId; "packageId" = $packageId } )
 						if([Utils]::IsBlank($install)){
-							[Model_XAssetsApplications]::Get().Create( $InstallDate, $app.id, $assetId, $packageId )
+							[Model_XAssetsApplications]::Get().Create( @{ "InstallDate" = $InstallDate; "applicationId" = $app.id; "assetId" = $assetId; "packageId" = $packageId } )
 						}
+
 					}
+					[GUI]::Get().hideModal()
 				}catch{
 				
 				}

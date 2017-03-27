@@ -39,7 +39,7 @@
 					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 
-				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="1"> Applications: </TextBlock>
+				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="1"> Packages: </TextBlock>
 				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="2">
 
 				<ComboBox Name="cboPkgs" ItemsSource="{Binding cboPkgs}" Width="200">
@@ -59,13 +59,11 @@
 
 			<Grid Grid.Column="1"  Grid.Row="3" x:Name="pkgSoftwareControls">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
+
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
-				<Button x:Name="btnAddSoftware" 	Style="{StaticResource btnSuccess}" Content="Add Software" 		Grid.Row="1" Grid.Column="0"/>
-				<Button x:Name="btnRemSoftware"  	Style="{StaticResource btnDanger}" 	Content="Remove Software" 	Grid.Row="1" Grid.Column="1"/>
-				<Button x:Name="btnReloadSoftware" 	Style="{StaticResource btnPrimary}" Content="Reload Software" 	Grid.Row="1" Grid.Column="2"/>
+				<Button x:Name="btnRemSoftware"  	Style="{StaticResource btnDanger}" 	Content="Remove Software" 	Grid.Row="1" Grid.Column="0"/>
+				
 			</Grid>
 
 			<Grid Grid.Column="0" Grid.ColumnSpan="3"  Grid.Row="4" x:Name="packageDisplayTable">
@@ -89,7 +87,7 @@
 				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc"  Width="{Binding ElementName=contentDiv, Path=ActualWidth}">
 					<Grid>
 
-						<ListBox x:Name="pkgHwList" Margin="10" ItemsSource="{Binding pkgSoftware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended"  SelectedItem="{Binding Path=assetSelItem, Mode=TwoWay}" >
+						<ListBox x:Name="pkgSwList" Margin="10" ItemsSource="{Binding pkgSoftware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended"  SelectedItem="{Binding Path=assetSelItem, Mode=TwoWay}" >
 							<ListBox.Template>
 								<ControlTemplate>
 									<DockPanel LastChildFill="True">
@@ -113,9 +111,7 @@
 
 							<ListBox.ContextMenu>
 								<ContextMenu x:Name="pkgSoftwareContext">
-									<MenuItem Header="Edit" x:Name="btnEditSoftware"/>
 									<MenuItem Header="Remove" x:Name="btnRemoveSoftware"/>
-									<MenuItem Header="Reload Software" x:Name="btnReloadSW"/>
 								</ContextMenu>
 							</ListBox.ContextMenu>
 
