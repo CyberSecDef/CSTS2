@@ -29,7 +29,7 @@
 			</Grid.RowDefinitions>
 
 			<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.ColumnSpan="3" Grid.Column="0" >
-				<TextBlock x:Name="pkgMgrHome">Package Manager - Software</TextBlock>
+				<TextBlock x:Name="pkgMgrHome">Package Manager - Hardware</TextBlock>
 			</TextBlock>
 
 			<Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
@@ -41,6 +41,8 @@
 
 				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="1"> Packages: </TextBlock>
 				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="2">
+
+ 				<Button Content="Go" Name="btnPkgs"/>
 
 				<ComboBox Name="cboPkgs" ItemsSource="{Binding cboPkgs}" Width="200">
 					<ComboBox.ItemTemplate>
@@ -57,13 +59,17 @@
 
 			<Grid x:Name="pkgTopMenu" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Style="{StaticResource ResourceKey=bsTopSubNavBar}" />
 
-			<Grid Grid.Column="1"  Grid.Row="3" x:Name="pkgSoftwareControls">
+			<Grid Grid.Column="1"  Grid.Row="3" x:Name="pkgHardwareControls">
 				<Grid.ColumnDefinitions>
-
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
-				<Button x:Name="btnRemSoftware"  	Style="{StaticResource btnDanger}" 	Content="Remove Software" 	Grid.Row="1" Grid.Column="0"/>
-				
+				<Button x:Name="btnImportFromAd" Style="{StaticResource btnInfo}" Content="Import" Grid.Row="1" Grid.Column="0"/>
+				<Button x:Name="btnRemoveHosts" Style="{StaticResource btnDanger}" Content="Remove" Grid.Row="1" Grid.Column="1"/>
+				<Button x:Name="btnReloadMetadata" Style="{StaticResource btnSuccess}" Content="Reload Metadata" Grid.Row="1" Grid.Column="2"/>
+				<Button x:Name="btnReloadSoftware" Style="{StaticResource btnInfo}" Content="Reload Software" Grid.Row="1" Grid.Column="3"/>
 			</Grid>
 
 			<Grid Grid.Column="0" Grid.ColumnSpan="3"  Grid.Row="4" x:Name="packageDisplayTable">
@@ -84,25 +90,33 @@
 					</Style>
 				</Grid.Resources>
 
-				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc"  Width="{Binding ElementName=contentDiv, Path=ActualWidth}">
+				<Border BorderThickness="0,0,0,1" BorderBrush="#cccccc" >
 					<Grid>
 
-						<ListBox x:Name="pkgSwList" Margin="10" ItemsSource="{Binding pkgSoftware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended"  SelectedItem="{Binding Path=assetSelItem, Mode=TwoWay}" >
+						<ListBox x:Name="pkgHwList" Margin="10" ItemsSource="{Binding pkgHardware}" HorizontalContentAlignment="Stretch" AlternationCount="2" BorderBrush="#e1e1e8" ItemContainerStyle="{StaticResource alternatingWithBinding}" Grid.Row="0" Grid.Column="0" SelectionMode="Extended"  SelectedItem="{Binding Path=assetSelItem, Mode=TwoWay}" >
 							<ListBox.Template>
 								<ControlTemplate>
 									<DockPanel LastChildFill="True">
 										<Grid DockPanel.Dock="Top" Height="30" Style="{StaticResource tblHeader}">
 											<Grid.ColumnDefinitions>
-												<ColumnDefinition Width="300"/>
 												<ColumnDefinition Width="150"/>
-												<ColumnDefinition Width="300"/>
+												<ColumnDefinition Width="150"/>
 												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="125"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
 
-											<Label Grid.Column="0" Width="300">Name</Label>
-											<Label Grid.Column="1" Width="150">Version</Label>
-											<Label Grid.Column="2" Width="300">Vendor</Label>
-											<Label Grid.Column="3" Width="100">Hosts</Label>
+											<Label Grid.Column="0" Width="150">Hostname</Label>
+											<Label Grid.Column="1" Width="150">IP</Label>
+											<Label Grid.Column="2" Width="100">Device Type</Label>
+											<Label Grid.Column="3" Width="125">OS</Label>
+											<Label Grid.Column="4" Width="100">Vendor</Label>
+											<Label Grid.Column="5" Width="100">Model</Label>
+											<Label Grid.Column="6" Width="100">Firmware</Label>
+											<Label Grid.Column="8" >Description</Label>
 										</Grid>
 										<ItemsPresenter></ItemsPresenter>
 									</DockPanel>
@@ -110,8 +124,11 @@
 							</ListBox.Template>
 
 							<ListBox.ContextMenu>
-								<ContextMenu x:Name="pkgSoftwareContext">
-									<MenuItem Header="Remove" x:Name="btnRemoveSoftware"/>
+								<ContextMenu x:Name="pkgHardwareContext">
+									<MenuItem Header="Edit" x:Name="btnEditAsset"/>
+									<MenuItem Header="Remove" x:Name="btnRemoveAsset"/>
+									<MenuItem Header="Reload Metadata" x:Name="btnReloadMeta"/>
+									<MenuItem Header="Reload Software" x:Name="btnReloadSW"/>
 								</ContextMenu>
 							</ListBox.ContextMenu>
 
@@ -120,15 +137,24 @@
 									<Border BorderThickness="0,1,0,0"  BorderBrush="#cccccc"  >
 										<Grid  >
 											<Grid.ColumnDefinitions>
-												<ColumnDefinition Width="300"/>
 												<ColumnDefinition Width="150"/>
-												<ColumnDefinition Width="300"/>
+												<ColumnDefinition Width="150"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="125"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
+												<ColumnDefinition Width="100"/>
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Name}"  TextWrapping="Wrap" Grid.Column="0"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Version}" TextWrapping="Wrap"  Grid.Column="1"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}" TextWrapping="Wrap" Grid.Column="2"/>
-												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Hosts}" TextWrapping="Wrap"  Grid.Column="3"/>
+
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Hostname}"  Grid.Column="0"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=IP}"  Grid.Column="1"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=DeviceType}" TextWrapping="Wrap" Grid.Column="2"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=OS}" TextWrapping="Wrap"  Grid.Column="3"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Vendor}" TextWrapping="Wrap" Grid.Column="4"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=Model}" TextWrapping="Wrap" Grid.Column="5"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=firmware}" TextWrapping="Wrap" Grid.Column="6"/>
+												<TextBlock  Style="{StaticResource normalText}" Text="{Binding Path=description}" TextWrapping="Wrap"  Grid.Column="7"/>
 										</Grid>
 									</Border>
 								</DataTemplate>

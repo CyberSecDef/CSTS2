@@ -26,7 +26,16 @@ begin{
 			$params = @{"@assetId" = $assetId; "@packageId" = $packageId}
 			return [SQL]::Get('packages.dat').query($query,$params).execAssoc();	
 		}
-		
+
+		[void] removeApp($packageId, $applicationId){
+			$params = @{
+				'@applicationId' = $applicationId;
+				'@packageId' = $packageId;
+			}
+			$query = "delete from xAssetsApplications where packageId = @packageId and applicationId = @applicationId"
+			[SQL]::Get( 'packages.dat' ).query( $query  , $params ).execNonQuery()
+		}
+	
 	}
 }
 Process{

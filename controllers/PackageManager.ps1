@@ -16,7 +16,6 @@ begin{
 			$this.dataContext | add-member -memberType NoteProperty -name 'pkgHardware' -value @()
 			$this.dataContext | add-member -memberType NoteProperty -name 'assetSelItem' -value @()
 			$this.dataContext | add-member -memberType NoteProperty -name 'pkgSoftware' -value @()
-
 		}
 		
 		[void] Poll(){
@@ -60,11 +59,12 @@ begin{
 		[void] showPkgMgrDashBoard(){
 			$this.updateDataContext()
 			
-			[GUI]::Get().ShowContent("/views/scans/packageManager/Dashboard.xaml", $this.dataContext) | out-null
+			[GUI]::Get().ShowContent("/views/packageManager/Dashboard.xaml", $this.dataContext) | out-null
 			$this.showMenu();
 
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id) } } ) | out-null
 			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } );
+			[GUI]::Get().window.findName('UC').findName('btnPkgs').add_Click( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard() } )
 			[GUI]::Get().window.findName('UC').findName('btnAddNewPackage').add_Click( { $global:csts.controllers.PackageManager.showAddNewPackage(); } ) | out-null
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
 			([GUI]::Get().window.findName('UC').findName('pkgAvailable').findName('pkgContext').Items | ? { $_.header -eq 'Delete' } ).add_Click({ $global:csts.vms.ViewModel_PackageManager.deletePkg( [GUI]::Get().window.findName('UC').findName('pkgAvailable').selectedItem.Tag ) }) 
@@ -88,15 +88,13 @@ begin{
 			}
 			
 			$this.updateDataContext()
-			[GUI]::Get().ShowContent("/views/scans/packageManager/Software.xaml", $this.dataContext) | out-null
+			[GUI]::Get().ShowContent("/views/packageManager/Software.xaml", $this.dataContext) | out-null
 			$this.showMenu();
 			
-			
-			[GUI]::Get().window.findName('UC').findName('btnRemSoftware').add_Click( { 
-				$global:csts.vms.ViewModel_PackageManager.removeSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgSwList').selectedItems ) 
-			} )
-			
+			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id);  } } ) | out-null
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
+			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } );
+			[GUI]::Get().window.findName('UC').findName('btnPkgs').add_Click( { $global:csts.controllers.PackageManager.showSoftware() } )
 			([GUI]::Get().window.findName('UC').findName('pkgSwList').findName('pkgSoftwareContext').Items | ? { $_.header -eq 'Remove' } ).add_Click({
 				$global:csts.vms.ViewModel_PackageManager.removeSoftware( $global:csts.controllers.PackageManager.dataContext.pkgSelItem, [GUI]::Get().window.findName('UC').findName('pkgSwList').selectedItems )
 				$global:csts.controllers.PackageManager.showSoftware()
@@ -125,12 +123,13 @@ begin{
 			}
 			
 			$this.updateDataContext()
-			[GUI]::Get().ShowContent("/views/scans/packageManager/Hardware.xaml", $this.dataContext) | out-null
+			[GUI]::Get().ShowContent("/views/packageManager/Hardware.xaml", $this.dataContext) | out-null
 			$this.showMenu();
 			
-			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id)	 } } ) | out-null 			
+			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id);  } } ) | out-null 			
 			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } );
 			[GUI]::Get().cboSelectItem( [GUI]::Get().window.findName('UC').findName('cboPkgs'),$this.dataContext.pkgSelItem )
+			[GUI]::Get().window.findName('UC').findName('btnPkgs').add_Click( { $global:csts.controllers.PackageManager.showHardware() } )
 			[GUI]::Get().window.findName('UC').findName('btnImportFromAd').add_Click( { $global:csts.vms.ViewModel_PackageManager.importHosts() } )
 			[GUI]::Get().window.findName('UC').findName('btnRemoveHosts').add_Click( { $global:csts.vms.ViewModel_PackageManager.removeHosts( ([GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems) ) } )
 			[GUI]::Get().window.findName('UC').findName('btnReloadMetadata').add_Click( { $global:csts.vms.ViewModel_PackageManager.reloadMetadata( ( [GUI]::Get().window.findName('UC').findName('pkgHwList').selectedItems ) ) } )
@@ -180,10 +179,11 @@ begin{
 		
 		[void] showAddNewPackage(){
 			$this.updateDataContext()
-			[GUI]::Get().ShowContent("/views/scans/packageManager/AddPackage.xaml", $this.dataContext) | out-null
+			[GUI]::Get().ShowContent("/views/packageManager/AddPackage.xaml", $this.dataContext) | out-null
 			$this.showMenu();
 			
 			[GUI]::Get().window.findName('UC').findName('cboPkgs').add_SelectionChanged( { if($this.selectedItem.id -ne $null){ $global:csts.controllers.PackageManager.dataContext.pkgSelItem = $($this.selectedItem.Id) } } ) | out-null
+			[GUI]::Get().window.findName('UC').findName('btnPkgs').add_Click( { $global:csts.controllers.PackageManager.showAddNewPackage() } )
 			[GUI]::Get().window.findName('UC').findName('pkgMgrHome').add_MouseDown( { $global:csts.controllers.PackageManager.showPkgMgrDashBoard(); } ) | out-null;
 			[GUI]::Get().window.findName('UC').findName('txtPkgName').add_TextChanged( { $this.text = $_.OriginalSource.text } ) | out-null;
 			[GUI]::Get().window.findName('UC').findName('txtPkgAcronym').add_TextChanged( { $this.text = $_.OriginalSource.text } ) | out-null;
@@ -192,7 +192,7 @@ begin{
 		}
 		
 		[void] showMenu(){
-			$uc = [GUI]::Get().parseXaml("$($global:csts.execPath)/views/scans/packageManager/submenu.xaml")
+			$uc = [GUI]::Get().parseXaml("$($global:csts.execPath)/views/packageManager/submenu.xaml")
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').children.clear()
 			[GUI]::Get().window.FindName('contentContainer').findName('UC').findName('pkgTopMenu').addChild($uc)
 			$uc.findName('mnuHardware').add_Click({ $global:csts.controllers.PackageManager.showHardware() })

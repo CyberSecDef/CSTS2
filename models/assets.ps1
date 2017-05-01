@@ -12,6 +12,60 @@ begin{
 			}			
 			return [Model_Assets]::model
 		}
+		
+		[Object[]] info( $packageId, $assetId ){
+		$query = @"
+Select 
+	a.id, 
+	a.model, 
+	a.firmware, 
+	a.hostname, 
+	a.ip, 
+	a.description, 
+	a.osKey, 
+	a.location, 
+	a.operatingSystemId, 
+	a.deviceTypeId,
+	a.vendorId,
+	(select name from operatingSystems where id = a.operatingSystemId) as operatingSystem,
+	(select name from deviceTypes where id = a.deviceTypeId) as deviceType,
+	(select name from vendors where id = a.vendorId) as Vendor
+from 
+	assets a
+where 
+	a.id = @assetId
+	and a.id in (select assetId from xPackagesAssets where packageId = @packageId)
+"@
+				$params = @{
+					"@assetId" = $assetId
+					"@packageId" = $packageId
+				}
+							
+			return ( [SQL]::Get( 'packages.dat' ).query( $query, $params ).execSingle() )
+		}
+		
+		[void] delete($packageId, $assetId){
+			$params = @{
+				'@assetId' = $assetId;
+				'@packageId' = $packageId;
+			}
+
+			$query = "delete from {{{table}}} where packageId = @packageId and assetId = @assetId"
+			@('xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
+				[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
+			}
+			
+			$query = "select count(id) from xPackagesAssets where assetId = @assetId"
+			$params = @{ "@assetId" = $assetId }			
+			$assetFound = [SQL]::Get( 'packages.dat' ).query( $query , $params ).execSingle()
+			if($assetFound -eq 0){
+				$query = "delete from assets where assetId = @assetId"
+				$params = @{ "@assetId" = $assetId }			
+				[SQL]::Get( 'packages.dat' ).query( $query , $params ).execNonQuery()
+			}
+			
+			
+		}
 
 	}
 }

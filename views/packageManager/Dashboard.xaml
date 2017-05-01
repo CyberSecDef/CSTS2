@@ -39,7 +39,7 @@
 			
 				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="1"> Packages: </TextBlock>
 				<TextBlock Style="{StaticResource ResourceKey=bsTopNavBar}" Grid.Column="2">
-				
+				<Button Content="Go" Name="btnPkgs"/>
 				<ComboBox Name="cboPkgs" ItemsSource="{Binding cboPkgs}" Width="200">
 					<ComboBox.ItemTemplate>
 						<DataTemplate>

@@ -143,8 +143,11 @@ process{
 	# load any model definitions
 	(gci "$($global:csts.execPath)\models") | % { . "$($_.FullName)" }
 	
-	# load any object definitions
+	# load any viewModels definitions
 	(gci "$($global:csts.execPath)\viewModels") | % { . "$($_.FullName)" }
+	
+	# load all the commander objects
+	(gci "$($global:csts.execPath)\objects") | % { . "$($_.FullName)" }
 	
 	# load all the controllers
 	(gci "$($global:csts.execPath)\controllers") | % { 

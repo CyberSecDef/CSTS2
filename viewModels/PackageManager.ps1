@@ -8,6 +8,14 @@ begin{
 		$dataComp = @()
 		$isChanged = $false
 		
+		[void] Initialize(){
+
+		}
+		
+		ViewModel_PackageManager(){
+			$global:csts.activeModule = $this
+		}
+		
 		[void] addPackage($name, $acronym){
 			$params = @{
 				'@Name' = $name.ToUpper()
@@ -16,10 +24,6 @@ begin{
 			if([Utils]::IsBlank( $params.'@Name') -eq $false -and [Utils]::IsBlank( $params.'@Acronym') -eq $false  ){
 				[Model_Packages]::Get().create( @{ "name" = $name.ToUpper(); "Acronym" = $acronym.ToUpper() } )	
 			}
-		}
-		
-		ViewModel_PackageManager(){
-			$global:csts.activeModule = $this
 		}
 		
 		[void] pollEvents(){
@@ -40,110 +44,23 @@ begin{
 			}
 		}
 		
-		[void] Initialize(){
-
-		}
-		
 		[object[]] getPackageInfo(){
-			$query = @"
-Select 
-    p.id, 
-    p.name, 
-    p.acronym,
-    (select count(*) from xPackagesAssets xpa where xpa.packageId = p.id) as Hardware,
-    (select count(*) from xAssetsApplications xaa where xaa.packageId = p.id) as Software,
-    (select count(*) from xAssetsScans xas where xas.packageId = p.id and xas.scanId in (select id from scans s where s.scanTypeId in ( select id from scanTypes where name = 'ACAS' )) ) as ACAS,
-    (select count(*) from xAssetsScans xas where xas.packageId = p.id and xas.scanId in (select id from scans s where s.scanTypeId in ( select id from scanTypes where name = 'CKL' )) ) as CKL,
-    (select count(*) from xAssetsScans xas where xas.packageId = p.id and xas.scanId in (select id from scans s where s.scanTypeId in ( select id from scanTypes where name = 'SCAP' )) ) as SCAP,
-    (select count(*) from findings f where f.id in ( Select findingId from xAssetsFindings xaf where xaf.packageId = p.id and xaf.statusId in ( select id from statuses where name = 'Open' or name='Error') )) as Open,
-    (select count(*) from findings f where f.id in ( Select findingId from xAssetsFindings xaf where xaf.packageId = p.id and xaf.statusId in ( select id from statuses where name = 'Not Reviewed') )) as NotReviewed,
-    (select count(*) from findings f where f.id in ( Select findingId from xAssetsFindings xaf where xaf.packageId = p.id and xaf.statusId in ( select id from statuses where name = 'Completed' or name = 'False Positive') )) as Completed,
-    (select count(*) from findings f where f.id in ( Select findingId from xAssetsFindings xaf where xaf.packageId = p.id and xaf.statusId in ( select id from statuses where name = 'Not Applicable') )) as NotApplicable
-from 
-	packages p
-order by 
-	p.acronym
-"@
-			return [SQL]::Get('packages.dat').query($query).execAssoc()
+			return [Model_Packages]::Get().PackageInfo()
 		}
 		
 		
 		[void] deletePkg($packageId){
-			$params = @{
-				'@packageId' = $packageId;
-			}
-			$query = "delete from {{{table}}} where packageId = @packageId"
-			@('requirements', 'xPackageContacts', 'xFindingsResources', 'xFindingsMitigations', 'xMitigationsMilestones', 'xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
-				[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
-			}
-
-			[Model_Packages]::Get().delete( $packageId )
+			[Model_Packages]::Get().Delete($packageId);
 			$global:csts.controllers.PackageManager.showPkgMgrDashBoard()
 		}
 		
 		[Object[]] getHostInfo($packageId, $assetId){
-			$query = @"
-Select 
-	a.id, 
-	a.model, 
-	a.firmware, 
-	a.hostname, 
-	a.ip, 
-	a.description, 
-	a.osKey, 
-	a.location, 
-	a.operatingSystemId, 
-	a.deviceTypeId,
-	a.vendorId,
-	(select name from operatingSystems where id = a.operatingSystemId) as operatingSystem,
-	(select name from deviceTypes where id = a.deviceTypeId) as deviceType,
-	(select name from vendors where id = a.vendorId) as Vendor
-from 
-	assets a
-where 
-	a.id = @assetId
-	and a.id in (select assetId from xPackagesAssets where packageId = @packageId)
-"@
-				$params = @{
-					"@assetId" = $assetId
-					"@packageId" = $packageId
-				}
-							
-				return ( [SQL]::Get( 'packages.dat' ).query( $query, $params ).execSingle() )
+			return [Model_Assets]::Get().Info($packageId,$assetId)
 		}
 		
 		
 		[void] removeHost($packageId, $assetId){
-			$params = @{
-				'@assetId' = $assetId;
-				'@packageId' = $packageId;
-			}
-
-			$query = "delete from {{{table}}} where packageId = @packageId and assetId = @assetId"
-			@('xAssetsFindings', 'xAssetsScans', 'xPackagesAssets', 'xAssetsApplications', 'xAssetRequirements') | % {
-				[SQL]::Get( 'packages.dat' ).query( ($query -replace '{{{table}}}', $_) , $params ).execNonQuery()
-			}
-
-			$params = @{
-				'@assetId' = $_.Id;
-			}
-			[Model_Assets]::Get().delete( $_.id )
-		}
-	
-		[void] removeApp($packageId, $applicationId){
-			$params = @{
-				'@applicationId' = $applicationId;
-				'@packageId' = $packageId;
-			}
-			$query = "delete from xAssetsApplications where packageId = @packageId and applicationId = @applicationId"
-			[SQL]::Get( 'packages.dat' ).query( $query  , $params ).execNonQuery()
-		}
-		
-		[void] removeSoftware($packageId, $applications){
-			$applications | % {
-				$this.removeApp($packageId, $_.Id)
-			}
-			$global:csts.controllers.PackageManager.ShowSoftware()
+			[Model_Assets]::Get().Delete($packageId, $assetId)
 		}
 		
 		[void] removeHosts($hosts){
@@ -152,6 +69,26 @@ where
 			}
 			$global:csts.controllers.PackageManager.showHardware()
 		}
+		
+		[void] removeApp($packageId, $applicationId){
+			[Model_XAssetsApplications]::Get().removeApp($packageId, $applicationId)
+		}
+
+		[void] removeSoftware($packageId, $applications){
+			$applications | % {
+				$this.removeApp($packageId, $_.Id)
+			}
+			$global:csts.controllers.PackageManager.ShowSoftware()
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		[Object[]] getMetadata($h){
 			$hostData = [psCustomObject]@{
@@ -187,10 +124,12 @@ where
 					$hostData.'@model' = ""
 				}
 				
-				$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().FindBy(@{"Name" = $os.Caption})[0].id
-				if( [Utils]::IsBlank($hostData.'@operatingSystemId') ){
+				$osCaption = ( [Model_OperatingSystems]::Get().FindBy(@{"Name" = $os.Caption}) )
+				if( [Utils]::IsBlank( $osCaption ) ){
 					$osVendor = [Model_Vendors]::Get().findBy(@{ "name" = "Microsoft";} )
-					$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().create( @{ "name" = $os.caption; "version" = $os.version; "vendor" = $osVendor } )[0].id					
+					$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().create( @{ "name" = $os.caption; "version" = $os.version; "vendorId" = $osVendor } )[0].id					
+				}else{
+					$hostData.'@operatingSystemId' = [Model_OperatingSystems]::Get().FindBy(@{"Name" = $os.Caption})[0].id
 				}
 				
 				if($os.caption -like '*server*'){
